@@ -1,52 +1,5 @@
 # Business Spec: Cash Money Organizer Website
 
-## For who?
-
-This website is for people who keep or manage money in cash and have difficulty organizing it, tracking it, and saving it.
-
-Primary users include:
-
-- People who want to manually track their cash amount.
-- Students or young adults managing pocket money.
-- Small informal sellers or service providers.
-- People who do not use a bank account regularly.
-- People who want a simple, visual way to update and understand how much cash they have.
-
-## Why?
-
-Cash is easy to spend because it is not automatically tracked. Users may forget how much money they received, how much they spent, and how much they wanted to save.
-
-The website helps users:
-
-- See their cash like a bank account balance.
-- Manually modify their money amount.
-- Correct their balance whenever they want.
-- Separate money for saving goals.
-- Understand where their cash is going.
-
-The goal is to make cash feel organized, visible, and easier to control.
-
-## What?
-
-The product is a personal cash management website that looks and feels similar to an online bank account, but it does not hold real money and does not connect to banks.
-
-Users manually enter and update their own cash amount. The website displays a bank-style dashboard with:
-
-- Current cash balance.
-- Recent cash activity.
-- Manual balance changes.
-- Saving goals.
-- Cash categories or envelopes.
-- Monthly overview.
-
-The website must clearly communicate that it is a personal tracking tool, not a real bank account.
-
-## Where?
-
-The website is used in a browser on desktop and mobile.
-
-Users should be able to open it quickly when they want to check or modify their money amount, especially from a phone.
-
 ## Business Goals
 
 - Help users organize cash without needing a real bank account.
@@ -64,39 +17,8 @@ The user can view their total available cash balance.
 The balance is calculated from:
 
 - Starting amount.
-- Money added with the plus action.
-- Money subtracted with the minus action.
+- Recorded cash movements.
 - Manual balance corrections.
-
-### Quick Add and Subtract Controls
-
-Under the main cash balance, the website should show two small icon actions:
-
-- `+` for adding money to the main amount.
-- `-` for subtracting money from the main amount.
-
-These controls are manual balance actions. They do not represent a real bank deposit, bank withdrawal, or payment.
-
-When the user taps the `+` icon:
-
-- The website asks for the amount to add.
-- The entered amount is added to the main cash balance.
-- The action is saved in the balance history as a positive adjustment.
-
-When the user taps the `-` icon:
-
-- The website asks for the amount to subtract.
-- The entered amount is subtracted from the main cash balance.
-- The action is saved in the balance history as a negative adjustment.
-
-Each add or subtract action should include:
-
-- Amount.
-- Date.
-- Action type: added or subtracted.
-- Optional note.
-
-The `+` and `-` icons should appear visually connected to the main amount so the user understands they directly change the displayed balance.
 
 ### Modify Money Amount
 
@@ -169,7 +91,6 @@ The user should be able to edit or delete entries when they make a mistake.
 
 - The first screen should look like a simple bank dashboard.
 - The current cash balance should be the most visible information.
-- Small `+` and `-` icons should appear under the main balance for quick manual changes.
 - Main actions should be easy to find: modify amount, save money, manage envelopes, view history.
 - The website should feel trustworthy, calm, and practical.
 - The interface should work well on mobile.
@@ -200,11 +121,9 @@ Better wording:
 
 1. User opens the website.
 2. User sees their current cash balance.
-3. User taps the `+` icon to add money or the `-` icon to subtract money.
-4. User enters the amount to add or subtract.
-5. User optionally adds a note.
-6. User checks saving goals and cash envelopes.
-7. User reviews history to understand balance changes.
+3. User modifies their cash amount when it changes.
+4. User checks saving goals and cash envelopes.
+5. User reviews history to understand balance changes.
 
 ## Success Metrics
 
