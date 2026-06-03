@@ -28,4 +28,27 @@ Each add or subtract action should include:
 - Action type: added or subtracted.
 - Optional note.
 
+Each modification should include:
+
+- New total amount.
+- Date.
+- Optional note.
+
+Each entry should include:
+
+- Previous amount.
+- New amount.
+- Difference.
+- Date.
+- Optional note.
+
+Each saving goal should include:
+
+- Goal name.
+- Target amount.
+- Current saved amount.
+- Progress indicator.
+
+The user should be able to edit or delete entries when they make a mistake.
+
 The `+` and `-` icons should appear visually connected to the main amount so the user understands they directly change the displayed balance.

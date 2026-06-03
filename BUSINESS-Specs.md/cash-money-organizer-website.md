@@ -24,25 +24,11 @@ The balance is calculated from:
 
 The user can manually change the amount of money shown in the website.
 
-Each modification should include:
-
-- New total amount.
-- Date.
-- Optional note.
-
 ### Balance Adjustment History
 
 The website should save each manual balance change so the user can understand how the amount changed over time.
 
-Each entry should include:
-
-- Previous amount.
-- New amount.
-- Difference.
-- Date.
-- Optional note.
-
-### Modify Balance
+## Modify Balance
 
 The user can manually correct the total balance whenever they want.
 
@@ -57,13 +43,6 @@ The user can create saving goals, such as:
 - Emergency money.
 - Trip.
 - School supplies.
-
-Each saving goal should include:
-
-- Goal name.
-- Target amount.
-- Current saved amount.
-- Progress indicator.
 
 ### Cash Envelopes
 
@@ -84,8 +63,6 @@ The user can see a list of all cash movements:
 - Spent money.
 - Savings transfers.
 - Balance corrections.
-
-The user should be able to edit or delete entries when they make a mistake.
 
 ## User Experience Requirements
 
@@ -128,26 +105,5 @@ Better wording:
 ## Success Metrics
 
 - Users modify their money amount regularly.
-- Users create at least one saving goal.
 - Users reduce unexplained cash loss.
 - Users return to the website to check or update their balance.
-
-## Out of Scope for First Version
-
-- Real bank connections.
-- Payments or money transfers.
-- Credit cards or debit cards.
-- Real account numbers.
-- Loans.
-- Investment features.
-- Multi-user business accounting.
-
-## Future Ideas
-
-- Login and cloud sync.
-- PIN or biometric lock.
-- Charts for monthly spending.
-- Reminders to count cash.
-- Export to PDF or CSV.
-- Multiple currencies.
-- Budget warnings when spending too fast.
