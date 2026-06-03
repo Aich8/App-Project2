@@ -17,8 +17,7 @@ The MVP should help a user:
 - Add or subtract cash manually.
 - Correct the balance when needed.
 - Track balance history.
-- Create saving goals.
-- Divide cash into simple virtual envelopes.
+- Divide cash into simple categories or virtual envelopes.
 - Review recent activity.
 
 ## MVP Scope
@@ -30,9 +29,9 @@ Included in the first version:
 - Subtract money flow with amount, date, and optional note.
 - Manual balance correction flow with new total amount, date, and optional note.
 - Balance adjustment history showing previous amount, new amount, difference, date, type, and note.
-- Saving goals with name, target amount, current saved amount, and progress indicator.
-- Cash envelopes for categories like Spending, Savings, Bills, and Emergency.
-- Activity history for added money, subtracted money, savings transfers, envelope changes, and corrections.
+- Cash envelopes for categories like Daily Spending, Food, Transport, Bills, Set Aside Cash, and Emergency.
+- Envelope summaries showing assigned cash and unassigned cash.
+- Activity history for added money, subtracted money, envelope changes, and corrections.
 - Edit and delete support for activity entries where practical.
 - Responsive layout for mobile and desktop.
 - Clear trust wording that this is a manual cash tracking tool, not a real bank.
@@ -53,7 +52,7 @@ Out of scope for the first version:
 - The balance should always be easy to find and understand.
 - Manual cash changes should feel quick, low-friction, and safe.
 - The interface can look bank-like, but the wording must not imply real banking.
-- The website should use plain language: "Cash balance", "Add to balance", "Subtract from balance", "Modify amount", "Manual correction", and "Saved cash".
+- The website should use plain language: "Cash balance", "Add to balance", "Subtract from balance", "Modify amount", "Manual correction", and "Set aside cash".
 - The first screen should be useful immediately, especially on a phone.
 - The user should not need financial knowledge to use the app.
 
@@ -62,16 +61,15 @@ Out of scope for the first version:
 Primary areas:
 - Dashboard
 - Activity History
-- Saving Goals
-- Cash Envelopes
+- Cash Categories / Envelopes
 - Settings or Data Management
 
 Suggested first-screen layout:
 - Top area: app name and trust label such as "Manual cash tracker".
 - Main balance area: current cash balance.
 - Quick actions: small `+` and `-` icon buttons under the balance.
-- Secondary actions: modify amount, manage goals, manage envelopes.
-- Overview area: recent activity, goals progress, envelope summary, monthly overview.
+- Secondary actions: modify amount, manage envelopes.
+- Overview area: recent activity, envelope summary, monthly overview.
 
 ## Core Data Model
 
@@ -82,7 +80,7 @@ Balance:
 
 Activity entry:
 - ID.
-- Type: added, subtracted, correction, savings transfer, envelope change.
+- Type: added, subtracted, correction, envelope change.
 - Amount.
 - Previous balance.
 - New balance.
@@ -92,19 +90,11 @@ Activity entry:
 - Created date.
 - Updated date.
 
-Saving goal:
-- ID.
-- Name.
-- Target amount.
-- Current saved amount.
-- Progress percentage.
-- Created date.
-- Updated date.
-
 Cash envelope:
 - ID.
 - Name.
 - Amount.
+- Optional color or icon.
 - Optional description.
 - Created date.
 - Updated date.
@@ -118,7 +108,7 @@ Tasks:
 - Create the main application shell.
 - Add responsive layout foundations.
 - Add basic local data persistence.
-- Define shared data types for balance, activities, goals, and envelopes.
+- Define shared data types for balance, activities, and envelopes.
 
 Acceptance criteria:
 - The app opens in a browser.
@@ -132,7 +122,7 @@ Tasks:
 - Display the current cash balance prominently.
 - Add small `+` and `-` icon buttons under the balance.
 - Add clear manual-tracker wording.
-- Add empty states for no history, no goals, and no envelopes.
+- Add empty states for no history and no envelopes.
 
 Acceptance criteria:
 - The balance is the most visible item on the first screen.
@@ -169,35 +159,23 @@ Acceptance criteria:
 - Editing or deleting an entry keeps the balance consistent.
 - Recent activity is visible from the dashboard.
 
-### Milestone 5: Saving Goals
-
-Tasks:
-- Build create goal flow.
-- Build edit and delete goal actions.
-- Display target amount, current saved amount, and progress.
-- Allow moving cash into or out of a goal if included in MVP behavior.
-- Record savings changes in activity history.
-
-Acceptance criteria:
-- A user can create at least one saving goal.
-- Goal progress is visually clear.
-- Savings changes do not make the total cash balance confusing.
-
-### Milestone 6: Cash Envelopes
+### Milestone 5: Cash Categories / Envelopes
 
 Tasks:
 - Build envelope list.
-- Add default envelope suggestions: Spending, Savings, Bills, Emergency.
+- Add default envelope suggestions: Daily Spending, Food, Transport, Bills, Set Aside Cash, Emergency.
 - Build create, edit, and delete envelope actions.
 - Allow assigning or adjusting envelope amounts.
 - Show total allocated cash and unallocated cash.
+- Allow moving cash between envelopes without changing the main balance.
 
 Acceptance criteria:
 - The user can divide their cash into virtual envelopes.
 - Envelope totals are understandable.
 - The app helps the user see how much cash is safe to spend.
+- Envelope changes do not imply real bank transfers or a separate target-tracking feature.
 
-### Milestone 7: Monthly Overview and Polish
+### Milestone 6: Monthly Overview and Polish
 
 Tasks:
 - Add a simple monthly overview.
@@ -212,7 +190,7 @@ Acceptance criteria:
 - The app feels calm, trustworthy, and practical.
 - The interface is usable on phone-sized screens.
 
-### Milestone 8: Verification and Handoff
+### Milestone 7: Verification and Handoff
 
 Tasks:
 - Test the main user flow end to end.
@@ -224,7 +202,7 @@ Tasks:
 - Move this plan from `Docs/Plans/Active` to `Docs/Plans/Done` after completion.
 
 Acceptance criteria:
-- A user can open the app, set a balance, add cash, subtract cash, create a goal, create an envelope, and review history.
+- A user can open the app, set a balance, add cash, subtract cash, create an envelope, and review history.
 - No real banking language or fake account behavior is present.
 - The MVP satisfies the business spec's first-version goals.
 
@@ -236,7 +214,7 @@ Acceptance criteria:
 4. User enters an amount and optional note.
 5. App updates the cash balance.
 6. App saves the action in history.
-7. User reviews goals and envelopes.
+7. User reviews envelopes.
 8. User checks activity history to understand changes.
 
 ## Validation Rules
@@ -244,8 +222,6 @@ Acceptance criteria:
 - Amounts must be numeric.
 - Amounts must be greater than zero for add and subtract actions.
 - Subtracting more than the current balance should require clear handling.
-- Goal target amount must be greater than zero.
-- Goal current saved amount should not be negative.
 - Envelope amount should not be negative.
 - Dates should default to the current date but remain editable if needed.
 - Notes should be optional.
@@ -265,7 +241,7 @@ Use:
 - Subtract from balance.
 - Modify amount.
 - Cash balance.
-- Saved cash.
+- Set aside cash.
 - Manual correction.
 - Manual cash tracker.
 
@@ -278,7 +254,6 @@ Use:
 - Activity history shows correct differences.
 - Editing an activity updates derived balance correctly.
 - Deleting an activity updates derived balance correctly.
-- Saving goals can be created, edited, and deleted.
 - Envelopes can be created, edited, and deleted.
 - App reload keeps saved data.
 - Layout works on mobile.
@@ -288,7 +263,6 @@ Use:
 ## Open Questions
 
 - Should subtracting more than the available balance be blocked, or allowed as a negative cash balance?
-- Should saving goal money reduce available spending cash, or only show as a separate saved amount?
 - Should envelope totals be required to match the cash balance?
 - Should the first version support editing dates, or only use the current date?
 - Should the app include a PIN lock in the first version, or leave it for a future release?
@@ -299,7 +273,7 @@ This plan can move to `Docs/Plans/Done` when:
 - The MVP features listed in scope are implemented.
 - The main user flow works end to end.
 - Manual balance changes are saved in history.
-- Goals and envelopes are usable.
+- Envelopes are usable.
 - Mobile and desktop layouts have been checked.
 - The trust wording has been reviewed.
 - Any remaining known limitations are documented.

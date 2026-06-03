@@ -42,12 +42,16 @@ Each entry should include:
 - Date.
 - Optional note.
 
-Each saving goal should include:
+Each cash category or envelope should include:
 
-- Goal name.
-- Target amount.
-- Current saved amount.
-- Progress indicator.
+- Envelope name.
+- Current assigned amount.
+- Optional color or icon.
+- Optional short description.
+
+The envelope view should show the user how the current cash balance is divided. It should make clear which money is assigned to categories and which money is still unassigned.
+
+Changing an envelope amount should be recorded as an envelope adjustment. Moving money between envelopes should not change the main cash balance.
 
 The user should be able to edit or delete entries when they make a mistake.
 

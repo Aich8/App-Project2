@@ -2,7 +2,7 @@
 
 ## For who?
 
-This website is for people who keep or manage money in cash and have difficulty organizing it, tracking it, and saving it.
+This website is for people who keep or manage money in cash and have difficulty organizing it, tracking it, and keeping it under control.
 
 Primary users include:
 
@@ -21,22 +21,25 @@ Users manually enter and update their own cash amount. The website displays a ba
 - Current cash balance.
 - Recent cash activity.
 - Manual balance changes.
-- Saving goals.
-- Cash categories or envelopes.
-- Monthly overview.
+- Cash categories or envelopes.*
+- Monthly overview.*
 
 The website must clearly communicate that it is a personal tracking tool, not a real bank account.
 
+Cash categories or envelopes should feel like labeled pockets inside the user's cash balance. The user still has one total cash amount, but they can split that amount into practical groups such as food, transport, bills, daily spending, set aside cash, or emergency cash.
+
+In the app, this could look like a small "Cash envelopes" area on the dashboard. Each envelope can show its name, assigned amount, and a simple visual marker such as a color swatch or icon. The user should be able to quickly see what cash is safe to spend, what cash is reserved for bills, and what cash has not been assigned yet.
+
 ## Why?
 
-Cash is easy to spend because it is not automatically tracked. Users may forget how much money they received, how much they spent, and how much they wanted to save.
+Cash is easy to spend because it is not automatically tracked. Users may forget how much money they received, how much they spent, and what cash they meant to keep aside.
 
 The website helps users:
 
 - See their cash like a bank account balance.
 - Manually modify their money amount.
 - Correct their balance whenever they want.
-- Separate money for saving goals.
+- Separate cash into practical categories or envelopes.
 - Understand where their cash is going.
 
 The goal is to make cash feel organized, visible, and easier to control.
