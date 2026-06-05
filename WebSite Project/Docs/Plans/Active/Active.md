@@ -127,6 +127,7 @@ Cash envelope:
 - ID.
 - Name.
 - Amount.
+- Optional color or icon.
 - Optional description.
 - Created date.
 - Updated date.
@@ -236,17 +237,19 @@ Acceptance criteria:
 
 Tasks:
 - Build envelope list.
-- Add default envelope suggestions: Spending, Savings, Bills, Emergency.
+- Add default envelope suggestions: Daily Spending, Food, Transport, Bills, Set Aside Cash, Emergency.
 - Build create, edit, and delete envelope actions.
 - Allow assigning or adjusting envelope amounts.
 - Show total allocated cash and unallocated cash.
+- Allow moving cash between envelopes without changing the main balance.
 
 Acceptance criteria:
 - The user can divide their cash into virtual envelopes.
 - Envelope totals are understandable.
 - The app helps the user see how much cash is safe to spend.
+- Envelope changes do not imply real bank transfers or a separate target-tracking feature.
 
-### Milestone 7: Monthly Overview and Polish
+### Milestone 6: Monthly Overview and Polish
 
 Tasks:
 - Add a simple monthly overview.
@@ -261,7 +264,7 @@ Acceptance criteria:
 - The app feels calm, trustworthy, and practical.
 - The interface is usable on phone-sized screens.
 
-### Milestone 8: Verification and Handoff
+### Milestone 7: Verification and Handoff
 
 Tasks:
 - Test the main user flow end to end.
