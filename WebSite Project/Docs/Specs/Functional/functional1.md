@@ -9,6 +9,8 @@ Under the main cash balance, the website should show two small icon actions:
 
 These controls are manual balance actions. They do not represent a real bank deposit, bank withdrawal, or payment.
 
+The user can add, subtract, or manually modify the cash amount as often or as rarely as they want. There should be no daily, weekly, monthly, or yearly limit on balance changes.
+
 When the user taps the `+` icon:
 
 - The website asks for the amount to add.
@@ -19,6 +21,8 @@ When the user taps the `-` icon:
 
 - The website asks for the amount to subtract.
 - The entered amount is subtracted from the main cash balance.
+- If the entered amount is greater than the current cash balance, the main cash balance is set to `0`.
+- The main cash balance must never go below `0`.
 - The action is saved in the balance history as a negative adjustment.
 
 Each add or subtract action should include:

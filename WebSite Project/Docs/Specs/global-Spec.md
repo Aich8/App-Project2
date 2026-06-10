@@ -14,7 +14,7 @@ Primary users include:
 
 ## What?
 
-The product is a personal cash management website that looks and feels similar to an online bank account, but it does not hold real money and does not connect to banks.
+The product is a personal cash management website that looks and feels similar to an online bank account, but it does not hold real money, does not connect to banks, and does not collect personal information.
 
 Users manually enter and update their own cash amount. The website displays a bank-style dashboard with:
 

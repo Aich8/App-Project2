@@ -45,14 +45,18 @@ Out of scope for the first version:
 - Investments.
 - Multi-user business accounting.
 - Cloud sync or login.
+- Personal information collection.
+- PIN lock or app passcode.
 - Multiple currencies.
 
 ## Product Principles
 
 - The balance should always be easy to find and understand.
 - Manual cash changes should feel quick, low-friction, and safe.
+- Users can add, subtract, or correct their cash amount as often or as rarely as they want.
 - The interface can look bank-like, but the wording must not imply real banking.
 - The website should use plain language: "Cash balance", "Add to balance", "Subtract from balance", "Modify amount", "Manual correction", and "Set aside cash".
+- The website should not ask for personal information because it is only a manual cash tracking tool.
 - The first screen should be useful immediately, especially on a phone.
 - The user should not need financial knowledge to use the app.
 
@@ -142,6 +146,8 @@ Tasks:
 Acceptance criteria:
 - Adding money increases the balance and creates a positive activity entry.
 - Subtracting money decreases the balance and creates a negative activity entry.
+- Subtracting more than the current balance sets the balance to `0` automatically.
+- There is no limit on how many times a user can add, subtract, or correct the balance.
 - Correcting the balance stores previous amount, new amount, and difference.
 - Invalid amounts are blocked with useful feedback.
 
@@ -221,7 +227,7 @@ Acceptance criteria:
 
 - Amounts must be numeric.
 - Amounts must be greater than zero for add and subtract actions.
-- Subtracting more than the current balance should require clear handling.
+- Subtracting more than the current balance should set the balance to `0` automatically; the balance must never go below `0`.
 - Envelope amount should not be negative.
 - Dates should default to the current date but remain editable if needed.
 - Notes should be optional.
@@ -250,6 +256,8 @@ Use:
 - New user can set or modify starting balance.
 - Add money updates balance correctly.
 - Subtract money updates balance correctly.
+- Subtracting more than the current balance sets the balance to `0`.
+- Repeated balance changes work without a daily, weekly, monthly, or yearly limit.
 - Manual correction records previous amount and new amount.
 - Activity history shows correct differences.
 - Editing an activity updates derived balance correctly.
@@ -262,10 +270,7 @@ Use:
 
 ## Open Questions
 
-- Should subtracting more than the available balance be blocked, or allowed as a negative cash balance?
-- Should envelope totals be required to match the cash balance?
 - Should the first version support editing dates, or only use the current date?
-- Should the app include a PIN lock in the first version, or leave it for a future release?
 
 ## Done Criteria
 

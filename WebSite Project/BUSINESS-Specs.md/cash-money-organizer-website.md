@@ -22,17 +22,21 @@ The balance is calculated from:
 
 ### Modify Money Amount
 
-The user can manually change the amount of money shown in the website.
+The user can quickly add cash to the balance or subtract cash from the balance when their real cash changes.
+
+This is for normal cash movements, such as receiving cash, spending cash, or removing cash from the tracked amount. It is not the same as correcting the full balance after the displayed amount is wrong.
+
+The user can add, subtract, or modify their money amount as often or as rarely as they want. The app should support many updates in one day and should also work if the user only updates it after a long time.
 
 ### Balance Adjustment History
 
-The website should save each manual balance change so the user can understand how the amount changed over time.
+The website should save each added amount, subtracted amount, and manual correction so the user can understand how the balance changed over time.
 
-## Modify Balance
+### Manual Balance Correction
 
 The user can manually correct the total balance whenever they want.
 
-The website should save this as an adjustment entry so the history stays clear.
+This is for setting the displayed total to the correct real cash amount when the app balance no longer matches reality. The website should save this as an adjustment entry so the history stays clear.
 
 ### Cash Categories / Envelopes
 
@@ -87,6 +91,8 @@ The user can see a list of all cash movements:
 
 The website may use a bank-account style interface, but it must not pretend to be a real bank.
 
+The website should not ask for personal information from the user. It is a manual cash tracking tool, not a bank account or financial account.
+
 It should avoid misleading wording such as:
 
 - Deposit to bank.
@@ -114,26 +120,29 @@ Better wording:
 
 ## Known Grey Zones and Corrections
 
-The business spec currently uses "Modify Money Amount" and "Modify Balance" in overlapping ways, so the intended difference should be clarified as quick add or subtract actions versus a full manual balance correction.
+### Corrections Already Clarified
 
-The "Modify Balance" heading is placed at a higher level than the surrounding core feature headings, which may be a formatting mistake rather than a separate business section.
+The starting amount is part of the first setup flow. A new user should be able to set an initial cash balance, and later changes should be handled through add, subtract, or manual correction entries so the history stays clear.
 
-The spec mentions a starting amount but does not yet explain how a new user sets that starting amount or whether it can be edited later.
+The first version stores data locally in the browser. Cloud sync, login, online accounts, and personal information collection are outside the MVP scope unless a later spec adds them.
 
-The spec says the website should save history, but it does not yet define whether data is stored only in the browser, synced online, or connected to a user account.
+Activity history is the main history list. Added money, subtracted money, manual balance corrections, and envelope changes should all appear there. Balance adjustment history is a filtered subset of activity history, not a separate competing record.
 
-The relationship between balance adjustment history and activity history is a grey zone, because adjustment history may be a subset of the broader activity history rather than a separate list.
+Envelope totals do not need to use the full cash balance. Users can leave cash unassigned, and the envelope area should show total cash, assigned cash, and unassigned cash.
 
-The spec does not yet define whether subtracting more than the available cash balance should be blocked or allowed as a negative balance.
+Subtracting more than the available cash balance should automatically bring the cash balance down to `0`. The balance must not go below `0` or show a negative cash amount.
 
-The spec should define whether envelope totals must exactly match the cash balance or whether users can leave some cash unassigned.
+The MVP does not need a PIN lock, login, or local privacy feature because the app is not a real bank account and should not collect personal information.
 
-The spec does not yet define privacy expectations such as a PIN lock, login, or warnings about storing sensitive personal cash information.
+The app should not require or expect regular usage. A user can modify their cash amount many times in one day, or only once after a long time, and both patterns are valid.
 
-The success metrics describe useful outcomes, but they do not yet define measurable targets for regular use, reduced cash loss, or return visits.
+### Still Open
 
-## Success Metrics
+No known business-spec grey zones remain.
 
-- Users modify their money amount regularly.
-- Users reduce unexplained cash loss.
-- Users return to the website to check or update their balance.
+## Success Criteria
+
+- Users can add, subtract, or manually correct their money amount whenever they need to.
+- Users can make many changes in one day without hitting a usage limit.
+- Users can return after a long time and still understand or update their cash balance.
+- Users can review history to understand how their balance changed.
