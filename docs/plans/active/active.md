@@ -3,11 +3,11 @@
 Status: Active
 
 Source specs:
-- `BUSINESS-Specs.md/cash-money-organizer-website.md`
-- `Docs/Specs/global-Spec.md`
-- `Docs/Specs/functional-map.md`
-- `Docs/Specs/Functional/functional1.md`
-- `Docs/Specs/Technical/technical1.md`
+- `docs/specs/business/cash-money-organizer-website.md`
+- `docs/specs/global.md`
+- `docs/specs/functional-map.md`
+- `docs/specs/functional/functional1.md`
+- `docs/specs/technical/technical1.md`
 
 ## Goal
 
@@ -279,7 +279,7 @@ Tasks:
 - Test invalid inputs.
 - Test edit and delete behavior.
 - Confirm out-of-scope banking features are not implied.
-- Move this plan from `Docs/Plans/Active` to `Docs/Plans/Done` after completion.
+- Move this plan from `docs/plans/active` to `docs/plans/done` after completion.
 
 Acceptance criteria:
 - A user can open the app, set a money amount, add cash, subtract cash, create a savings folder or square, create an envelope, and review history.
@@ -393,7 +393,7 @@ Use:
 
 ## Done Criteria
 
-This plan can move to `Docs/Plans/Done` when:
+This plan can move to `docs/plans/done` when:
 - The MVP features listed in scope are implemented.
 - The main user flow works end to end.
 - Add and subtract changes are saved in history as separate entries.

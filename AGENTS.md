@@ -12,13 +12,27 @@ The project folder may be named `App Project2`, but the product should be treate
 
 Before changing features, read these files:
 
-- `BUSINESS-Specs.md/cash-money-organizer-website.md`
-- `Docs/Specs/global-Spec.md`
-- `Docs/Specs/Functional/functional1.md`
-- `Docs/Specs/Technical/technical1.md`
-- `Docs/Plans/Active/Active.md`
+- `docs/specs/business/cash-money-organizer-website.md`
+- `docs/specs/global.md`
+- `docs/specs/functional/functional1.md`
+- `docs/specs/technical/technical1.md`
+- `docs/plans/active/active.md`
 
 If behavior changes, update the specs and active plan so they stay consistent.
+
+## Project Structure
+
+- `website/`: Next.js website application.
+- `website/app/`: Next.js App Router pages, layout, and global CSS.
+- `website/public/`: static assets served by the website.
+- `docs/specs/`: product, functional, business, and technical specifications.
+- `docs/specs/business/`: business-level product requirements.
+- `docs/specs/functional/`: user flows and feature behavior.
+- `docs/specs/technical/`: implementation and storage rules.
+- `docs/plans/active/`: active implementation plans.
+- `.vscode/`: workspace editor settings.
+
+Do not recreate the old folders `WebSite Project/`, `BUSINESS-Specs.md/`, root `Docs/`, or root `AGENTS.md/`. The project now uses `website/`, `docs/`, and the root `AGENTS.md` file.
 
 ## GitFlow
 
@@ -51,6 +65,6 @@ If behavior changes, update the specs and active plan so they stay consistent.
 ## Work Style
 
 - Keep changes simple and easy to understand.
-- Prefer updating existing specs instead of creating unnecessary new files.
+- Prefer updating the existing files under `docs/` instead of creating unnecessary new files.
 - Keep the website mobile-friendly.
 - Explain important changes in easy words.

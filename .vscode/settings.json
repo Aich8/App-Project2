@@ -2,11 +2,11 @@
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,
   "files.watcherExclude": {
-    "**/BUSINESS-Specs.md/**": false,
-    "**/Docs/**": false
+    "**/docs/**": false,
+    "**/website/**": false
   },
   "files.exclude": {
-    "**/BUSINESS-Specs.md/**": false,
-    "**/Docs/**": false
+    "**/docs/**": false,
+    "**/website/**": false
   }
 }

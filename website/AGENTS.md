@@ -1,8 +1,23 @@
 <!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# This Is Not The Next.js You Know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+This version has breaking changes. APIs, conventions, and file structure may differ from training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing Next.js code.
 <!-- END:nextjs-agent-rules -->
+
+## Scope
+
+This file applies to the `website/` application folder.
+
+Project-wide instructions live in the root `AGENTS.md`.
+
+## App Structure
+
+- `app/`: Next.js App Router files.
+- `app/page.tsx`: main page entry point.
+- `app/layout.tsx`: root layout.
+- `app/globals.css`: global styles.
+- `public/`: static assets.
+- `package.json`: app scripts and dependencies.
 
 ## GitFlow
 

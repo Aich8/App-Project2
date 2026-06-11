@@ -207,4 +207,4 @@ If no saved data exists, the website should show the first money amount setup.
 
 The website should explain that saved data belongs only to the same device and browser unless online accounts are added in a future version.
 
-Technical browser storage rules are defined in `Docs/Specs/Technical/technical1.md`.
+Technical browser storage rules are defined in `docs/specs/technical/technical1.md`.

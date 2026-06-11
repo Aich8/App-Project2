@@ -1,4 +1,4 @@
-# Technical Spec: Cash Money Organizer Website
+y# Technical Spec: Cash Money Organizer Website
 
 ## Money Amount Storage
 
