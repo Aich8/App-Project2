@@ -10,7 +10,9 @@ When the first money amount is saved:
 - The action is saved in history as `+{money amount} added`.
 - The website should then show the main money amount with the user-facing label `Current Balance`.
 
-After the first money amount exists, the website should show three actions near the main money amount:
+After the first money amount exists, the main money amount should be clickable.
+
+When the user clicks the main money amount, the website should show three actions near the main money amount:
 
 - `Modify` for correcting the total displayed amount.
 - `Add` for adding money to the main money amount.
@@ -108,6 +110,27 @@ The user should be able to edit or delete entries when they make a mistake.
 
 The `Modify`, `Add`, and `Subtract` actions should appear visually connected to the main money amount so the user understands they directly change the displayed money amount.
 
+## Activity History Behavior
+
+Activity history is the main history list.
+
+Activity history should include:
+
+- Added money.
+- Subtracted money.
+- `Saving` square changes.
+- Envelope changes.
+
+Money change history is a filtered view or subset of activity history. It should not become a separate competing record.
+
+Money amount change history should appear directly under the main money amount on the dashboard.
+
+Money amount change history should use the user-facing label `Balance Changes`.
+
+There should not be a separate `View history` action or button for the main money amount change history.
+
+If the history list has too many entries to fit on the screen, the user should be able to scroll down to see more entries.
+
 ## Dashboard And User Flow
 
 The first screen should look like a simple bank dashboard.
@@ -116,18 +139,20 @@ The main money amount should be the most visible information on the dashboard.
 
 The dashboard should show the main money amount with the label `Current Balance`.
 
+On the dashboard, `Savings` should appear under `Balance Changes`.
+
 The website should feel trustworthy, calm, and practical.
 
 The user should not need financial knowledge to use it.
 
 Main actions should be easy to find:
 
+- Click the money amount.
 - Modify amount.
 - Add money.
 - Subtract money.
-- Open savings.
+- Click `Savings`.
 - Manage envelopes.
-- View history.
 
 The interface should work well on mobile.
 
@@ -137,49 +162,65 @@ Main user flow:
 2. If no money amount exists yet, user enters their first money amount.
 3. Website records the first amount as `+{money amount} added`.
 4. User sees their current money amount labeled as `Current Balance`.
-5. User uses `Add` for new cash, `Subtract` for spent or removed cash, and `Modify` to correct mistakes without creating history or notifications.
-6. User checks savings folders or squares and cash envelopes.
-7. User reviews history to understand money amount changes.
+5. User clicks the main money amount to show `Modify`, `Add`, and `Subtract`.
+6. User uses `Add` for new cash, `Subtract` for spent or removed cash, and `Modify` to correct mistakes without creating history or notifications.
+7. User sees money amount change history directly under the main money amount.
+8. User scrolls down if the history list is longer than the screen.
+9. User checks `Saving` squares and cash envelopes.
 
 ## Savings Behavior
 
-The website should have a `Savings` section that can be opened from the main dashboard.
+The website should have a `Savings` section that can be reached from the main dashboard.
+
+`Savings` is the separate planning section of the website.
+
+A `Saving` is one square inside the `Savings` section.
+
+The user should click `Savings` to open the `Savings` section.
+
+There should not be a separate `Open savings` action.
 
 The `Savings` section is a planning view. It helps the user see what money would be left after setting some money aside.
 
 The `Savings` section should start from the current money amount.
 
-The `Savings` section should show a savings available amount at the top.
+The `Savings` section should show a money amount at the top.
 
-The savings available amount should be calculated as:
+Under the money amount shown inside `Savings`, the website should show `Saving` squares.
 
-- Current money amount minus the total money set aside in savings folders or squares.
+When the user clicks an unnamed `Saving` square, the website should ask them to `Name the saving`.
+
+Each `Saving` square can hold a money amount.
+
+The money amount shown inside `Savings` should be calculated as:
+
+- Current money amount minus the total money set aside in `Saving` squares.
 
 Example:
 
 - Current money amount is `$350`.
-- Total money set aside in savings folders or squares is `$0`.
-- Savings available amount is `$350`.
+- Total money set aside in `Saving` squares is `$0`.
+- Money amount shown inside `Savings` is `$350`.
 
-If the user creates a `Rent` folder or square and puts `$40` inside it:
+If the user creates a `Rent` `Saving` square and puts `$40` inside it:
 
 - Current money amount stays `$350`.
-- `Rent` folder or square shows `$40`.
-- Total money set aside in savings folders or squares is `$40`.
-- Savings available amount becomes `$310`.
+- `Rent` square shows `$40`.
+- Total money set aside in `Saving` squares is `$40`.
+- Money amount shown inside `Savings` becomes `$310`.
 
 This means the user's money amount is still `$350`, but the `Savings` section shows that `$40` is planned for rent and `$310` is still available for other plans.
 
-Putting money into a savings folder or square is a planning action. It is not an `Add`, `Subtract`, or `Modify` action.
+Putting money into a `Saving` square is a planning action. It is not an `Add`, `Subtract`, or `Modify` action.
 
-Savings folder or square changes should not display as `+{money amount} added` or `-{money amount} subtracted`.
+`Saving` square changes should not display as `+{money amount} added` or `-{money amount} subtracted`.
 
-Savings folder or square changes may appear in activity history as savings organization entries, such as:
+`Saving` square changes may appear in activity history as savings organization entries, such as:
 
 - `Set aside $40 for Rent`.
 - `Removed $10 from Rent`.
 
-Each savings folder or square should include:
+Each `Saving` square should include:
 
 - ID.
 - Name.
@@ -189,15 +230,47 @@ Each savings folder or square should include:
 
 The user should be able to:
 
-- Create a savings folder or square.
-- Rename a savings folder or square.
-- Put money aside in a savings folder or square.
-- Remove money from a savings folder or square so it becomes available again inside the `Savings` section.
-- Delete a savings folder or square.
+- Create a `Saving` square.
+- Rename a `Saving` square.
+- Put money aside in a `Saving` square.
+- Remove money from a `Saving` square so it becomes available again inside the `Savings` section.
+- Delete a `Saving` square.
 
-The user should not be allowed to put more money into savings folders or squares than the current savings available amount.
+The user should not be allowed to put more money into `Saving` squares than the current money amount shown inside `Savings`.
 
-If the current money amount becomes lower than the total money set aside in savings folders or squares, the website should show a clear warning and ask the user to adjust the folders or squares.
+If the current money amount becomes lower than the total money set aside in `Saving` squares, the website should show a clear warning and ask the user to adjust the `Saving` squares.
+
+## Cash Envelope Behavior
+
+Cash envelopes are simple virtual categories inside the user's one main money amount.
+
+Cash envelopes are labeled portions of the same real cash. They are not separate bank accounts and are not a separate target-tracking feature.
+
+Example envelopes can include:
+
+- Daily spending.
+- Food.
+- Transport.
+- Bills.
+- Emergency.
+
+Each envelope can appear as a compact row or small card with:
+
+- Envelope name.
+- Amount currently assigned to that envelope.
+- A simple color swatch or icon.
+- Short status text, such as "safe to spend" or "reserved".
+- Small actions to add, subtract, or adjust the envelope amount.
+
+The envelope area should make these totals clear:
+
+- Total money amount.
+- Cash assigned to envelopes.
+- Cash not yet assigned to an envelope.
+
+Envelope totals do not need to use the full money amount. Users can leave cash unassigned.
+
+Moving cash between envelopes should not change the total money amount. Only adding money, subtracting money, or using `Modify` should change the main money amount.
 
 ## Browser Storage User Behavior
 

@@ -19,11 +19,19 @@ The product is a personal cash management website that looks and feels similar t
 Users manually enter and update their own money amount. The website displays a bank-style dashboard with:
 
 - Main money amount shown with the label `Current Balance`.
-- Recent money activity.
+- Recent money activity directly under the main money amount.
 - Separate add and subtract history entries.
-- `Savings` section with user-named folders or squares.
+- `Savings` section with user-named `Saving` squares.
 - Cash categories or envelopes.
 - Monthly overview.
+
+The main money amount is clickable. When the user clicks it, the website shows `Modify`, `Add`, and `Subtract` actions.
+
+The user opens `Savings` by clicking `Savings`. There should not be a separate `Open savings` action.
+
+`Savings` is the separate planning section of the website. A `Saving` is one user-named square inside the `Savings` section.
+
+There is no separate `View history` action. Money amount change history stays under the main money amount, and the user can scroll down if there are too many entries to fit on the screen.
 
 The first ever money amount is saved as the starting amount and shown in history as `+{money amount} added`. After that, users update the amount with `Modify`, `Add`, and `Subtract`.
 
@@ -37,9 +45,9 @@ The first version saves the user's money amount and money changes in browser sto
 
 The website must clearly communicate that it is a personal tracking tool, not a real bank account.
 
-Cash categories or envelopes should feel like labeled pockets inside the user's cash balance. The user still has one total cash amount, but they can split that amount into practical groups such as food, transport, bills, daily spending, set aside cash, or emergency cash.
+Cash categories or envelopes should feel like labeled pockets inside the user's money amount. The user still has one total money amount, but they can split that money amount into practical groups such as food, transport, bills, daily spending, or emergency.
 
-In the app, this could look like a small "Cash envelopes" area on the dashboard. Each envelope can show its name, assigned amount, and a simple visual marker such as a color swatch or icon. The user should be able to quickly see what cash is safe to spend, what cash is reserved for bills, and what cash has not been assigned yet.
+In the website, this could look like a small "Cash envelopes" area on the dashboard. Each envelope can show its name, assigned amount, and a simple visual marker such as a color swatch or icon. The user should be able to quickly see what cash is safe to spend, what cash is reserved for bills, and what cash has not been assigned yet.
 
 ## Why?
 
@@ -52,7 +60,7 @@ The website helps users:
 - Add money and subtract money while keeping each change visible on its own.
 - Correct mistakes with `Modify` without saving or showing a correction entry.
 - Correct their money amount whenever they want.
-- Plan savings with user-named folders or squares that reduce only the savings available amount.
+- Plan savings with user-named `Saving` squares that reduce only the money amount shown inside `Savings`.
 - Understand where their cash is going.
 
 The goal is to make cash feel organized, visible, and easier to control.

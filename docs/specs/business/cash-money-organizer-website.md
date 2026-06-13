@@ -10,37 +10,51 @@
 
 ## Core Features
 
-### Cash Balance
+### Current Money Amount
 
-The user can view their total available cash balance.
+The user can view their total money amount with the user-facing label `Current Balance`.
 
-The balance is calculated from:
+A new user should be able to set their first money amount before using the dashboard. After setup, the user should be able to keep that money amount accurate with simple manual actions.
 
-- Starting amount.
-- Recorded cash movements.
-- Manual balance corrections.
+The website should make the main money actions easy to understand without using real banking language.
 
-### Modify Money Amount
+### Add and Subtract Money Amount
 
-The user can quickly add cash to the balance or subtract cash from the balance when their real cash changes.
+The user can quickly add money to the money amount or subtract money from the money amount when their real cash changes.
 
-This is for normal cash movements, such as receiving cash, spending cash, or removing cash from the tracked amount. It is not the same as correcting the full balance after the displayed amount is wrong.
+This is for normal cash movements, such as receiving cash, spending cash, or removing cash from the tracked amount. It is not the same as correcting the full money amount after the displayed amount is wrong.
 
-The user can add, subtract, or modify their money amount as often or as rarely as they want. The app should support many updates in one day and should also work if the user only updates it after a long time.
+The website should support users who update their money amount rarely and users who update it many times in one day.
 
-### Balance Adjustment History
+### Money Change History
 
-The website should save each added amount, subtracted amount, and manual correction so the user can understand how the balance changed over time.
+The website should help users review recent money changes using the user-facing label `Balance Changes`.
 
-### Manual Balance Correction
+`Balance Changes` helps the user understand how the money amount changed over time.
 
-The user can manually correct the total balance whenever they want.
+### Silent Modify Correction
 
-This is for setting the displayed total to the correct real cash amount when the app balance no longer matches reality. The website should save this as an adjustment entry so the history stays clear.
+The user can manually correct the total money amount whenever they want by using `Modify`.
+
+This is for setting the displayed total to the correct real cash amount when the website's current money amount no longer matches reality. The correction should not be confused with normal added or subtracted money.
+
+### Savings
+
+`Savings` is a separate planning section of the website.
+
+A `Saving` is one user-named square inside the `Savings` section.
+
+A `Saving` can hold a money amount.
+
+The user can use `Saving` squares to see what money would be left in the `Savings` section.
+
+Putting money into a `Saving` square does not subtract money and does not lower the main money amount. It only lowers the money amount shown inside the `Savings` section.
+
+`Savings` is not a separate real account and not a separate goals feature.
 
 ### Cash Categories / Envelopes
 
-The user can divide their total cash balance into simple virtual envelopes. An envelope is a labeled portion of the same real cash, not a separate bank account and not a target-tracking feature.
+The user can divide their total money amount into simple virtual envelopes. An envelope is a labeled portion of the same real cash, not a separate bank account and not a target-tracking feature.
 
 Example envelopes could include:
 
@@ -48,41 +62,21 @@ Example envelopes could include:
 - Food.
 - Transport.
 - Bills.
-- Set aside cash.
 - Emergency.
 
-In the app, this could feel like looking at labeled pockets inside one wallet. The dashboard can still show one main cash balance, while a category area shows how that cash is currently divided.
+In the website, this should feel like looking at labeled pockets inside one wallet. The dashboard can still show one main money amount, while a category area helps the user understand how that cash is currently divided.
 
-Each envelope could appear as a compact row or small card with:
+Cash categories or envelopes are separate from `Savings`. Envelopes help organize cash into everyday categories, while `Savings` helps plan money set aside in `Saving` squares.
 
-- Envelope name.
-- Amount currently assigned to that envelope.
-- A simple color swatch or icon.
-- Short status text, such as "safe to spend" or "reserved".
-- Small actions to add, subtract, or adjust the envelope amount.
+### Recent Activity
 
-The envelope area should make these totals clear:
-
-- Total cash balance.
-- Cash assigned to envelopes.
-- Cash not yet assigned to an envelope.
-
-Moving cash between envelopes should not change the total cash balance. Only adding cash, subtracting cash, or manually correcting the balance should change the main cash balance.
-
-### Activity History
-
-The user can see a list of all cash movements:
-
-- Added money.
-- Spent money.
-- Envelope moves or category adjustments.
-- Balance corrections.
+The user can see recent cash organization activity. Money changes should be understood through `Balance Changes`.
 
 ## User Experience Requirements
 
 - The first screen should look like a simple bank dashboard.
-- The current cash balance should be the most visible information.
-- Main actions should be easy to find: modify amount, organize envelopes, view history.
+- The current money amount should be the most visible information.
+- Main money actions, `Savings`, and envelope organization should be easy to find.
 - The website should feel trustworthy, calm, and practical.
 - The interface should work well on mobile.
 - The user should not need financial knowledge to use it.
@@ -92,6 +86,8 @@ The user can see a list of all cash movements:
 The website may use a bank-account style interface, but it must not pretend to be a real bank.
 
 The website should not ask for personal information from the user. It is a manual cash tracking tool, not a bank account or financial account.
+
+The MVP should not include online accounts, personal information collection, or real banking capabilities.
 
 It should avoid misleading wording such as:
 
@@ -103,46 +99,19 @@ It should avoid misleading wording such as:
 
 Better wording:
 
-- Add to balance.
-- Subtract from balance.
+- Add money.
+- Subtract money.
 - Modify amount.
-- Cash balance.
-- Set aside cash.
-- Manual correction.
-
-## User Flow
-
-1. User opens the website.
-2. User sees their current cash balance.
-3. User modifies their cash amount when it changes.
-4. User checks cash categories or envelopes.
-5. User reviews history to understand balance changes.
-
-## Known Grey Zones and Corrections
-
-### Corrections Already Clarified
-
-The starting amount is part of the first setup flow. A new user should be able to set an initial cash balance, and later changes should be handled through add, subtract, or manual correction entries so the history stays clear.
-
-The first version stores data locally in the browser. Cloud sync, login, online accounts, and personal information collection are outside the MVP scope unless a later spec adds them.
-
-Activity history is the main history list. Added money, subtracted money, manual balance corrections, and envelope changes should all appear there. Balance adjustment history is a filtered subset of activity history, not a separate competing record.
-
-Envelope totals do not need to use the full cash balance. Users can leave cash unassigned, and the envelope area should show total cash, assigned cash, and unassigned cash.
-
-Subtracting more than the available cash balance should automatically bring the cash balance down to `0`. The balance must not go below `0` or show a negative cash amount.
-
-The MVP does not need a PIN lock, login, or local privacy feature because the app is not a real bank account and should not collect personal information.
-
-The app should not require or expect regular usage. A user can modify their cash amount many times in one day, or only once after a long time, and both patterns are valid.
-
-### Still Open
-
-No known business-spec grey zones remain.
+- Current Balance.
+- Saved cash.
+- Manual cash tracker.
 
 ## Success Criteria
 
 - Users can add, subtract, or manually correct their money amount whenever they need to.
 - Users can make many changes in one day without hitting a usage limit.
-- Users can return after a long time and still understand or update their cash balance.
-- Users can review history to understand how their balance changed.
+- Users can return after a long time and still understand or update their money amount.
+- Users can review `Balance Changes` to understand how their money amount changed.
+- Users can use `Savings` to plan money set aside without lowering the money amount.
+- Users can understand the difference between `Savings` and cash envelopes.
+- Users can understand that the website is a manual cash tracker, not a real bank.

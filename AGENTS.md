@@ -47,9 +47,11 @@ Do not recreate the old folders `WebSite Project/`, `BUSINESS-Specs.md/`, root `
 ## Product Rules
 
 - Do not use real banking language like deposit, withdrawal, bank transfer, real account number, or card-related money wording.
-- Use `money amount` in specs and planning when explaining the tracked value.
-- Use `Current Balance` only as the user-facing website label for the main money amount.
-- Use simple wording like add, subtract, modify, savings, and folders.
+- Use `money amount` in specs, planning, explanations, and code comments when explaining the tracked value.
+- Use `Current Balance` only as the exact user-facing website label for the money amount.
+- Do not use `Current Balance` as the general name of the value outside website text.
+- Example: write "Savings does not lower the money amount." Do not write "Savings does not lower `Current Balance`" unless explaining the label shown on the website.
+- Use simple wording like add, subtract, modify, `Savings`, `Saving`, and squares.
 - The first version saves data only in browser storage.
 - Do not add email accounts, login, cloud sync, or server database unless explicitly requested.
 - Do not assume users update money on a regular schedule; the website should work for rare use and very frequent use.
@@ -58,9 +60,10 @@ Do not recreate the old folders `WebSite Project/`, `BUSINESS-Specs.md/`, root `
 - Subtracting more than the current money amount should set the money amount to `$0`, not a negative amount.
 - Subtracting when the current money amount is already `$0` should not create a history entry.
 - `Modify` should silently correct the current money amount without creating history, activity, or notification entries.
-- `Savings` is one planning section with user-named folders or squares.
+- `Savings` is the separate planning section of the website.
+- A `Saving` is one user-named square inside the `Savings` section.
 - Do not add a separate goals feature unless the user explicitly asks for it later.
-- Savings folders or squares show money set aside and reduce only the savings available amount, not the main money amount.
+- `Saving` squares show money set aside and reduce only the money amount shown inside `Savings`, not the main money amount.
 
 ## Work Style
 

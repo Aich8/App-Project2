@@ -1,4 +1,4 @@
-y# Technical Spec: Cash Money Organizer Website
+# Technical Spec: Cash Money Organizer Website
 
 ## Money Amount Storage
 
@@ -29,16 +29,16 @@ The saved browser data should include:
 - Current money amount.
 - First money amount.
 - Visible activity history for the last month.
-- Savings folders or squares.
+- `Saving` squares.
 - Cash envelopes.
-- Basic app settings if needed.
+- Basic website settings if needed.
 
 The website should save data after every successful:
 
 - `Add`.
 - `Subtract`.
 - `Modify`.
-- Savings folder or square change.
+- `Saving` square change.
 - Envelope change.
 - History edit.
 
@@ -51,6 +51,10 @@ If the user opens the website on another phone, another computer, another browse
 If the user clears browser data, clears site data, or uninstalls the browser, the saved website data may be deleted.
 
 The website should explain this in simple words so the user understands that browser storage is useful for convenience but is not the same as an online account or cloud backup.
+
+## Local Privacy Scope
+
+The MVP does not need a PIN lock, website passcode, login, or local privacy feature because the website is not a real bank account and should not collect personal information.
 
 ## History Retention
 
@@ -66,6 +70,6 @@ If saved browser data is broken or cannot be read, the website should not silent
 
 The website should show a clear message and give the user a safe way to start again.
 
-The website should use one stable storage key for the app data.
+The website should use one stable storage key for the website data.
 
 The website should include a data version number so future versions can upgrade old saved data safely.
