@@ -23,8 +23,7 @@ The MVP should help a user:
 - Keep saved money data after closing and reopening the website in the same browser.
 - Organize the `Savings` section into user-named `Saving` squares.
 - See what money would be left after setting money aside in `Savings`.
-- Divide cash into simple virtual envelopes.
-- Review recent activity.
+- Review `Balance Changes`.
 
 ## MVP Scope
 
@@ -32,15 +31,14 @@ Included in the first version:
 - Dashboard with the main money amount as the main focus.
 - First money amount setup that saves the first entry as `+{money amount} added`.
 - Clickable main money amount that reveals `Modify`, `Add`, and `Subtract` actions.
-- Browser storage for saved money amount, one-month visible activity history, `Saving` squares, envelopes, and basic website settings.
+- Browser storage for saved money amount, one-month visible `Balance Changes` history, `Saving` squares, and basic website settings.
 - Add money flow with amount, date, and optional note.
 - Subtract money flow with amount, date, and optional note.
 - Silent modify flow with corrected total amount.
 - One-month visible money amount change history shown directly under the main money amount, where each add and subtract action stays as its own entry.
 - `Savings` planning section with a money amount shown inside `Savings` and user-named `Saving` squares for money set aside.
-- Cash envelopes for categories like Daily Spending, Food, Transport, Bills, and Emergency.
-- Activity history for added money, subtracted money, `Saving` square changes, and envelope changes.
-- Edit and delete support for activity entries where practical.
+- `Balance Changes` history for added money and subtracted money.
+- Delete support for `Balance Changes` entries.
 - Responsive layout for mobile and desktop.
 - Clear trust wording that this is a manual cash tracking tool, not a real bank.
 
@@ -80,15 +78,14 @@ Primary areas:
 - Dashboard
 - Money amount change history under the main money amount
 - Savings
-- Cash Envelopes
 - Settings or Data Management
 
 Suggested first-screen layout:
 - Top area: website name and trust label such as "Manual cash tracker".
 - Main money amount area: user-facing label `Current Balance`; clicking the money amount reveals `Modify`, `Add`, and `Subtract`.
 - Money amount change history directly under the main money amount.
-- Secondary actions: click `Savings` and manage envelopes.
-- Overview area: recent activity, savings summary, envelope summary, monthly overview.
+- Secondary action: click `Savings`.
+- Overview area: `Balance Changes` and savings summary.
 
 ## Core Data Model
 
@@ -101,15 +98,14 @@ Browser storage:
 - Storage key.
 - Data version.
 - Current money amount data.
-- One-month visible activity entries.
+- One-month visible `Balance Changes` entries.
 - `Saving` squares.
-- Cash envelopes.
 - Basic website settings if needed.
 - Last saved date.
 
-Activity entry:
+`Balance Changes` entry:
 - ID.
-- Type: added, subtracted, `Saving` square change, envelope change.
+- Type: added or subtracted.
 - Amount.
 - Previous money amount.
 - New money amount.
@@ -118,21 +114,11 @@ Activity entry:
 - Visible until date.
 - Optional note.
 - Created date.
-- Updated date.
 
 `Saving` square:
 - ID.
 - Name.
 - Amount set aside.
-- Created date.
-- Updated date.
-
-Cash envelope:
-- ID.
-- Name.
-- Amount.
-- Optional color or icon.
-- Optional description.
 - Created date.
 - Updated date.
 
@@ -147,7 +133,7 @@ Tasks:
 - Add browser storage persistence.
 - Define one stable storage key for website data.
 - Add a data version number for saved data.
-- Define shared data types for money amount, activities, `Saving` squares, and envelopes.
+- Define shared data types for money amount, `Balance Changes` entries, and `Saving` squares.
 
 Acceptance criteria:
 - The website opens in a browser.
@@ -165,7 +151,7 @@ Tasks:
 - Show `Modify`, `Add`, and `Subtract` controls when the user clicks the main money amount.
 - Show money amount change history directly under the main money amount.
 - Add clear manual-tracker wording.
-- Add empty states for no history, no `Saving` squares, and no envelopes.
+- Add empty states for no history and no `Saving` squares.
 
 Acceptance criteria:
 - The main money amount is the most visible item on the first screen.
@@ -183,44 +169,44 @@ Tasks:
 - Build subtract money flow.
 - Build silent modify/correct money amount flow.
 - Validate amount inputs.
-- Save each `Add` and `Subtract` action to activity history as its own separate entry.
+- Save each `Add` and `Subtract` action to `Balance Changes` as its own separate entry.
 - Do not combine separate `Add` and `Subtract` actions into one net history result.
-- Do not save `Modify` actions to activity history.
+- Do not save `Modify` actions to `Balance Changes`.
 - Save each successful money change to browser storage.
 - Recalculate the current money amount after each action.
 
 Acceptance criteria:
 - The first ever money amount creates a `+{money amount} added` history entry.
-- Adding money increases the money amount and creates a positive activity entry.
-- Subtracting money decreases the money amount and creates a negative activity entry.
+- Adding money increases the money amount and creates a positive `Balance Changes` entry.
+- Subtracting money decreases the money amount and creates a negative `Balance Changes` entry.
 - Subtracting more than the current money amount sets the money amount to `$0` instead of creating a negative money amount.
 - Subtracting when the current money amount is `$0` keeps the money amount at `$0` and does not create a history entry.
-- Modifying the money amount replaces the current money amount without creating history, activity, or notification entries.
+- Modifying the money amount replaces the current money amount without creating history or notification entries.
 - Separate `Add` and `Subtract` actions stay separate in history.
 - Money changes are still visible after page refresh.
 - Invalid amounts are blocked with useful feedback.
 
-### Milestone 4: Activity History
+### Milestone 4: Balance Changes
 
 Tasks:
-- Build the money amount change history list directly under the main money amount.
+- Build the `Balance Changes` list directly under the main money amount.
 - Show type, amount, date, money amount change, and note.
 - Keep each add and subtract action as its own visible entry.
 - Do not replace separate entries with only a combined net result.
 - Hide or remove visible history entries after one month.
 - Keep the current money amount unchanged when old history entries expire.
 - Let the user scroll down when the history list is longer than the screen.
-- Add edit support for activity entries where safe.
 - Add delete support with money amount recalculation.
 
 Acceptance criteria:
 - The user can understand how their money amount changed over time.
 - The user sees separate entries such as `+$56 added` and `-$34 subtracted`.
-- The activity history does not show only a combined result such as `+$22 net change`.
-- Activity history entries older than one month are no longer shown.
+- `Balance Changes` does not show only a combined result such as `+$22 net change`.
+- `Balance Changes` entries older than one month are no longer shown.
 - Removing old history entries does not change the current money amount.
 - The user can scroll down to see more history entries when needed.
-- Editing or deleting an entry keeps the money amount consistent.
+- Deleting an entry keeps the money amount consistent.
+- Saved `Balance Changes` entries cannot be edited.
 - Recent money amount change history is visible from the dashboard without a separate `View history` action.
 
 ### Milestone 5: Savings Section and Saving Squares
@@ -236,7 +222,6 @@ Tasks:
 - Calculate the money amount inside `Savings` as current money amount minus total money set aside in `Saving` squares.
 - Build create, rename, and delete square actions.
 - Build set-aside-in-square and remove-from-square flows.
-- Record savings organization changes in activity history if activity history includes savings entries.
 - Save `Saving` square changes to browser storage.
 
 Acceptance criteria:
@@ -249,38 +234,20 @@ Acceptance criteria:
 - A user can create at least one `Saving` square.
 - Savings changes do not make the total money amount confusing.
 
-### Milestone 6: Cash Envelopes
+### Milestone 6: Polish
 
 Tasks:
-- Build envelope list.
-- Add default envelope suggestions: Daily Spending, Food, Transport, Bills, Emergency.
-- Build create, edit, and delete envelope actions.
-- Allow assigning or adjusting envelope amounts.
-- Show total allocated cash and unallocated cash.
-- Allow moving cash between envelopes without changing the main balance.
-
-Acceptance criteria:
-- The user can divide their cash into virtual envelopes.
-- Envelope totals are understandable.
-- The website helps the user see how much cash is safe to spend.
-- Envelope changes do not imply real bank transfers or a separate target-tracking feature.
-
-### Milestone 7: Monthly Overview and Polish
-
-Tasks:
-- Add a simple monthly overview.
-- Show recent money activity without replacing separate add and subtract entries.
+- Show `Balance Changes` without replacing separate add and subtract entries.
 - Improve mobile spacing and touch targets.
 - Add helpful empty states.
 - Review wording for trust and clarity.
 - Add final visual polish.
 
 Acceptance criteria:
-- The monthly overview gives a quick sense of money movement.
 - The website feels calm, trustworthy, and practical.
 - The interface is usable on phone-sized screens.
 
-### Milestone 8: Verification and Handoff
+### Milestone 7: Verification and Handoff
 
 Tasks:
 - Test the main user flow end to end.
@@ -290,12 +257,12 @@ Tasks:
 - Test unreadable or broken browser storage data.
 - Test mobile and desktop layouts.
 - Test invalid inputs.
-- Test edit and delete behavior.
+- Test delete behavior for `Balance Changes` entries.
 - Confirm out-of-scope banking features are not implied.
 - Move this plan from `docs/plans/active` to `docs/plans/done` after completion.
 
 Acceptance criteria:
-- A user can open the website, set a money amount, add cash, subtract cash, create a `Saving` square, create an envelope, and review `Balance Changes` and recent activity.
+- A user can open the website, set a money amount, add cash, subtract cash, create a `Saving` square, and review `Balance Changes`.
 - No real banking language or fake account behavior is present.
 - The MVP satisfies the business spec's first-version goals.
 
@@ -314,7 +281,7 @@ Acceptance criteria:
 11. If the action is `Modify`, website updates the current money amount without saving history or showing a notification.
 12. Website shows money amount change history directly under the main money amount.
 13. Website saves the updated data in browser storage.
-14. User reviews `Saving` squares and envelopes.
+14. User reviews `Saving` squares.
 15. User can close the website and open it again later in the same browser to see the saved data.
 
 ## Validation Rules
@@ -328,8 +295,7 @@ Acceptance criteria:
 - `Saving` square name is required.
 - `Saving` square amount should not be negative.
 - Total money set aside in `Saving` squares should not be greater than the current money amount.
-- Envelope amount should not be negative.
-- Dates should default to the current date but remain editable if needed.
+- Dates should default to the current date. If custom dates are supported, the date is chosen when creating an `Add` or `Subtract` entry, not by editing a saved `Balance Changes` entry.
 - Notes should be optional.
 - Browser storage data should be checked before use so broken saved data does not crash the website.
 - Visible history entries should be shown for one month.
@@ -339,10 +305,10 @@ Acceptance criteria:
 
 - Save website data in browser storage on the user's device.
 - The first version should not use email accounts, login, cloud sync, or a server database.
-- Save after every successful money amount change, `Saving` square change, envelope change, or history edit.
+- Save after every successful money amount change, `Saving` square change, or `Balance Changes` delete.
 - Save `Modify` changes only as an updated current money amount, not as a history entry.
 - Load saved browser data before showing the dashboard.
-- If saved browser data exists, restore the money amount, one-month visible activity history, `Saving` squares, and cash envelopes.
+- If saved browser data exists, restore the money amount, one-month visible `Balance Changes` history, and `Saving` squares.
 - Hide or remove visible history entries older than one month without changing the saved current money amount.
 - If no saved browser data exists, show first money amount setup.
 - If saved browser data is broken or unreadable, show a clear error and let the user choose whether to start again.
@@ -380,17 +346,17 @@ Use:
 - Subtracting more than the current money amount saves the actual removed amount in history.
 - Subtracting when the current money amount is `$0` does not create a history entry.
 - The website never shows a negative money amount.
-- Modify updates the current money amount without creating history, activity, or notification entries.
+- Modify updates the current money amount without creating history or notification entries.
 - Add and subtract entries stay separate in history.
 - History does not replace separate entries with only a net result.
 - Money amount change history appears directly under the main money amount.
 - There is no separate `View history` action for money amount change history.
 - Long money amount change history can be reached by scrolling down.
-- Activity history entries older than one month are hidden or removed.
+- `Balance Changes` entries older than one month are hidden or removed.
 - Expiring old history entries does not change the current money amount.
-- Activity history shows correct differences.
-- Editing an activity updates the derived money amount correctly.
-- Deleting an activity updates the derived money amount correctly.
+- `Balance Changes` shows correct differences.
+- Deleting a `Balance Changes` entry updates the derived money amount correctly.
+- Saved `Balance Changes` entries cannot be edited.
 - Browser storage saves the current money amount and history.
 - Browser storage restores the current money amount and history after refresh.
 - Browser storage restores data after closing and reopening the website in the same browser.
@@ -401,7 +367,6 @@ Use:
 - Clicking `Savings` opens the Savings section.
 - Setting aside `$40` in a `Rent` `Saving` square changes the money amount shown inside `Savings` from `$350` to `$310` when the main money amount is `$350`.
 - Setting money aside in a `Saving` square does not change the main money amount.
-- Envelopes can be created, edited, and deleted.
 - Website reload keeps saved data.
 - Layout works on mobile.
 - Layout works on desktop.
@@ -409,7 +374,7 @@ Use:
 
 ## Open Questions
 
-- Should the first version support editing dates, or only use the current date?
+- Should the first version support choosing a custom date when creating an `Add` or `Subtract` entry, or only use the current date?
 
 ## Done Criteria
 
@@ -418,7 +383,7 @@ This plan can move to `docs/plans/done` when:
 - The main user flow works end to end.
 - Add and subtract changes are saved in history as separate entries.
 - Modify changes are saved only as the current money amount, not as history.
-- `Saving` squares and envelopes are usable.
+- `Saving` squares are usable.
 - Mobile and desktop layouts have been checked.
 - The trust wording has been reviewed.
 - Any remaining known limitations are documented.

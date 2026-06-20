@@ -19,11 +19,9 @@ The product is a personal cash management website that looks and feels similar t
 Users manually enter and update their own money amount. The website displays a bank-style dashboard with:
 
 - Main money amount shown with the label `Current Balance`.
-- Recent money activity directly under the main money amount.
+- `Balance Changes` directly under the main money amount.
 - Separate add and subtract history entries.
 - `Savings` section with user-named `Saving` squares.
-- Cash categories or envelopes.
-- Monthly overview.
 
 The main money amount is clickable. When the user clicks it, the website shows `Modify`, `Add`, and `Subtract` actions.
 
@@ -37,17 +35,13 @@ The first ever money amount is saved as the starting amount and shown in history
 
 `Add` and `Subtract` actions should appear as separate visible history entries for one month. They should not be combined into only one net result.
 
-`Modify` silently corrects the current money amount. It should not create history, activity, or notification entries.
+`Modify` silently corrects the current money amount. It should not create history or notification entries.
 
 The money amount should never become negative. If the user subtracts more than the current money amount, the website should set the money amount to `$0`.
 
 The first version saves the user's money amount and money changes in browser storage on the same device and browser. It does not require an email account, login, server database, or online sync.
 
 The website must clearly communicate that it is a personal tracking tool, not a real bank account.
-
-Cash categories or envelopes should feel like labeled pockets inside the user's money amount. The user still has one total money amount, but they can split that money amount into practical groups such as food, transport, bills, daily spending, or emergency.
-
-In the website, this could look like a small "Cash envelopes" area on the dashboard. Each envelope can show its name, assigned amount, and a simple visual marker such as a color swatch or icon. The user should be able to quickly see what cash is safe to spend, what cash is reserved for bills, and what cash has not been assigned yet.
 
 ## Why?
 

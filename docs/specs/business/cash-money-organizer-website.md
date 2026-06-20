@@ -3,9 +3,9 @@
 ## Business Goals
 
 - Help users organize cash without needing a real bank account.
-- Help users separate cash into clear categories without creating a separate target-tracking system.
+- Help users plan cash set aside in `Savings` without creating a separate target-tracking system.
 - Reduce forgotten spending.
-- Make cash tracking simple enough for daily use.
+- Make cash tracking simple enough for daily use when the user wants it, without requiring daily updates.
 - Build trust with a clean, bank-like interface.
 
 ## Core Features
@@ -15,6 +15,8 @@
 The user can view their total money amount with the user-facing label `Current Balance`.
 
 A new user should be able to set their first money amount before using the dashboard. After setup, the user should be able to keep that money amount accurate with simple manual actions.
+
+The first money amount should be saved in history as `+{money amount} added`.
 
 The website should make the main money actions easy to understand without using real banking language.
 
@@ -32,6 +34,14 @@ The website should help users review recent money changes using the user-facing 
 
 `Balance Changes` helps the user understand how the money amount changed over time.
 
+`Add` and `Subtract` entries should stay separate in `Balance Changes` and remain visible for one month.
+
+Old visible history entries can be hidden or removed after one month without changing the saved money amount.
+
+The user can delete a `Balance Changes` entry when they make a mistake.
+
+The user should not be able to edit a saved `Balance Changes` entry. If the saved entry is wrong, the user should delete it and record the correct `Add` or `Subtract` action.
+
 ### Silent Modify Correction
 
 The user can manually correct the total money amount whenever they want by using `Modify`.
@@ -48,35 +58,19 @@ A `Saving` can hold a money amount.
 
 The user can use `Saving` squares to see what money would be left in the `Savings` section.
 
+The money amount shown inside `Savings` should equal the main money amount minus the total money set aside in `Saving` squares.
+
 Putting money into a `Saving` square does not subtract money and does not lower the main money amount. It only lowers the money amount shown inside the `Savings` section.
 
+The user should not be allowed to put more money into `Saving` squares than the available money shown inside `Savings`.
+
 `Savings` is not a separate real account and not a separate goals feature.
-
-### Cash Categories / Envelopes
-
-The user can divide their total money amount into simple virtual envelopes. An envelope is a labeled portion of the same real cash, not a separate bank account and not a target-tracking feature.
-
-Example envelopes could include:
-
-- Daily spending.
-- Food.
-- Transport.
-- Bills.
-- Emergency.
-
-In the website, this should feel like looking at labeled pockets inside one wallet. The dashboard can still show one main money amount, while a category area helps the user understand how that cash is currently divided.
-
-Cash categories or envelopes are separate from `Savings`. Envelopes help organize cash into everyday categories, while `Savings` helps plan money set aside in `Saving` squares.
-
-### Recent Activity
-
-The user can see recent cash organization activity. Money changes should be understood through `Balance Changes`.
 
 ## User Experience Requirements
 
 - The first screen should look like a simple bank dashboard.
 - The current money amount should be the most visible information.
-- Main money actions, `Savings`, and envelope organization should be easy to find.
+- Main money actions and `Savings` should be easy to find.
 - The website should feel trustworthy, calm, and practical.
 - The interface should work well on mobile.
 - The user should not need financial knowledge to use it.
@@ -113,5 +107,5 @@ Better wording:
 - Users can return after a long time and still understand or update their money amount.
 - Users can review `Balance Changes` to understand how their money amount changed.
 - Users can use `Savings` to plan money set aside without lowering the money amount.
-- Users can understand the difference between `Savings` and cash envelopes.
+- Users can understand that `Savings` is a planning section, not a real account or separate goals feature.
 - Users can understand that the website is a manual cash tracker, not a real bank.

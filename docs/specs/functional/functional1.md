@@ -32,7 +32,7 @@ When the user chooses `Modify`:
 - The entered amount replaces the current money amount.
 - The new current money amount is saved in browser storage.
 - The action should not create a history entry.
-- The action should not create an activity entry.
+- The action should not create a `Balance Changes` entry.
 - The action should not create a notification.
 - The action should not display as `+{money amount} added`, `-{money amount} subtracted`, or a manual correction.
 
@@ -40,7 +40,7 @@ When the user chooses `Add`:
 
 - The website asks for the amount to add.
 - The entered amount is added to the main money amount.
-- The action is saved in visible activity history as a positive entry.
+- The action is saved in `Balance Changes` as a positive entry.
 - The history entry should display as `+{money amount} added`.
 - The history entry should stay separate from other add or subtract entries.
 
@@ -48,7 +48,7 @@ When the user chooses `Subtract`:
 
 - The website asks for the amount to subtract.
 - The website subtracts up to the current money amount.
-- The action is saved in visible activity history as a negative entry.
+- The action is saved in `Balance Changes` as a negative entry.
 - The history entry should display as `-{money amount} subtracted`.
 - The history entry should stay separate from other add or subtract entries.
 
@@ -98,7 +98,7 @@ Each `Modify` action should require:
 
 `Modify` actions should not be included in visible history.
 
-Each add or subtract activity entry should include:
+Each `Balance Changes` entry should include:
 
 - Previous money amount.
 - New money amount.
@@ -106,28 +106,30 @@ Each add or subtract activity entry should include:
 - Date.
 - Optional note.
 
-The user should be able to edit or delete entries when they make a mistake.
+The user should be able to delete a `Balance Changes` entry when they make a mistake.
+
+The user should not be able to edit a saved `Balance Changes` entry. If the saved entry is wrong, the user should delete it and record the correct `Add` or `Subtract` action.
+
+Deleting a `Balance Changes` entry is different from hiding or removing an old visible history entry after one month. Deleting an entry because of a mistake should update the money amount consistently. Hiding or removing old visible history entries after one month should not change the money amount.
 
 The `Modify`, `Add`, and `Subtract` actions should appear visually connected to the main money amount so the user understands they directly change the displayed money amount.
 
-## Activity History Behavior
+## Balance Changes Behavior
 
-Activity history is the main history list.
+`Balance Changes` is the user-facing history list for money amount changes.
 
-Activity history should include:
+`Balance Changes` should include:
 
 - Added money.
 - Subtracted money.
-- `Saving` square changes.
-- Envelope changes.
 
-Money change history is a filtered view or subset of activity history. It should not become a separate competing record.
+`Balance Changes` should not include `Saving` square changes, because `Saving` square changes do not change the main money amount.
 
-Money amount change history should appear directly under the main money amount on the dashboard.
+`Balance Changes` should appear directly under the main money amount on the dashboard.
 
-Money amount change history should use the user-facing label `Balance Changes`.
+There should not be a separate `Recent Activity` area for the first version.
 
-There should not be a separate `View history` action or button for the main money amount change history.
+There should not be a separate `View history` action or button for `Balance Changes`.
 
 If the history list has too many entries to fit on the screen, the user should be able to scroll down to see more entries.
 
@@ -152,7 +154,6 @@ Main actions should be easy to find:
 - Add money.
 - Subtract money.
 - Click `Savings`.
-- Manage envelopes.
 
 The interface should work well on mobile.
 
@@ -166,7 +167,7 @@ Main user flow:
 6. User uses `Add` for new cash, `Subtract` for spent or removed cash, and `Modify` to correct mistakes without creating history or notifications.
 7. User sees money amount change history directly under the main money amount.
 8. User scrolls down if the history list is longer than the screen.
-9. User checks `Saving` squares and cash envelopes.
+9. User checks `Saving` squares.
 
 ## Savings Behavior
 
@@ -215,10 +216,7 @@ Putting money into a `Saving` square is a planning action. It is not an `Add`, `
 
 `Saving` square changes should not display as `+{money amount} added` or `-{money amount} subtracted`.
 
-`Saving` square changes may appear in activity history as savings organization entries, such as:
-
-- `Set aside $40 for Rent`.
-- `Removed $10 from Rent`.
+`Saving` square changes should not appear in `Balance Changes`.
 
 Each `Saving` square should include:
 
@@ -239,38 +237,6 @@ The user should be able to:
 The user should not be allowed to put more money into `Saving` squares than the current money amount shown inside `Savings`.
 
 If the current money amount becomes lower than the total money set aside in `Saving` squares, the website should show a clear warning and ask the user to adjust the `Saving` squares.
-
-## Cash Envelope Behavior
-
-Cash envelopes are simple virtual categories inside the user's one main money amount.
-
-Cash envelopes are labeled portions of the same real cash. They are not separate bank accounts and are not a separate target-tracking feature.
-
-Example envelopes can include:
-
-- Daily spending.
-- Food.
-- Transport.
-- Bills.
-- Emergency.
-
-Each envelope can appear as a compact row or small card with:
-
-- Envelope name.
-- Amount currently assigned to that envelope.
-- A simple color swatch or icon.
-- Short status text, such as "safe to spend" or "reserved".
-- Small actions to add, subtract, or adjust the envelope amount.
-
-The envelope area should make these totals clear:
-
-- Total money amount.
-- Cash assigned to envelopes.
-- Cash not yet assigned to an envelope.
-
-Envelope totals do not need to use the full money amount. Users can leave cash unassigned.
-
-Moving cash between envelopes should not change the total money amount. Only adding money, subtracting money, or using `Modify` should change the main money amount.
 
 ## Browser Storage User Behavior
 

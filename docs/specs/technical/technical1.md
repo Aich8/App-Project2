@@ -28,9 +28,8 @@ The saved browser data should include:
 
 - Current money amount.
 - First money amount.
-- Visible activity history for the last month.
+- Visible `Balance Changes` history for the last month.
 - `Saving` squares.
-- Cash envelopes.
 - Basic website settings if needed.
 
 The website should save data after every successful:
@@ -39,8 +38,7 @@ The website should save data after every successful:
 - `Subtract`.
 - `Modify`.
 - `Saving` square change.
-- Envelope change.
-- History edit.
+- `Balance Changes` delete.
 
 When the user closes the website, refreshes the page, or opens the website again later in the same browser, the saved money amount and one-month visible history should still be there.
 
