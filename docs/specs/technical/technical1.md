@@ -13,6 +13,35 @@ The money amount is calculated and updated from:
 
 Removing or hiding old history entries should not change the current money amount, because the current money amount is saved separately.
 
+Deleting a `Balance Changes` entry should only remove that visible history entry. It should not change, recalculate, or reverse the current money amount.
+
+The first money amount history entry should be stored as a normal visible `Balance Changes` entry. It should stay visible for one month and may be deleted from visible history without changing the current money amount.
+
+## Savings Coverage And Storage
+
+Each `Saving` square should be saved with:
+
+- ID.
+- Name.
+- Amount set aside.
+- Order.
+- Created date.
+- Updated date.
+
+`Saving` square order should be saved in browser storage so the same order appears after refresh.
+
+Coverage bars and `{money amount} needed` notes should be calculated from the current money amount and the ordered `Saving` squares. They should not be stored as the source of truth.
+
+The coverage calculation should:
+
+- Start with the current money amount.
+- Check `Saving` squares from top to bottom.
+- Mark each square as fully covered, partly covered, or not covered.
+- Reduce the remaining money amount used for display after each square.
+- Stop the money amount shown inside `Savings` at `$0`.
+
+Changing the current money amount should update coverage bars and the money amount shown inside `Savings`, but it should not automatically change the saved amounts inside `Saving` squares.
+
 ## Browser Storage
 
 The first version should save data in the user's browser storage.
@@ -38,7 +67,7 @@ The website should save data after every successful:
 - `Subtract`.
 - `Modify`.
 - `Saving` square change.
-- `Balance Changes` delete.
+- `Balance Changes` delete that removes only the visible history entry.
 
 When the user closes the website, refreshes the page, or opens the website again later in the same browser, the saved money amount and one-month visible history should still be there.
 

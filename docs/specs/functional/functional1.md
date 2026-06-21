@@ -8,6 +8,10 @@ When the first money amount is saved:
 
 - The entered amount becomes the starting money amount.
 - The action is saved in history as `+{money amount} added`.
+- The history entry follows the same visible history rules as a normal `Add` entry.
+- The history entry stays visible in `Balance Changes` for one month.
+- The user can delete the history entry from visible history.
+- Deleting the history entry does not change the main money amount.
 - The website should then show the main money amount with the user-facing label `Current Balance`.
 
 After the first money amount exists, the main money amount should be clickable.
@@ -108,9 +112,11 @@ Each `Balance Changes` entry should include:
 
 The user should be able to delete a `Balance Changes` entry when they make a mistake.
 
-The user should not be able to edit a saved `Balance Changes` entry. If the saved entry is wrong, the user should delete it and record the correct `Add` or `Subtract` action.
+Deleting a `Balance Changes` entry only removes that entry from the visible history. It does not change, recalculate, or reverse the main money amount.
 
-Deleting a `Balance Changes` entry is different from hiding or removing an old visible history entry after one month. Deleting an entry because of a mistake should update the money amount consistently. Hiding or removing old visible history entries after one month should not change the money amount.
+The user should not be able to edit a saved `Balance Changes` entry. If the saved entry is wrong, the user should delete it from the visible history. If the main money amount is wrong, the user should use `Modify` to correct the main money amount.
+
+Deleting a `Balance Changes` entry is different from hiding or removing an old visible history entry after one month. Both actions remove entries from the visible history only. Neither action should change the main money amount.
 
 The `Modify`, `Add`, and `Subtract` actions should appear visually connected to the main money amount so the user understands they directly change the displayed money amount.
 
@@ -122,6 +128,8 @@ The `Modify`, `Add`, and `Subtract` actions should appear visually connected to 
 
 - Added money.
 - Subtracted money.
+
+`Balance Changes` is a visible history record. It should not control or recalculate the main money amount.
 
 `Balance Changes` should not include `Saving` square changes, because `Saving` square changes do not change the main money amount.
 
@@ -181,21 +189,51 @@ The user should click `Savings` to open the `Savings` section.
 
 There should not be a separate `Open savings` action.
 
-The `Savings` section is a planning view. It helps the user see what money would be left after setting some money aside.
+The `Savings` section is a planning view. It helps the user see which `Saving` squares are fully covered, partly covered, or not covered by the main money amount.
 
 The `Savings` section should start from the current money amount.
 
-The `Savings` section should show a money amount at the top.
+The `Savings` section should show a money amount at the top. This money amount is what remains after the website checks the ordered `Saving` squares against the main money amount. It should never show less than `$0`.
 
 Under the money amount shown inside `Savings`, the website should show `Saving` squares.
 
-When the user clicks an unnamed `Saving` square, the website should ask them to `Name the saving`.
+The user should add a new `Saving` square with a circle action that contains a `+` sign.
+
+When the user adds a new `Saving` square, the website should ask them to `Name the saving`.
 
 Each `Saving` square can hold a money amount.
 
+Each `Saving` square should keep the money amount chosen by the user. If the main money amount changes, the `Saving` square amount should not change automatically.
+
+`Saving` squares should have a visible order:
+
+- The first `Saving` square the user creates should stay at the top by default.
+- The website should check `Saving` squares from top to bottom.
+- The user should be able to change the order by holding and moving `Saving` squares.
+
+The website should calculate `Saving` square coverage like this:
+
+- Start with the main money amount.
+- Check the first `Saving` square.
+- Use as much of the remaining money amount as needed to cover that square.
+- Move to the next `Saving` square with whatever money amount is still remaining.
+- Continue until all `Saving` squares have been checked or the remaining money amount is `$0`.
+
+Each `Saving` square should show a thin vertical coverage bar inside the square:
+
+- The bar is grey by default.
+- The bar fills green based on the covered percentage of that square's money amount.
+- If a square is fully covered, the bar is fully green.
+- If a square is partly covered, the bar is partly green and partly grey.
+- If a square is not covered, the bar is fully grey.
+
+If a `Saving` square is 80% covered, the coverage bar should be 80% green and 20% grey.
+
+If a `Saving` square is not fully covered, the square should show a small `{money amount} needed` note near the top-left of the grey part of the coverage bar.
+
 The money amount shown inside `Savings` should be calculated as:
 
-- Current money amount minus the total money set aside in `Saving` squares.
+- Current money amount minus the total money amount in `Saving` squares, with the result stopped at `$0`.
 
 Example:
 
@@ -212,6 +250,18 @@ If the user creates a `Rent` `Saving` square and puts `$40` inside it:
 
 This means the user's money amount is still `$350`, but the `Savings` section shows that `$40` is planned for rent and `$310` is still available for other plans.
 
+Example with ordered coverage:
+
+- Current money amount is `$85`.
+- `Rent` is the first `Saving` square and has `$50`.
+- `Food` is the second `Saving` square and has `$20`.
+- `School` is the third `Saving` square and has `$30`.
+- `Rent` is fully covered, so its bar is 100% green.
+- `Food` is fully covered, so its bar is 100% green.
+- `School` is partly covered with `$15` of `$30`, so its bar is 50% green and 50% grey.
+- `School` shows `$15 needed`.
+- Money amount shown inside `Savings` is `$0`.
+
 Putting money into a `Saving` square is a planning action. It is not an `Add`, `Subtract`, or `Modify` action.
 
 `Saving` square changes should not display as `+{money amount} added` or `-{money amount} subtracted`.
@@ -223,6 +273,7 @@ Each `Saving` square should include:
 - ID.
 - Name.
 - Amount set aside.
+- Order.
 - Created date.
 - Updated date.
 
@@ -233,10 +284,9 @@ The user should be able to:
 - Put money aside in a `Saving` square.
 - Remove money from a `Saving` square so it becomes available again inside the `Savings` section.
 - Delete a `Saving` square.
+- Reorder `Saving` squares by holding and moving them.
 
-The user should not be allowed to put more money into `Saving` squares than the current money amount shown inside `Savings`.
-
-If the current money amount becomes lower than the total money set aside in `Saving` squares, the website should show a clear warning and ask the user to adjust the `Saving` squares.
+If the current money amount becomes lower than the total money amount in `Saving` squares, the website should not change the `Saving` square amounts automatically. It should update the coverage bars and show the money amount inside `Savings` as `$0`.
 
 ## Browser Storage User Behavior
 

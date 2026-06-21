@@ -21,7 +21,7 @@ Users manually enter and update their own money amount. The website displays a b
 - Main money amount shown with the label `Current Balance`.
 - `Balance Changes` directly under the main money amount.
 - Separate add and subtract history entries.
-- `Savings` section with user-named `Saving` squares.
+- `Savings` section with ordered user-named `Saving` squares and coverage bars.
 
 The main money amount is clickable. When the user clicks it, the website shows `Modify`, `Add`, and `Subtract` actions.
 
@@ -29,9 +29,13 @@ The user opens `Savings` by clicking `Savings`. There should not be a separate `
 
 `Savings` is the separate planning section of the website. A `Saving` is one user-named square inside the `Savings` section.
 
+The `Savings` section checks `Saving` squares from top to bottom against the main money amount. Each square keeps the money amount chosen by the user and shows a green and grey coverage bar so the user can see whether that square is fully covered, partly covered, or not covered.
+
 There is no separate `View history` action. Money amount change history stays under the main money amount, and the user can scroll down if there are too many entries to fit on the screen.
 
 The first ever money amount is saved as the starting amount and shown in history as `+{money amount} added`. After that, users update the amount with `Modify`, `Add`, and `Subtract`.
+
+The first money amount history entry follows the same visible history rules as later `Add` entries. It stays visible in `Balance Changes` for one month and can be deleted from visible history without changing the main money amount.
 
 `Add` and `Subtract` actions should appear as separate visible history entries for one month. They should not be combined into only one net result.
 
@@ -54,7 +58,7 @@ The website helps users:
 - Add money and subtract money while keeping each change visible on its own.
 - Correct mistakes with `Modify` without saving or showing a correction entry.
 - Correct their money amount whenever they want.
-- Plan savings with user-named `Saving` squares that reduce only the money amount shown inside `Savings`.
+- Plan savings with user-named `Saving` squares that show covered and needed money without lowering the main money amount.
 - Understand where their cash is going.
 
 The goal is to make cash feel organized, visible, and easier to control.
