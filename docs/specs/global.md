@@ -29,15 +29,27 @@ The user opens `Savings` by clicking `Savings`. There should not be a separate `
 
 `Savings` is the separate planning section of the website. A `Saving` is one user-named square inside the `Savings` section.
 
-The `Savings` section checks `Saving` squares from top to bottom against the main money amount. Each square keeps the money amount chosen by the user and shows a green and grey coverage bar so the user can see whether that square is fully covered, partly covered, or not covered.
+The user creates a `Saving` square by clicking the `+` action in `Savings`, then entering the square name and planned money amount before the square appears.
+
+The `Savings` section checks `Saving` squares from top to bottom against the main money amount. Each square keeps the planned money amount chosen by the user and shows a thin bottom coverage bar so the user can see whether that square is fully covered, partly covered, or not covered. The bar is grey by default and fills green from left to right as coverage increases. If a square is not fully covered, its `{money amount} needed` note appears at the top-left of the bottom coverage bar.
+
+The planned money amount in a `Saving` square does not mean money has moved into a separate place. It does not lower the main money amount.
+
+After a `Saving` square is created, changing its planned money amount replaces the old planned money amount with a new total planned money amount. It is not an add or subtract action and does not change the main money amount.
+
+A `Saving` square should not be created or saved with a `$0` planned money amount. If an existing `Saving` square's planned money amount becomes `$0`, the square should disappear from `Savings`.
+
+Deleting a `Saving` square removes only that square and its saved details. It does not change the main money amount, `Balance Changes`, or the other `Saving` squares. The money amount shown inside `Savings` and coverage bars update from the remaining squares because they are calculated display values.
 
 There is no separate `View history` action. Money amount change history stays under the main money amount, and the user can scroll down if there are too many entries to fit on the screen.
 
 The first ever money amount is saved as the starting amount and shown in history as `+{money amount} added`. After that, users update the amount with `Modify`, `Add`, and `Subtract`.
 
-The first money amount history entry follows the same visible history rules as later `Add` entries. It stays visible in `Balance Changes` for one month and can be deleted from visible history without changing the main money amount.
+The first money amount history entry follows the same visible history rules as later `Add` entries. It stays visible in `Balance Changes` for 30 days and can be deleted from visible history without changing the main money amount.
 
-`Add` and `Subtract` actions should appear as separate visible history entries for one month. They should not be combined into only one net result.
+`Add` and `Subtract` actions should appear as separate visible history entries for 30 days. They should not be combined into only one net result.
+
+For visible `Balance Changes` history, one month means 30 days, not a calendar month. Each visible-until date should be calculated from the entry date and time plus 30 days.
 
 `Modify` silently corrects the current money amount. It should not create history or notification entries.
 
@@ -71,6 +83,6 @@ Users should be able to open it quickly when they want to check or modify their 
 
 Users may update their money rarely or many times in one day. The website should not require a specific update schedule.
 
-If the user closes the website and opens it again later in the same browser, their saved money amount and one-month visible history should still appear.
+If the user closes the website and opens it again later in the same browser, their saved money amount and 30-day visible history should still appear.
 
 If the user changes browser, changes device, uses private browsing, or clears browser data, the saved information may not be available.
