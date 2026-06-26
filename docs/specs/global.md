@@ -21,7 +21,7 @@ Users manually enter and update their own money amount. The website displays a b
 - Main money amount shown with the label `Current Balance`.
 - `Balance Changes` directly under the main money amount.
 - Separate add and subtract history entries.
-- `Savings` section with ordered user-named `Saving` squares and coverage bars.
+- `Savings` section with the label `Savings money amount`, ordered user-named `Saving` squares, and coverage bars.
 
 The main money amount is clickable. When the user clicks it, the website shows `Modify`, `Add`, and `Subtract` actions.
 
@@ -31,7 +31,13 @@ The user opens `Savings` by clicking `Savings`. There should not be a separate `
 
 The user creates a `Saving` square by clicking the `+` action in `Savings`, then entering the square name and planned money amount before the square appears.
 
+A `Saving` square name is required and must be unique inside `Savings`. The website should not create or rename a `Saving` square with the same name as another `Saving` square, using trimmed names and ignoring uppercase or lowercase letters when checking for duplicates.
+
+The money amount shown at the top of `Savings` should use the exact user-facing label `Savings money amount`. This label is separate from `Current Balance`, which is only for the main money amount.
+
 The `Savings` section checks `Saving` squares from top to bottom against the main money amount. Each square keeps the planned money amount chosen by the user and shows a thin bottom coverage bar so the user can see whether that square is fully covered, partly covered, or not covered. The bar is grey by default and fills green from left to right as coverage increases. If a square is not fully covered, its `{money amount} needed` note appears at the top-left of the bottom coverage bar.
+
+The visible order is the coverage order. If the user moves a `Saving` square to the top, that square is checked first, so its coverage bar fills from the main money amount before lower squares use what remains. When the user finishes moving a square and lets go, the website saves the new order and recalculates the `Savings` display from that order.
 
 The planned money amount in a `Saving` square does not mean money has moved into a separate place. It does not lower the main money amount.
 
@@ -49,13 +55,17 @@ The first money amount history entry follows the same visible history rules as l
 
 `Add` and `Subtract` actions should appear as separate visible history entries for 30 days. They should not be combined into only one net result.
 
-For visible `Balance Changes` history, one month means 30 days, not a calendar month. Each visible-until date should be calculated from the entry date and time plus 30 days.
+`Add`, `Subtract`, and `Balance Changes` entries should not have notes.
+
+For visible `Balance Changes` history, one month means 30 days, not a calendar month. The user should not choose dates for `Add` or `Subtract` entries. The website should use dates only internally to clear visible `Balance Changes` entries after 30 days. Each visible-until date should be calculated from the internal created date and time plus 30 days.
 
 `Modify` silently corrects the current money amount. It should not create history or notification entries.
 
 The money amount should never become negative. If the user subtracts more than the current money amount, the website should set the money amount to `$0`.
 
-The first version saves the user's money amount and money changes in browser storage on the same device and browser. It does not require an email account, login, server database, or online sync.
+The first version saves the user's money amount and money changes without requiring an email account, login, server database, or online sync.
+
+The website should not tell the user where saved information is stored, and should not warn that saved information may disappear after changing browser, changing device, using private browsing, or clearing browser data.
 
 The website must clearly communicate that it is a personal tracking tool, not a real bank account.
 
@@ -83,6 +93,4 @@ Users should be able to open it quickly when they want to check or modify their 
 
 Users may update their money rarely or many times in one day. The website should not require a specific update schedule.
 
-If the user closes the website and opens it again later in the same browser, their saved money amount and 30-day visible history should still appear.
-
-If the user changes browser, changes device, uses private browsing, or clears browser data, the saved information may not be available.
+If the user closes the website and opens it again later, their saved money amount and 30-day visible history should still appear when the saved data is available.

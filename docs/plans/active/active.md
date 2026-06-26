@@ -20,10 +20,10 @@ The MVP should help a user:
 - Add or subtract money manually after setup.
 - Correct mistakes with a modify action when needed.
 - See 30-day visible money amount change history directly under the main money amount.
-- Keep saved money data after closing and reopening the website in the same browser.
+- Keep saved money data after closing and reopening the website when saved data is available.
 - Organize the `Savings` section into user-named `Saving` squares.
 - See which `Saving` squares are fully covered, partly covered, or not covered.
-- See what money amount is left inside `Savings`.
+- See what money amount is left inside `Savings` with the user-facing label `Savings money amount`.
 - Review `Balance Changes`.
 
 ## MVP Scope
@@ -33,11 +33,11 @@ Included in the first version:
 - First money amount setup that saves the first entry as `+{money amount} added` and treats it like a normal visible `Add` history entry.
 - Clickable main money amount that reveals `Modify`, `Add`, and `Subtract` actions.
 - Browser storage for saved money amount, 30-day visible `Balance Changes` history, `Saving` squares, and basic website settings.
-- Add money flow with amount, date, and optional note.
-- Subtract money flow with amount, date, and optional note.
+- Add money flow with amount.
+- Subtract money flow with amount.
 - Silent modify flow with corrected total amount.
 - 30-day visible money amount change history shown directly under the main money amount, where each add and subtract action stays as its own entry.
-- `Savings` planning section with a money amount shown inside `Savings`, ordered user-named `Saving` squares, and coverage bars.
+- `Savings` planning section with a money amount shown inside `Savings` using the label `Savings money amount`, ordered user-named `Saving` squares, and coverage bars.
 - `Balance Changes` history for added money and subtracted money.
 - Delete support for `Balance Changes` entries that removes only the visible history entry.
 - Responsive layout for mobile and desktop.
@@ -65,9 +65,12 @@ Out of scope for the first version:
 - The interface can look bank-like, but the wording must not imply real banking.
 - The website should use plain language: "Current Balance", "Add money", "Subtract money", "Modify amount", and "Saved cash".
 - Use `Current Balance` as the user-facing label for the main money amount.
+- Use `Savings money amount` as the user-facing label for the money amount shown at the top of `Savings`.
 - Use `money amount` in specs and implementation planning when explaining what the value means.
 - The first version should save data only in the user's browser storage.
-- The website should clearly explain that browser storage is not an online account or cloud backup.
+- Browser storage is an internal implementation detail and should not be explained to the user.
+- The website should not tell the user where saved information is stored.
+- The website should not warn the user that saved information may disappear after changing browser, changing device, using private browsing, clearing browser data, clearing site data, or uninstalling the browser.
 - The website should not ask for personal information because it is only a manual cash tracking tool.
 - The first screen should be useful immediately, especially on a phone.
 - The user should not need financial knowledge to use the website.
@@ -79,7 +82,6 @@ Primary areas:
 - Dashboard
 - Money amount change history under the main money amount
 - Savings
-- Settings or Data Management
 
 Suggested first-screen layout:
 - Top area: website name and trust label such as "Manual cash tracker".
@@ -111,10 +113,8 @@ Browser storage:
 - Previous money amount.
 - New money amount.
 - Difference.
-- Date.
-- Visible until date.
-- Optional note.
-- Created date.
+- Internal created date and time used only for 30-day clearing.
+- Internal visible until date and time.
 
 `Saving` square:
 - ID.
@@ -133,7 +133,6 @@ Tasks:
 - Create the main application shell.
 - Add responsive layout foundations.
 - Add browser storage persistence.
-- Add simple browser storage scope wording before or near first money amount setup.
 - Define one stable storage key for website data.
 - Add a data version number for saved data.
 - Define shared data types for money amount, `Balance Changes` entries, and `Saving` squares.
@@ -144,7 +143,7 @@ Acceptance criteria:
 - Data can be saved in browser storage and restored after refresh.
 - Data can be restored after closing and reopening the website in the same browser.
 - If no saved data exists, the website shows first money amount setup.
-- The first setup flow explains that saved data belongs only to the same browser and device.
+- First setup does not explain where saved data is stored.
 
 ### Milestone 2: Cash Dashboard
 
@@ -195,10 +194,11 @@ Acceptance criteria:
 
 Tasks:
 - Build the `Balance Changes` list directly under the main money amount.
-- Show type, amount, date, money amount change, and note.
+- Show type, amount, and money amount change.
 - Keep each add and subtract action as its own visible entry.
+- Do not ask the user to choose a date for `Add` or `Subtract`.
 - Do not replace separate entries with only a combined net result.
-- Calculate each `Balance Changes` visible until date as the entry date and time plus 30 days.
+- Calculate each `Balance Changes` internal visible until date and time as the internal created date and time plus 30 days.
 - Hide or remove visible history entries at or after their visible until date.
 - Keep the current money amount unchanged when old history entries expire.
 - Let the user scroll down when the history list is longer than the screen.
@@ -223,24 +223,30 @@ Tasks:
 - Treat a `Saving` as one user-named square inside the `Savings` section.
 - Let the user open the Savings section by clicking `Savings`.
 - Do not add a separate `Open savings` action.
-- Show the money amount inside `Savings` at the top.
+- Show the money amount inside `Savings` at the top with the user-facing label `Savings money amount`.
 - Start the money amount inside `Savings` from the current money amount.
 - Calculate the money amount inside `Savings` as current money amount minus total planned money amount in `Saving` squares, stopped at `$0`.
 - Calculate `Saving` square coverage from top to bottom using the main money amount.
+- Treat the visible `Saving` square order as the coverage order.
 - Add thin horizontal coverage bars at the very bottom of `Saving` squares.
 - Show full green bars for fully covered `Saving` squares, left-to-right partly green bars for partly covered squares, and grey bars for uncovered squares.
 - Show a `{money amount} needed` note at the top-left of the bottom coverage bar when a `Saving` square is not fully covered.
 - Build the add-a-saving action as a circle with a `+` sign.
 - Require the user to enter a `Saving` name and planned money amount before creating the `Saving` square.
+- Require each `Saving` square name to be unique inside `Savings`.
 - Build create, rename, delete, and reorder square actions.
+- Block creating or renaming a `Saving` square with a duplicate name.
 - Make delete remove only the selected `Saving` square and its saved details.
 - Build planned-money-amount editing flows that replace the old planned money amount with a new total planned money amount.
 - Remove a `Saving` square if its planned money amount becomes `$0`.
 - Save `Saving` square changes to browser storage.
-- Save `Saving` square order to browser storage.
+- Save the final `Saving` square order to browser storage after the user finishes moving a square and lets go.
+- Recalculate the money amount shown inside `Savings` and coverage bars after the final reorder.
 
 Acceptance criteria:
 - Money amount shown inside `Savings` starts equal to the current money amount when no `Saving` squares exist.
+- The money amount shown at the top of `Savings` uses the label `Savings money amount`.
+- The main money amount keeps the label `Current Balance`.
 - Creating a `Saving` square with a planned money amount reduces only the money amount shown inside `Savings`.
 - A planned money amount in a `Saving` square does not reduce the main money amount.
 - `Saving` square planned money amounts do not change automatically when the main money amount changes.
@@ -250,6 +256,9 @@ Acceptance criteria:
 - The Savings section helps the user see which plans are fully covered, partly covered, or not covered.
 - The user can add a `Saving` square with a circle `+` action.
 - A new `Saving` square is created only after the user enters a valid name and a planned money amount greater than `$0`.
+- A new `Saving` square is not created when its name duplicates another `Saving` square name.
+- Renaming a `Saving` square to a duplicate name is blocked and keeps the old name.
+- Duplicate `Saving` square name checks use trimmed names and ignore uppercase or lowercase differences.
 - A new `Saving` square is not created with a `$0` planned money amount.
 - The planned money amount in a `Saving` square does not mean money has moved into a separate place.
 - A `Saving` square disappears from `Savings` if its planned money amount becomes `$0`.
@@ -258,6 +267,11 @@ Acceptance criteria:
 - Deleting a `Saving` square does not change the main money amount, `Balance Changes`, or the names, planned money amounts, and relative order of other `Saving` squares.
 - After deleting a `Saving` square, the money amount shown inside `Savings` and coverage bars update from the remaining squares.
 - The user can reorder `Saving` squares by holding and moving them.
+- The visible `Saving` square order is the coverage order.
+- A `Saving` square moved to the top is checked first and its coverage bar is calculated before lower squares use what remains.
+- Reordering `Saving` squares saves the final order after the user lets go.
+- Reordering `Saving` squares updates the money amount shown inside `Savings` and coverage bars from the new visible order.
+- Reordering `Saving` squares does not change the main money amount and does not create a `Balance Changes` entry.
 - Coverage bars fill green from left to right by the covered percentage of each `Saving` square.
 - A `Saving` square that is 80% covered shows the left 80% of the coverage bar as green and the right 20% as grey.
 - A not fully covered `Saving` square shows its `{money amount} needed` note at the top-left of the bottom coverage bar.
@@ -274,7 +288,7 @@ Tasks:
 - Improve mobile spacing and touch targets.
 - Add helpful empty states.
 - Review wording for trust and clarity.
-- Add or confirm browser storage scope wording in any data or settings area.
+- Confirm the website does not explain where saved data is stored and does not warn that saved data may disappear after browser or device changes.
 - Add final visual polish.
 
 Acceptance criteria:
@@ -286,7 +300,7 @@ Acceptance criteria:
 Tasks:
 - Test the main user flow end to end.
 - Test data persistence after refresh.
-- Test data persistence after closing and reopening the website in the same browser.
+- Test data persistence after closing and reopening the website when saved data is available.
 - Test first load with no browser storage data.
 - Test unreadable or broken browser storage data.
 - Test mobile and desktop layouts.
@@ -310,14 +324,14 @@ Acceptance criteria:
 6. User clicks the main money amount.
 7. Website shows `Modify`, `Add`, and `Subtract`.
 8. User chooses `Add`, `Subtract`, or `Modify`.
-9. User enters an amount and optional note.
+9. User enters an amount.
 10. Website updates the money amount.
 11. If the action is `Add` or `Subtract`, website saves it as its own history entry with the correct display type.
 12. If the action is `Modify`, website updates the current money amount without saving history or showing a notification.
 13. Website shows money amount change history directly under the main money amount.
 14. Website saves the updated data in browser storage.
 15. User reviews `Saving` squares.
-16. User can close the website and open it again later in the same browser to see the saved data.
+16. User can close the website and open it again later to see saved data when it is available.
 
 ## Validation Rules
 
@@ -328,16 +342,19 @@ Acceptance criteria:
 - Subtracting when the current money amount is `$0` should not create a history entry.
 - The current money amount should never be negative.
 - `Saving` square name is required.
+- `Saving` square name should be unique inside `Savings`.
+- Duplicate `Saving` square name checks should use trimmed names and ignore uppercase or lowercase differences.
 - `Saving` square planned money amount should be greater than `$0` when creating a `Saving` square.
 - `$0` should remove an existing `Saving` square instead of saving it with a `$0` planned money amount.
 - Changing a `Saving` square planned money amount should use a new total planned money amount, not an add or subtract amount.
 - Total planned money amount in `Saving` squares may be greater than the current money amount. The money amount shown inside `Savings` should stop at `$0`, and coverage bars should show what is still needed.
-- Dates should default to the current date. If custom dates are supported, the date is chosen when creating an `Add` or `Subtract` entry, not by editing a saved `Balance Changes` entry.
-- Notes should be optional.
+- Dates are used only internally for clearing `Balance Changes` entries after 30 days.
+- The user should not choose dates for `Add` or `Subtract`.
+- `Add`, `Subtract`, and `Balance Changes` entries should not have notes.
 - Browser storage data should be checked before use so broken saved data does not crash the website.
 - Visible history entries should be shown for 30 days.
 - For visible `Balance Changes` history, one month means 30 days, not a calendar month.
-- Each `Balance Changes` visible until date should be calculated from the entry date and time plus 30 days.
+- Each `Balance Changes` internal visible until date and time should be calculated from the internal created date and time plus 30 days.
 - Expiring old history entries should not change the current money amount.
 
 ## Browser Storage Rules
@@ -354,9 +371,9 @@ Acceptance criteria:
 - If saved browser data is broken or unreadable, show a clear error and let the user choose whether to start again.
 - Use one stable storage key for the website data.
 - Include a data version number in the saved data so future versions can upgrade old data safely.
-- Tell the user that the data is saved only in the same browser and device.
-- Tell the user that data may disappear if they clear browser data, use private browsing, change device, change browser, or uninstall the browser.
-- Do not imply that browser storage is an online account, cloud sync, or online backup.
+- Do not tell the user where saved information is stored.
+- Do not tell the user that saved information belongs only to the same browser or device.
+- Do not warn the user that saved information may disappear after changing browser, changing device, using private browsing, clearing browser data, clearing site data, or uninstalling the browser.
 
 ## Trust and Wording Checklist
 
@@ -373,6 +390,7 @@ Use:
 - Subtract money.
 - Modify amount.
 - Current Balance.
+- Savings money amount.
 - Saved cash.
 - Manual cash tracker.
 
@@ -396,7 +414,7 @@ Use:
 - There is no separate `View history` action for money amount change history.
 - Long money amount change history can be reached by scrolling down.
 - `Balance Changes` entries at or after their visible until date are hidden or removed.
-- `Balance Changes` visible until dates are calculated from the entry date and time plus 30 days.
+- `Balance Changes` internal visible until dates are calculated from the internal created date and time plus 30 days.
 - Expiring old history entries does not change the current money amount.
 - `Balance Changes` shows correct differences.
 - Deleting a `Balance Changes` entry removes only that visible history entry and does not change the current money amount.
@@ -404,14 +422,18 @@ Use:
 - Browser storage saves the current money amount and history.
 - Browser storage restores the current money amount and history after refresh.
 - Browser storage restores data after closing and reopening the website in the same browser.
-- First setup explains that saved data belongs only to the same browser and device.
-- First setup explains that data may not appear after changing device, changing browser, using private browsing, or clearing browser data.
+- First setup does not explain where saved data is stored.
+- First setup does not warn that saved data may disappear after browser or device changes.
 - First money amount setup appears when there is no saved browser data.
 - Broken browser storage data shows a clear recovery message.
 - The website works whether the user updates money rarely or many times in one day.
 - `Saving` squares can be created, renamed, updated, and deleted.
+- Creating or renaming a `Saving` square with a duplicate name is blocked.
 - `Saving` squares can be reordered by holding and moving them.
+- Moving the last `Saving` square to the top makes that square checked first, saves the final order after the user lets go, and recalculates coverage bars from the new visible order.
 - Clicking `Savings` opens the Savings section.
+- The money amount shown at the top of `Savings` is labeled `Savings money amount`.
+- The main money amount is still labeled `Current Balance`.
 - Creating a `Rent` `Saving` square with a planned money amount of `$40` changes the money amount shown inside `Savings` from `$350` to `$310` when the main money amount is `$350`.
 - Creating a `Saving` square with a planned money amount does not change the main money amount.
 - Creating a `Saving` square with a `$0` planned money amount is blocked.
@@ -428,10 +450,6 @@ Use:
 - Layout works on mobile.
 - Layout works on desktop.
 - Wording does not imply real banking.
-
-## Open Questions
-
-- Should the first version support choosing a custom date when creating an `Add` or `Subtract` entry, or only use the current date?
 
 ## Done Criteria
 

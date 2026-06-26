@@ -86,19 +86,26 @@ Visible add and subtract history entries should be kept for 30 days.
 
 For visible `Balance Changes` history, one month means 30 days, not a calendar month.
 
-When a `Balance Changes` entry is created, its visible until date should be the entry date and time plus 30 days.
+The user should not choose a date when creating an `Add` or `Subtract` entry.
+
+The website should not treat dates as a user-facing `Balance Changes` feature.
+
+When a `Balance Changes` entry is created, the website should save the created date and time internally only so it can clear the entry after 30 days.
+
+The visible until date should be the internal created date and time plus 30 days.
 
 At or after the visible until date and time, the entry may be hidden or removed from the visible history list.
 
 The current money amount should be saved separately from the visible history list so removing old history entries does not change the current money amount.
 
+`Add`, `Subtract`, and `Balance Changes` entries should not have notes.
+
 Each add or subtract action should include:
 
 - Amount.
-- Date.
 - Action type: added or subtracted.
-- Visible until date.
-- Optional note.
+- Internal created date and time used only for 30-day clearing.
+- Internal visible until date and time.
 
 Each `Modify` action should require:
 
@@ -111,8 +118,8 @@ Each `Balance Changes` entry should include:
 - Previous money amount.
 - New money amount.
 - Difference.
-- Date.
-- Optional note.
+- Internal created date and time used only for 30-day clearing.
+- Internal visible until date and time.
 
 The user should be able to delete a `Balance Changes` entry when they make a mistake.
 
@@ -199,6 +206,12 @@ The `Savings` section should start from the current money amount.
 
 The `Savings` section should show a money amount at the top. This money amount is what remains after the website checks the ordered `Saving` squares against the main money amount. It should never show less than `$0`.
 
+The money amount shown at the top of `Savings` should use the exact user-facing label `Savings money amount`.
+
+The `Savings money amount` label is user-facing website text. In the specs, the concept can still be described as the money amount shown inside `Savings`.
+
+The `Savings money amount` label should not be used for the main money amount. The main money amount should keep the `Current Balance` label.
+
 Under the money amount shown inside `Savings`, the website should show `Saving` squares.
 
 The user should add a new `Saving` square with a circle action that contains a `+` sign.
@@ -210,6 +223,12 @@ When the user clicks the `+` action to add a new `Saving` square, the website sh
 
 The `Saving` square should be created only after the user enters a valid name and a planned money amount greater than `$0`.
 
+The `Saving` square name must be unique inside `Savings`.
+
+The website should treat names as duplicates when they match after trimming spaces and ignoring uppercase or lowercase letters.
+
+If the user enters a name already used by another `Saving` square, the website should not create the new `Saving` square.
+
 If the user cancels or does not enter both required values, the website should not create the `Saving` square.
 
 If the user enters `$0` as the planned money amount while creating a `Saving` square, the website should not create the `Saving` square.
@@ -219,6 +238,18 @@ Each `Saving` square stores the planned money amount chosen by the user.
 The planned money amount in a `Saving` square does not mean money has moved into a separate place. It does not change the main money amount.
 
 Each `Saving` square should keep the planned money amount chosen by the user. If the main money amount changes, the `Saving` square planned money amount should not change automatically.
+
+When the user renames an existing `Saving` square:
+
+- The website should ask for the new `Saving` name.
+- The new name should be required.
+- The new name should be unique inside `Savings`.
+- The website should treat names as duplicates when they match after trimming spaces and ignoring uppercase or lowercase letters.
+- If the new name is empty or already used by another `Saving` square, the website should keep the old name.
+- If the new name is valid, the website should replace the old name, update that square's updated date, and save the change in browser storage.
+- Renaming a `Saving` square should not change the main money amount.
+- Renaming a `Saving` square should not change the money amount shown inside `Savings` or coverage bars.
+- Renaming a `Saving` square should not create a `Balance Changes` entry.
 
 When the user changes the planned money amount in an existing `Saving` square:
 
@@ -245,8 +276,14 @@ If the user changes an existing `Saving` square planned money amount to `$0`:
 `Saving` squares should have a visible order:
 
 - The first `Saving` square the user creates should stay at the top by default.
+- The visible order should be the coverage order.
 - The website should check `Saving` squares from top to bottom.
 - The user should be able to change the order by holding and moving `Saving` squares.
+- If the user moves a `Saving` square to the top, the website should check that square first.
+- The moved square's coverage bar should be calculated before lower squares use any remaining money amount.
+- When the user finishes moving a `Saving` square and lets go, the website should save the new order in browser storage.
+- After the move finishes, the money amount shown inside `Savings` and the coverage bars should update from the new visible order.
+- Reordering `Saving` squares should not change the main money amount and should not create a `Balance Changes` entry.
 
 When the user deletes a `Saving` square:
 
@@ -307,6 +344,14 @@ Example with ordered coverage:
 - `School` shows `$15 needed` at the top-left of its bottom coverage bar.
 - Money amount shown inside `Savings` is `$0`.
 
+If the user moves `School` to the top in this example:
+
+- `School` is checked first and becomes fully covered.
+- `Rent` is checked second and becomes fully covered.
+- `Food` is checked third with `$5` of `$20`, so the left 25% of its bar is green and the right 75% is grey.
+- `Food` shows `$15 needed` at the top-left of its bottom coverage bar.
+- Money amount shown inside `Savings` stays `$0`.
+
 Creating a `Saving` square with a planned money amount is a planning action. It is not an `Add`, `Subtract`, or `Modify` action.
 
 Changing a `Saving` square planned money amount is a planning action. It is not an `Add`, `Subtract`, or `Modify` action.
@@ -334,16 +379,16 @@ The user should be able to:
 
 If the current money amount becomes lower than the total planned money amount in `Saving` squares, the website should not change the `Saving` square planned money amounts automatically. It should update the coverage bars and show the money amount inside `Savings` as `$0`.
 
-## Browser Storage User Behavior
+## Saved Data User Behavior
 
-The website should restore saved data when the user refreshes, closes, or opens the website again later in the same browser.
+The website should restore saved data when the user refreshes, closes, or opens the website again later and the saved data is available.
 
 If no saved data exists, the website should show the first money amount setup.
 
-The website should explain in simple words before or near first setup and in any data or settings area that saved data belongs only to the same browser on the same device.
+The website should not show user-facing text that explains where saved data is stored.
 
-The explanation should say that data may not appear or may be deleted if the user changes device, changes browser, uses private browsing, clears browser data, clears site data, or uninstalls the browser.
+The website should not show user-facing text that says saved data belongs only to the same browser or device.
 
-The explanation should not imply that the first version has an online account, cloud sync, or online backup.
+The website should not show user-facing text that warns saved data may disappear after changing browser, changing device, using private browsing, clearing browser data, clearing site data, or uninstalling the browser.
 
 Technical browser storage rules are defined in `docs/specs/technical/technical1.md`.

@@ -22,15 +22,15 @@ This first history entry should follow the same visible history rules as a norma
 
 The website should make the main money actions easy to understand without using real banking language.
 
-### Browser Storage Scope
+### Storage Scope
 
 The first version should save the user's data only in browser storage.
 
-Saved data belongs only to the same browser on the same device. It is not an online account, cloud sync, or online backup.
+Browser storage is an internal implementation detail. The website should not tell the user where saved information is stored.
 
-If the user changes device, changes browser, uses private browsing, clears browser data, clears site data, or uninstalls the browser, saved data may not appear or may be deleted.
+The website should not tell the user that saved information belongs to the same browser or device.
 
-The website should explain this in simple words before or near first setup and in any data or settings area, so the user understands that browser storage is only local convenience storage.
+The website should not warn the user that saved information may disappear after changing browser, changing device, using private browsing, clearing browser data, clearing site data, or uninstalling the browser.
 
 ### Add and Subtract Money Amount
 
@@ -58,13 +58,19 @@ The website should help users review recent money changes using the user-facing 
 
 Old visible history entries can be hidden or removed after 30 days without changing the saved money amount.
 
-For `Balance Changes`, one month means 30 days, not a calendar month. When a `Balance Changes` entry is created, its visible-until date should be the entry date and time plus 30 days. At or after the visible-until date and time, the entry may be hidden or removed from the visible history list.
+For `Balance Changes`, one month means 30 days, not a calendar month.
+
+The user should not choose a date for an `Add` or `Subtract` entry.
+
+Dates should matter only for clearing old visible `Balance Changes` entries after 30 days. When a `Balance Changes` entry is created, the website should save the created date and time internally and calculate its visible-until date and time as 30 days later. At or after the visible-until date and time, the entry may be hidden or removed from the visible history list.
 
 The user can delete a `Balance Changes` entry when they make a mistake.
 
 Deleting a `Balance Changes` entry only removes that entry from the visible history. It does not change, recalculate, or reverse the main money amount.
 
 The user should not be able to edit a saved `Balance Changes` entry. If the saved entry is wrong, the user should delete it from the visible history. If the main money amount is wrong, the user should use `Modify` to correct the main money amount.
+
+`Balance Changes` entries should not have notes. `Add` and `Subtract` should ask only for the money amount to add or subtract.
 
 ### Silent Modify Correction
 
@@ -80,11 +86,21 @@ A `Saving` is one user-named square inside the `Savings` section.
 
 A `Saving` stores a planned money amount chosen by the user.
 
+A `Saving` square name is required and must be unique inside `Savings`.
+
+Two `Saving` squares cannot use the same name. Names that match after trimming spaces and ignoring uppercase or lowercase letters should count as the same name.
+
+If the user tries to create or rename a `Saving` square with a duplicate name, the website should not save that duplicate name.
+
 A `Saving` square should exist only when its planned money amount is greater than `$0`.
 
 The user can use `Saving` squares to see what planned money is fully covered, partly covered, or not covered by the main money amount.
 
 The money amount shown inside `Savings` should start from the main money amount and subtract the planned money amounts in `Saving` squares in their visible order. It should never go below `$0`.
+
+The money amount shown at the top of `Savings` should use the exact user-facing label `Savings money amount`.
+
+The `Savings money amount` label is only for the money amount shown inside `Savings`. The main money amount should still use the exact user-facing label `Current Balance`.
 
 Each `Saving` square keeps the planned money amount chosen by the user. If the main money amount changes, the `Saving` square planned money amounts should not change automatically.
 
@@ -99,6 +115,14 @@ If a `Saving` square's planned money amount becomes `$0`, the `Saving` square sh
 Removing a `Saving` square because its planned money amount became `$0` should not change the main money amount and should not create a `Balance Changes` entry.
 
 `Saving` squares should have an order. The first `Saving` square the user creates should stay at the top by default. The user should be able to delete `Saving` squares and change their order by holding and moving them.
+
+The visible order is the coverage order. The top `Saving` square is checked first and gets first priority for coverage. If the user moves a `Saving` square to the top, that square is checked before the squares below it.
+
+When the user finishes moving a `Saving` square and lets go, the website should save the new order in browser storage.
+
+After the move finishes, the money amount shown inside `Savings` and the coverage bars should recalculate from the new visible order.
+
+Reordering `Saving` squares should not change the main money amount and should not create a `Balance Changes` entry.
 
 When the user deletes a `Saving` square:
 
@@ -161,6 +185,7 @@ Better wording:
 - Subtract money.
 - Modify amount.
 - Current Balance.
+- Savings money amount.
 - Saved cash.
 - Manual cash tracker.
 
@@ -173,26 +198,7 @@ Better wording:
 - Users can use `Savings` to plan money visually without lowering the main money amount.
 - Users can understand that `Savings` is a planning section, not a real account or separate goals feature.
 - Users can understand that the website is a manual cash tracker, not a real bank.
-- Users can understand that saved data belongs only to the same browser and device, and may not appear after changing device, changing browser, using private browsing, or clearing browser data.
 
-## Savings Grey Zones To Resolve
+## Remaining Grey Zones
 
-These notes are review items for the `Savings` section. They should be corrected or removed after final product decisions are made.
-
-### Reordering `Saving` Squares
-
-Grey zone: The specs say the user can change square order by holding and moving `Saving` squares, but they do not say when the new order is saved or when coverage recalculates.
-
-Decision needed: Decide whether reorder changes save immediately, whether coverage recalculates immediately, and whether the first version needs a non-drag fallback for mobile or accessibility.
-
-### Duplicate `Saving` Square Names
-
-Grey zone: The specs say a `Saving` square name is required, but they do not say whether two `Saving` squares can use the same name.
-
-Decision needed: Decide whether duplicate `Saving` square names are allowed in the first version.
-
-### User-Facing Label For The Money Amount Inside `Savings`
-
-Grey zone: The specs describe the "money amount shown inside `Savings`", but they do not define the exact user-facing label for that amount.
-
-Decision needed: Choose the exact label for the money amount shown at the top of `Savings`, and make sure it is not confused with the main `Current Balance` label.
+Grey zone: The active plan and technical spec still say saved data may include `Basic website settings if needed`, but the first version does not define any settings. Decide whether to remove that line completely or define the exact settings that should exist.

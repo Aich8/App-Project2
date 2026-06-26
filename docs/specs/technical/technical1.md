@@ -30,7 +30,21 @@ Each `Saving` square should be saved with:
 
 The website should not save `Saving` squares with a planned money amount of `$0`.
 
+Saved `Saving` square names should be unique inside `Savings`.
+
+Before creating or renaming a `Saving` square, the website should trim spaces at the beginning and end of the entered name.
+
+The website should check duplicate `Saving` square names by comparing trimmed names without uppercase or lowercase differences.
+
+If a create or rename action would duplicate another saved `Saving` square name, the website should not save that duplicate name.
+
 `Saving` square order should be saved in browser storage so the same order appears after refresh.
+
+When the user finishes moving a `Saving` square and lets go, the website should save the final visible order in browser storage. Intermediate drag positions should not be saved as the source of truth.
+
+After a reorder action finishes, coverage bars and the money amount shown inside `Savings` should be recalculated from the new visible order.
+
+Reordering `Saving` squares should not change the current money amount and should not create a `Balance Changes` entry.
 
 Coverage bars and `{money amount} needed` notes should be calculated from the current money amount and the ordered `Saving` square planned money amounts. They should not be stored as the source of truth.
 
@@ -44,9 +58,14 @@ The coverage calculation should:
 
 - Start with the current money amount.
 - Check `Saving` squares from top to bottom.
+- Use the final visible order after any completed reorder action.
 - Mark each square as fully covered, partly covered, or not covered.
 - Reduce the remaining money amount used for display after each square.
 - Stop the money amount shown inside `Savings` at `$0`.
+
+The calculated money amount shown at the top of `Savings` should render with the exact user-facing label `Savings money amount`.
+
+`Savings money amount` is display text only. It should not be stored as the source of truth for the calculated value.
 
 Changing the current money amount should update coverage bars and the money amount shown inside `Savings`, but it should not automatically change the saved planned money amounts inside `Saving` squares.
 
@@ -103,7 +122,11 @@ If the user opens the website on another phone, another computer, another browse
 
 If the user clears browser data, clears site data, or uninstalls the browser, the saved website data may be deleted.
 
-The website should explain this in simple words so the user understands that browser storage is useful for convenience but is not the same as an online account or cloud backup.
+Browser storage is an internal implementation detail. The website should not tell the user where saved information is stored.
+
+The website should not tell the user that saved information belongs to the same browser or device.
+
+The website should not warn the user that saved information may disappear after changing browser, changing device, using private browsing, clearing browser data, clearing site data, or uninstalling the browser.
 
 ## Local Privacy Scope
 
@@ -115,7 +138,11 @@ Visible money change history should be kept for 30 days.
 
 For visible `Balance Changes` history, one month means 30 days, not a calendar month.
 
-When a `Balance Changes` entry is created, its visible until date should be calculated as the entry date and time plus 30 days.
+The user should not choose dates for `Add` or `Subtract` entries.
+
+The website should store a `Balance Changes` created date and time internally only for 30-day clearing.
+
+When a `Balance Changes` entry is created, its visible until date should be calculated as the internal created date and time plus 30 days.
 
 When the current date and time is at or after the visible until date and time, the entry may be removed or hidden from the visible history list.
 
