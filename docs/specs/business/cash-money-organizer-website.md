@@ -10,21 +10,29 @@
 
 ## Core Features
 
-### Current Money Amount
+### Money Amount
 
 The user can view their total money amount with the user-facing label `Current Balance`.
 
-A new user should be able to set their first money amount before using the dashboard. After setup, the user should be able to keep that money amount accurate with simple manual actions.
+A new user should see the money amount as `0$` the first time they open the website.
 
-The first money amount should be saved in history as `+{money amount} added`.
+The website should not ask for a starting amount before showing the dashboard.
 
-This first history entry should follow the same visible history rules as a normal `Add` entry. It should stay visible in `Balance Changes` for 30 days, and the user can delete it from the visible history without changing the main money amount.
+The website should not create saved browser data only because it shows the default `0$` money amount.
+
+The default `0$` money amount should not create a `Balance Changes` entry.
+
+When the money amount is `0$`, clicking the main money amount should show only the `Add` action.
+
+After the user adds money and the money amount is greater than `0$`, clicking the main money amount should show `Add`, `Modify`, and `Subtract`.
 
 The website should make the main money actions easy to understand without using real banking language.
 
 ### Storage Scope
 
 The first version should save the user's data only in browser storage.
+
+When no saved data exists yet, the website should show the default `0$` money amount without saving it just because the website opened. The website should start saving data after the first successful saved user action. In the normal first money flow, this is the first successful `Add`.
 
 Browser storage is an internal implementation detail. The website should not tell the user where saved information is stored.
 
@@ -42,11 +50,29 @@ The website should support users who update their money amount rarely and users 
 
 The money amount should never become negative.
 
-If the user subtracts more than the current money amount, the website should set the money amount to `$0`.
+The `Add` action should be available when the money amount is `0$` or more.
+
+The `Subtract` action should be available only when the money amount is greater than `0$`.
+
+`Add` and `Subtract` should accept only money amounts greater than `0$`.
+
+Negative money amounts should be blocked for all money actions.
+
+Money inputs should allow cents, with up to two digits after the decimal point.
+
+The user should enter only the number. The user may type a decimal point, such as `14.56`.
+
+The website should save and show that money amount with the `$` sign at the end, such as `14.56$`.
+
+Money amounts should be saved as decimal money amounts with the `$` sign at the end, not as integer cents. For example, save `14.56$`, not `1456`.
+
+Inputs with more than two digits after the decimal point should be blocked.
+
+If the user subtracts more than the current money amount, the website should set the money amount to `0$`.
 
 When a subtract action is larger than the current money amount, the `Balance Changes` entry should show only the actual amount removed from the money amount.
 
-If the money amount is already `$0`, subtracting should keep the money amount at `$0` and should not create a `Balance Changes` entry.
+If the money amount is already `0$`, subtracting should keep the money amount at `0$` and should not create a `Balance Changes` entry.
 
 ### Money Change History
 
@@ -56,17 +82,27 @@ The website should help users review recent money changes using the user-facing 
 
 `Add` and `Subtract` entries should stay separate in `Balance Changes` and remain visible for 30 days.
 
-Old visible history entries can be hidden or removed after 30 days without changing the saved money amount.
+The newest `Balance Changes` entry should appear first.
+
+Old visible history entries should be deleted from browser storage after 30 days without changing the saved money amount.
 
 For `Balance Changes`, one month means 30 days, not a calendar month.
 
 The user should not choose a date for an `Add` or `Subtract` entry.
 
-Dates should matter only for clearing old visible `Balance Changes` entries after 30 days. When a `Balance Changes` entry is created, the website should save the created date and time internally and calculate its visible-until date and time as 30 days later. At or after the visible-until date and time, the entry may be hidden or removed from the visible history list.
+Dates should matter only for clearing old visible `Balance Changes` entries after 30 days. When a `Balance Changes` entry is created, the website should save the created date and time internally and calculate its visible-until date and time as 30 days later. At or after the visible-until date and time, the entry should be deleted from browser storage and removed from the visible history list.
 
 The user can delete a `Balance Changes` entry when they make a mistake.
 
+Before deleting a `Balance Changes` entry, the website should ask the user to confirm the delete action.
+
+The confirmation message should be exactly `Delete this Balance Change?`.
+
+The confirmation buttons should be exactly `Cancel` and `Delete`.
+
 Deleting a `Balance Changes` entry only removes that entry from the visible history. It does not change, recalculate, or reverse the main money amount.
+
+After a `Balance Changes` entry is deleted, the website should not offer undo.
 
 The user should not be able to edit a saved `Balance Changes` entry. If the saved entry is wrong, the user should delete it from the visible history. If the main money amount is wrong, the user should use `Modify` to correct the main money amount.
 
@@ -74,9 +110,11 @@ The user should not be able to edit a saved `Balance Changes` entry. If the save
 
 ### Silent Modify Correction
 
-The user can manually correct the total money amount whenever they want by using `Modify`.
+The user can manually correct the total money amount by using `Modify` after the money amount is greater than `0$`.
 
 This is for setting the displayed total to the correct real cash amount when the website's current money amount no longer matches reality. The correction should not be confused with normal added or subtracted money.
+
+`Modify` should allow `0$` or more, but should not allow a negative money amount.
 
 ### Savings
 
@@ -92,11 +130,11 @@ Two `Saving` squares cannot use the same name. Names that match after trimming s
 
 If the user tries to create or rename a `Saving` square with a duplicate name, the website should not save that duplicate name.
 
-A `Saving` square should exist only when its planned money amount is greater than `$0`.
+A `Saving` square should exist only when its planned money amount is greater than `0$`.
 
 The user can use `Saving` squares to see what planned money is fully covered, partly covered, or not covered by the main money amount.
 
-The money amount shown inside `Savings` should start from the main money amount and subtract the planned money amounts in `Saving` squares in their visible order. It should never go below `$0`.
+The money amount shown inside `Savings` should start from the main money amount and subtract the planned money amounts in `Saving` squares in their visible order. It should never go below `0$`.
 
 The money amount shown at the top of `Savings` should use the exact user-facing label `Savings money amount`.
 
@@ -110,9 +148,9 @@ Changing a `Saving` square's planned money amount should replace the old planned
 
 Changing a `Saving` square's planned money amount does not change the main money amount and should not create a `Balance Changes` entry.
 
-If a `Saving` square's planned money amount becomes `$0`, the `Saving` square should disappear from `Savings` and should not stay saved as a `$0` square.
+If a `Saving` square's planned money amount becomes `0$`, the `Saving` square should disappear from `Savings` and should not stay saved as a `0$` square.
 
-Removing a `Saving` square because its planned money amount became `$0` should not change the main money amount and should not create a `Balance Changes` entry.
+Removing a `Saving` square because its planned money amount became `0$` should not change the main money amount and should not create a `Balance Changes` entry.
 
 `Saving` squares should have an order. The first `Saving` square the user creates should stay at the top by default. The user should be able to delete `Saving` squares and change their order by holding and moving them.
 
@@ -126,11 +164,15 @@ Reordering `Saving` squares should not change the main money amount and should n
 
 When the user deletes a `Saving` square:
 
+- The website should ask the user to confirm the delete action before deleting the `Saving` square.
+- The confirmation message should be exactly `Delete this Saving?`.
+- The confirmation buttons should be exactly `Cancel` and `Delete`.
 - Only that `Saving` square and the details inside it should be removed.
 - The main money amount should not change.
 - `Balance Changes` should not get a new entry.
 - Other `Saving` squares should keep their names, planned money amounts, and relative order.
 - The money amount shown inside `Savings` and the coverage bars should update from the remaining `Saving` squares because they are calculated display values.
+- After the `Saving` square is deleted, the website should not offer undo.
 
 The website should check `Saving` squares from top to bottom using the main money amount:
 
@@ -146,9 +188,9 @@ If a `Saving` square is not fully covered, the square should show a small `{mone
 
 The user should add a new `Saving` square using a circle action with a `+` sign.
 
-Before a new `Saving` square is created, the user should enter the `Saving` name and a planned money amount greater than `$0` for that square.
+Before a new `Saving` square is created, the user should enter the `Saving` name and a planned money amount greater than `0$` for that square.
 
-If the user does not enter both a valid name and a planned money amount greater than `$0`, the `Saving` square should not be created.
+If the user does not enter both a valid name and a planned money amount greater than `0$`, the `Saving` square should not be created.
 
 The planned money amount in a `Saving` square does not mean money has moved into a separate place. It does not subtract money and does not lower the main money amount. It only changes planning inside the `Savings` section.
 
@@ -191,7 +233,7 @@ Better wording:
 
 ## Success Criteria
 
-- Users can add, subtract, or manually correct their money amount whenever they need to.
+- Users can add money whenever they need to, and can use `Modify` or `Subtract` after the money amount is greater than `0$`.
 - Users can make many changes in one day without hitting a usage limit.
 - Users can return after a long time and still understand or update their money amount.
 - Users can review `Balance Changes` to understand how their money amount changed.
@@ -199,6 +241,8 @@ Better wording:
 - Users can understand that `Savings` is a planning section, not a real account or separate goals feature.
 - Users can understand that the website is a manual cash tracker, not a real bank.
 
-## Remaining Grey Zones
+## Remaining Grey Zones And Mistakes
 
-Grey zone: The active plan and technical spec still say saved data may include `Basic website settings if needed`, but the first version does not define any settings. Decide whether to remove that line completely or define the exact settings that should exist.
+- Grey zone: Invalid input is blocked, but the exact error messages are not defined. This includes invalid money amounts, duplicate `Saving` names, and missing `Saving` names or planned money amounts.
+- Grey zone: Money amounts with no cents or one decimal digit are not fully defined. For example, the specs do not say whether `14`, `14.0`, and `14.50` should be saved and shown as `14$`, `14.0$`, `14.50$`, or another exact format.
+- Grey zone: The technical spec says to use one stable storage key and a data version number, but it does not name the exact storage key or the first data version value.
