@@ -23,7 +23,7 @@ Users manually enter and update their own money amount. The website displays a b
 - Separate add and subtract history entries.
 - `Savings` section with the label `Savings money amount`, ordered user-named `Saving` squares, and coverage bars.
 
-The main money amount is clickable. When the money amount is `0$`, clicking it shows only `Add`. When the money amount is greater than `0$`, clicking it shows `Modify`, `Add`, and `Subtract`.
+The main money amount is clickable. When the money amount is `0$`, clicking it shows only `Add`. When the money amount is greater than `0$`, clicking it shows `Add`, `Subtract`, and `Modify`.
 
 The user opens `Savings` by clicking `Savings`. There should not be a separate `Open savings` action.
 
@@ -31,7 +31,15 @@ The user opens `Savings` by clicking `Savings`. There should not be a separate `
 
 The user creates a `Saving` square by clicking the `+` action in `Savings`, then entering the square name and planned money amount before the square appears.
 
+If the user tries to save a new `Saving` square without a planned money amount, the website should do nothing: no message, no new square, no saved data change, and the create flow stays open until the user enters a planned money amount or cancels.
+
 A `Saving` square name is required and must be unique inside `Savings`. The website should not create or rename a `Saving` square with the same name as another `Saving` square, using trimmed names and ignoring uppercase or lowercase letters when checking for duplicates.
+
+If the user tries to save a new `Saving` square without a `Saving` name, the website should do nothing: no message, no new square, no saved data change, and the create flow stays open until the user enters a name or cancels.
+
+If the user tries to rename an existing `Saving` square with an empty name, the website should do nothing: no message, no saved data change, and the rename flow stays open until the user enters a name or cancels.
+
+If the user enters a duplicate `Saving` name while creating or renaming a `Saving` square, the website should return to the `Saving` squares view without showing a duplicate-name error message. Nothing should change.
 
 The money amount shown at the top of `Savings` should use the exact user-facing label `Savings money amount`. This label is separate from `Current Balance`, which is only for the main money amount.
 
@@ -42,6 +50,8 @@ The visible order is the coverage order. If the user moves a `Saving` square to 
 The planned money amount in a `Saving` square does not mean money has moved into a separate place. It does not lower the main money amount.
 
 After a `Saving` square is created, changing its planned money amount replaces the old planned money amount with a new total planned money amount. It is not an add or subtract action and does not change the main money amount.
+
+If the user tries to change an existing `Saving` square's planned money amount with an empty planned money amount, the website should do nothing: no message, no saved data change, and the change flow stays open until the user enters a planned money amount or cancels.
 
 A `Saving` square should not be created or saved with a `0$` planned money amount. If an existing `Saving` square's planned money amount becomes `0$`, the square should disappear from `Savings`.
 
@@ -55,9 +65,9 @@ When no saved money amount exists yet, the website starts with the money amount 
 
 Opening the website with the default `0$` money amount should not create saved browser data by itself. The website should start saving after the first successful saved user action. In the normal first money flow, this is the first successful `Add`.
 
-The user clicks the money amount and uses `Add` to add money. After the money amount is greater than `0$`, users can update the amount with `Modify`, `Add`, and `Subtract`.
+The user clicks the money amount and uses `Add` to add money. After the money amount is greater than `0$`, users can update the amount with `Add`, `Subtract`, and `Modify`.
 
-Money inputs may use a decimal point for cents, such as `14.56`. The website should save and show that money amount as `14.56$`, not as integer cents like `1456`.
+Money inputs may use a decimal point for cents, such as `14.56`. Money amount inputs should request a decimal numeric keyboard on devices that support it, so the user gets number keys `0` through `9` and a decimal point. Money amount inputs should ignore letters while the user types, and the first accepted character must be a number from `0` through `9`. The website should save and show that money amount as `14.56$`, not as integer cents like `1456`. The zero money amount should show as `0$`, nonzero whole money amounts should show with one digit after the decimal point such as `14.0$`, and nonzero money amounts with cents should show with two digits after the decimal point such as `14.50$`.
 
 `Add` and `Subtract` actions should appear as separate visible history entries for 30 days. They should not be combined into only one net result.
 
