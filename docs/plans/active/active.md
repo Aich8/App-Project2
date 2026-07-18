@@ -101,6 +101,7 @@ Money amount:
 Browser storage:
 - Storage key: `cash-money-organizer-website-data`.
 - Data version: `1` for the first saved data version.
+- Load saved browser data only when the data version value is exactly `1`.
 - Money amount data.
 - 30-day visible `Balance Changes` entries.
 - `Saving` squares.
@@ -150,6 +151,7 @@ Acceptance criteria:
 - Data can be restored after closing and reopening the website in the same browser.
 - If no saved data exists, the website shows the dashboard with the money amount set to `0$`.
 - Showing the default `0$` money amount does not create saved browser data by itself.
+- Saved browser data with a missing, wrong, future, unreadable, or unrecognized data version shows `Saved data could not be loaded.` and a `Start again` action.
 - The first view does not explain where saved data is stored.
 
 ### Milestone 2: Cash Dashboard
@@ -183,6 +185,9 @@ Tasks:
 - Validate amount inputs.
 - Request a decimal numeric keyboard for money amount inputs on devices that support it.
 - Keep money amount input fields unchanged when the user types letters or other blocked characters.
+- Block paste into money amount inputs and keep the input unchanged with no message.
+- Add bottom text actions `Save` and `Cancel` to `Add`, `Subtract`, and `Modify` money amount input flows.
+- Make `Cancel` close the money amount input flow, return to the dashboard money amount view, and change nothing.
 - Save each `Add` and `Subtract` action to `Balance Changes` as its own separate entry.
 - Do not combine separate `Add` and `Subtract` actions into one net history result.
 - Do not save `Modify` actions to `Balance Changes`.
@@ -200,19 +205,30 @@ Acceptance criteria:
 - Modifying the money amount replaces the current money amount without creating history or notification entries.
 - Separate `Add` and `Subtract` actions stay separate in history.
 - Money changes are still visible after page refresh.
-- Invalid amounts are blocked with useful feedback.
+- Money amount inputs keep their previous value when the user types letters, minus signs, a second decimal point, or more than two digits after the decimal point.
+- If an empty money amount input receives a letter, minus sign, or decimal point as the first typed character, the field stays empty and no message is shown for that typed character.
+- If the user tries to paste letters, numbers, symbols, or any other content into a money amount input, the pasted content does not appear, the input keeps its previous value, and no message is shown.
+- `Add`, `Subtract`, and `Modify` money amount input flows show bottom text actions `Save` and `Cancel`.
+- `Cancel` in `Add`, `Subtract`, or `Modify` closes the money amount input flow, returns to the dashboard money amount view, changes nothing, saves nothing, creates no `Balance Changes` entry, and shows no message.
+- `Add`, `Subtract`, and `Modify` do not save invalid money amounts. Negative money amounts are blocked, `Add` and `Subtract` require more than `0$`, and `Modify` allows `0$` or more.
+- Trying to save an empty money amount in `Add`, `Subtract`, or `Modify` does nothing: no message, no money amount change, no saved data change, no `Balance Changes` entry, and the same money amount input step stays open.
+- Trying to save `0$` in `Add` or `Subtract` does nothing: no message, no money amount change, no saved data change, no `Balance Changes` entry, and the same money amount input step stays open.
 
 ### Milestone 4: Balance Changes
 
 Tasks:
 - Build the `Balance Changes` list directly under the main money amount.
-- Show type, amount, and money amount change.
+- Show each visible `Balance Changes` row as only the signed money amount and action text: `+{money amount} added` or `-{money amount} subtracted`.
+- Do not show the previous money amount, new money amount, date, or time in visible `Balance Changes` rows.
 - Keep each add and subtract action as its own visible entry.
 - Show newest `Balance Changes` entries first.
 - Do not ask the user to choose a date for `Add` or `Subtract`.
 - Do not replace separate entries with only a combined net result.
 - Calculate each `Balance Changes` internal visible until date and time as the internal created date and time plus 30 days.
-- Delete visible history entries from browser storage at or after their visible until date.
+- Run `Balance Changes` cleanup when the website opens and loads saved data.
+- Run `Balance Changes` cleanup after every successful saved user action.
+- During cleanup, delete visible history entries from browser storage at or after their visible until date.
+- Do not add a background timer for checking old `Balance Changes` entries while the website stays open with no user action.
 - Keep the current money amount unchanged when old history entries expire.
 - Let the user scroll down when the history list is longer than the screen.
 - Add delete support that asks for confirmation with `Delete this Balance Change?`, shows `Cancel` and `Delete`, removes only the visible history entry, does not change the current money amount, and does not offer undo.
@@ -220,9 +236,12 @@ Tasks:
 Acceptance criteria:
 - The user can understand how their money amount changed over time.
 - The user sees separate entries such as `+56.0$ added` and `-34.0$ subtracted`.
+- Visible `Balance Changes` rows do not show previous money amount, new money amount, date, or time.
 - The newest `Balance Changes` entry appears first.
 - `Balance Changes` does not show only a combined result such as `+22.0$ net change`.
-- `Balance Changes` entries at or after their visible until date are deleted from browser storage and no longer shown.
+- `Balance Changes` cleanup runs when the website opens and loads saved data.
+- `Balance Changes` cleanup runs after every successful saved user action.
+- During cleanup, entries at or after their visible until date are deleted from browser storage and no longer shown.
 - Removing old history entries does not change the current money amount.
 - The user can scroll down to see more history entries when needed.
 - Deleting an entry asks for confirmation first with `Delete this Balance Change?`, shows `Cancel` and `Delete`, removes only the visible history entry, does not change the current money amount, and does not offer undo.
@@ -251,6 +270,10 @@ Tasks:
 - Build create, rename, delete, and reorder square actions.
 - Keep create or rename open with no message and no saved data changes when the user tries to save a missing `Saving` name.
 - Keep create or planned-money-amount change open with no message and no saved data changes when the user tries to save a missing planned money amount.
+- Keep the `Saving` square create input step open with no message and no saved data changes when the user tries to save a new `Saving` square with a planned money amount of `0$`.
+- Add bottom text actions `Save` and `Cancel` to `Saving` square create, rename, and planned-money-amount change input flows.
+- Make `Cancel` close the `Saving` square input flow, return to the `Saving` squares view, and change nothing.
+- For new `Saving` square creation, validate in this order: planned money amount missing or `0$`, missing `Saving` name, then duplicate `Saving` name.
 - Return to the `Saving` squares view with no changes when creating or renaming a `Saving` square with a duplicate name.
 - Make delete ask for confirmation with `Delete this Saving?`, show `Cancel` and `Delete`, remove only the selected `Saving` square and its saved details, and not offer undo.
 - Build planned-money-amount editing flows that replace the old planned money amount with a new total planned money amount.
@@ -276,10 +299,14 @@ Acceptance criteria:
 - If the user tries to save a new `Saving` square without a planned money amount, nothing happens: no message appears, no square is created, saved data stays unchanged, and the create flow stays open until the user enters a planned money amount or cancels.
 - If the user tries to rename a `Saving` square with an empty name, nothing happens: no message appears, the old name stays saved, saved data stays unchanged, and the rename flow stays open until the user enters a name or cancels.
 - If the user tries to change a `Saving` square planned money amount with an empty planned money amount, nothing happens: no message appears, the old planned money amount stays saved, saved data stays unchanged, and the change flow stays open until the user enters a planned money amount or cancels.
+- `Saving` square create, rename, and planned-money-amount change input flows show bottom text actions `Save` and `Cancel`.
+- `Cancel` in `Saving` square create, rename, or planned-money-amount change closes the input flow, returns to the `Saving` squares view, changes nothing, saves nothing, creates no `Balance Changes` entry, updates no dates, and shows no message.
 - If the user enters a duplicate name while creating a `Saving` square, the website returns to the `Saving` squares view, shows no duplicate-name error message, creates no new `Saving` square, and keeps saved data unchanged.
 - If the user enters a duplicate name while renaming a `Saving` square, the website returns to the `Saving` squares view, shows no duplicate-name error message, keeps the old name, and keeps saved data unchanged.
 - Duplicate `Saving` square name checks use trimmed names and ignore uppercase or lowercase differences.
 - A new `Saving` square is not created with a `0$` planned money amount.
+- If the user tries to save a new `Saving` square with a planned money amount of `0$`, nothing happens: no message appears, no square is created, saved data stays unchanged, `Balance Changes` does not get a new entry, and the same `Saving` square create input step stays open until the user enters a planned money amount greater than `0$` or cancels.
+- If a new `Saving` square create attempt has a duplicate name and a missing or `0$` planned money amount, the planned-money-amount rule happens first, so the same `Saving` square create input step stays open with no message and no saved data change.
 - The planned money amount in a `Saving` square does not mean money has moved into a separate place.
 - A `Saving` square disappears from `Savings` if its planned money amount becomes `0$`.
 - A `0$` `Saving` square is not saved in browser storage.
@@ -364,6 +391,11 @@ Acceptance criteria:
 - Money amount inputs should request a decimal numeric keyboard on devices that support it, so the user gets number keys `0` through `9` and a decimal point.
 - Money amount inputs should ignore letters while the user types. The first accepted character must be a number from `0` through `9`.
 - If a money amount field is empty and the user types a letter or decimal point, the field should not change.
+- Blocked typed characters should not appear in money amount inputs, and no message should appear for those blocked typed characters.
+- Money amount inputs and `Saving` square planned money amount inputs should block paste. Pasted content should not appear, the input should keep its previous value, and no message should appear.
+- Normal input flows should show bottom text actions `Save` and `Cancel`.
+- In normal input flows, `Save` should try to save the entered values using the rules for that action.
+- In normal input flows, `Cancel` should close the input flow, return to the view the user was already using, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
 - After the first number, money amount inputs should accept only numbers and one decimal point, while still blocking more than two digits after the decimal point.
 - The website should save and show money amounts with the `$` sign at the end, such as `14.56$`.
 - Saved money amounts should use the decimal money amount with the `$` sign at the end, such as `14.56$`, not integer cents such as `1456`.
@@ -372,6 +404,8 @@ Acceptance criteria:
 - Nonzero money amounts with cents should show with two digits after the decimal point, such as `14.50$`.
 - Amounts with more than two digits after the decimal point should be blocked.
 - Amounts must be greater than zero for add and subtract actions.
+- Trying to save an empty money amount in `Add`, `Subtract`, or `Modify` should do nothing: no message, no money amount change, no saved data change, no `Balance Changes` entry, and the same money amount input step stays open.
+- Trying to save `0$` in `Add` or `Subtract` should do nothing: no message, no money amount change, no saved data change, no `Balance Changes` entry, and the same money amount input step stays open.
 - Modify amounts must be `0$` or more.
 - Negative amounts should be blocked for all money actions.
 - Subtracting more than the current money amount should set the current money amount to `0$`.
@@ -384,6 +418,9 @@ Acceptance criteria:
 - Duplicate `Saving` square name checks should use trimmed names and ignore uppercase or lowercase differences.
 - `Saving` square planned money amount should be greater than `0$` when creating a `Saving` square.
 - Trying to save a missing planned money amount should do nothing until the user enters a planned money amount or cancels.
+- Trying to save a new `Saving` square with a planned money amount of `0$` should do nothing: no message, no new `Saving` square, no saved data change, no `Balance Changes` entry, and the same `Saving` square create input step stays open.
+- New `Saving` square create validation should check planned money amount first, missing `Saving` name second, and duplicate `Saving` name third.
+- A duplicate `Saving` name with a missing or `0$` planned money amount should keep the same `Saving` square create input step open with no message and no saved data change.
 - `0$` should remove an existing `Saving` square instead of saving it with a `0$` planned money amount.
 - Changing a `Saving` square planned money amount should use a new total planned money amount, not an add or subtract amount.
 - Total planned money amount in `Saving` squares may be greater than the current money amount. The money amount shown inside `Savings` should stop at `0$`, and coverage bars should show what is still needed.
@@ -392,7 +429,9 @@ Acceptance criteria:
 - `Add`, `Subtract`, and `Balance Changes` entries should not have notes.
 - Browser storage data should be checked before use so broken saved data does not crash the website.
 - Broken saved data should show `Saved data could not be loaded.` and a `Start again` action.
-- Clicking `Start again` should delete the broken saved data, start fresh at `0$`, show empty `Balance Changes`, and show no saved `Saving` squares.
+- Saved browser data should load only when the data version value is exactly `1`.
+- Saved browser data with a missing, wrong, future, unreadable, or unrecognized data version should be treated as broken saved data.
+- Clicking `Start again` should delete the broken saved data and immediately create fresh browser storage data with the money amount set to `0$`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`.
 - Visible history entries should be shown for 30 days.
 - For visible `Balance Changes` history, one month means 30 days, not a calendar month.
 - Each `Balance Changes` internal visible until date and time should be calculated from the internal created date and time plus 30 days.
@@ -404,11 +443,19 @@ Acceptance criteria:
 - The first version should not use email accounts, login, cloud sync, or a server database.
 - Do not create saved browser data only because the website opened and showed the default `0$` money amount.
 - Save after every successful money amount change, `Saving` square change, or `Balance Changes` delete.
+- Do not save browser storage for `Add`, `Subtract`, or `Modify` attempts with an empty money amount because nothing changed.
+- Do not save browser storage for `Add` or `Subtract` attempts with `0$` because nothing changed.
+- Do not save browser storage for new `Saving` square attempts with a planned money amount of `0$` because nothing changed.
 - Save `Modify` changes only as an updated current money amount, not as a history entry.
 - Save `Balance Changes` deletes only as visible history removal, not as a money amount change.
 - Load saved browser data before showing the dashboard.
 - If saved browser data exists, restore the money amount, 30-day visible `Balance Changes` history, and `Saving` squares.
-- Delete visible history entries from browser storage at or after their visible until date without changing the saved current money amount.
+- Restore saved browser data only when the data version value is exactly `1`.
+- Treat saved browser data with a missing, wrong, future, unreadable, or unrecognized data version as broken saved data.
+- When the user chooses `Start again` after broken saved data, immediately create fresh browser storage data with the money amount set to `0$`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`.
+- Delete visible history entries from browser storage at or after their visible until date during cleanup without changing the saved current money amount.
+- Run `Balance Changes` cleanup when the website opens and loads saved data, and after every successful saved user action.
+- Do not add a background timer for old `Balance Changes` cleanup while the website stays open with no user action.
 - If no saved browser data exists, show the dashboard with the money amount set to `0$`.
 - If saved browser data is broken or unreadable, show `Saved data could not be loaded.` and let the user choose `Start again`.
 - Use one stable storage key for website data: `cash-money-organizer-website-data`.
@@ -448,8 +495,15 @@ Use:
 - Add money accepts a whole amount such as `14` and saves it as `14.0$`.
 - Add money accepts a cents amount such as `14.50` and saves it as `14.50$`.
 - Money amount inputs request a decimal numeric keyboard on devices that support it.
-- Typing letters into a money amount input does not change the field.
+- Typing letters into a money amount input does not change the field, and no message appears for that typed character.
+- Trying to paste letters, numbers, symbols, or any other content into a money amount input does not change the field and shows no message.
+- Trying to paste letters, numbers, symbols, or any other content into a `Saving` square planned money amount input does not change the field and shows no message.
+- `Add`, `Subtract`, `Modify`, `Saving` square create, `Saving` square rename, and `Saving` square planned-money-amount change input flows show `Save` and `Cancel` text actions at the bottom.
+- Canceling any normal input flow changes nothing, saves nothing, creates no `Balance Changes` entry, and shows no message.
 - An empty money amount input stays empty until the first accepted character is a number from `0` through `9`.
+- Trying to save an empty money amount in `Add`, `Subtract`, or `Modify` does not change the money amount, does not save data, does not create a `Balance Changes` entry, and keeps the same money amount input step open.
+- Trying to save `0$` in `Add` does not change the money amount, does not save data, does not create a `Balance Changes` entry, and keeps the same money amount input step open.
+- Trying to save `0$` in `Subtract` does not change the money amount, does not save data, does not create a `Balance Changes` entry, and keeps the same money amount input step open.
 - Subtract money updates the money amount correctly.
 - Subtracting more than the current money amount sets the money amount to `0$`.
 - Subtracting more than the current money amount saves the actual removed amount in history.
@@ -462,10 +516,14 @@ Use:
 - Money amount change history appears directly under the main money amount.
 - There is no separate `View history` action for money amount change history.
 - Long money amount change history can be reached by scrolling down.
-- `Balance Changes` entries at or after their visible until date are deleted from browser storage.
+- During cleanup, `Balance Changes` entries at or after their visible until date are deleted from browser storage.
+- `Balance Changes` cleanup runs when the website opens and loads saved data.
+- `Balance Changes` cleanup runs after every successful saved user action.
 - `Balance Changes` internal visible until dates are calculated from the internal created date and time plus 30 days.
 - Expiring old history entries does not change the current money amount.
 - `Balance Changes` shows correct differences.
+- Visible `Balance Changes` rows show only the signed money amount and action text, such as `+56.0$ added` or `-34.0$ subtracted`.
+- Visible `Balance Changes` rows do not show previous money amount, new money amount, date, or time.
 - Deleting a `Balance Changes` entry removes only that visible history entry and does not change the current money amount.
 - Deleting a `Balance Changes` entry asks for confirmation first with `Delete this Balance Change?`, shows `Cancel` and `Delete`, and does not offer undo.
 - Saved `Balance Changes` entries cannot be edited.
@@ -476,7 +534,7 @@ Use:
 - The first view does not warn that saved data may disappear after browser or device changes.
 - The default `0$` dashboard appears when there is no saved browser data.
 - Broken browser storage data shows a clear recovery message.
-- Clicking `Start again` after broken browser storage data deletes the broken saved data and starts fresh at `0$` with empty `Balance Changes` and no saved `Saving` squares.
+- Clicking `Start again` after broken browser storage data deletes the broken saved data and immediately creates fresh browser storage data with the money amount set to `0$`, empty `Balance Changes`, no saved `Saving` squares, and data version `1`.
 - The website works whether the user updates money rarely or many times in one day.
 - `Saving` squares can be created, renamed, updated, and deleted.
 - Trying to save a new `Saving` square without a name does nothing, keeps the create flow open, and does not change saved data.
@@ -484,6 +542,7 @@ Use:
 - Trying to rename a `Saving` square with an empty name does nothing, keeps the rename flow open, and does not change saved data.
 - Trying to change a `Saving` square planned money amount with an empty planned money amount does nothing, keeps the change flow open, and does not change saved data.
 - Creating or renaming a `Saving` square with a duplicate name returns to the `Saving` squares view with no duplicate-name error message and no saved data changes.
+- Creating a `Saving` square with a duplicate name and a missing or `0$` planned money amount keeps the same `Saving` square create input step open with no message and no saved data change.
 - `Saving` squares can be reordered by holding and moving them.
 - Moving the last `Saving` square to the top makes that square checked first, saves the final order after the user lets go, and recalculates coverage bars from the new visible order.
 - Clicking `Savings` opens the Savings section.
@@ -491,7 +550,7 @@ Use:
 - The main money amount is still labeled `Current Balance`.
 - Creating a `Rent` `Saving` square with a planned money amount of `40.0$` changes the money amount shown inside `Savings` from `350.0$` to `310.0$` when the main money amount is `350.0$`.
 - Creating a `Saving` square with a planned money amount does not change the main money amount.
-- Creating a `Saving` square with a `0$` planned money amount is blocked.
+- Trying to save a new `Saving` square with a `0$` planned money amount does not create a square, does not save data, does not create a `Balance Changes` entry, shows no message, and keeps the same `Saving` square create input step open.
 - Changing `Rent` from `40.0$` to `60.0$` makes `Rent` show `60.0$`, not `100.0$`.
 - Changing `Rent` from `40.0$` to `10.0$` makes `Rent` show `10.0$`, not `30.0$`.
 - Changing `Rent` from `40.0$` to `0$` removes `Rent` from `Savings`.

@@ -34,6 +34,10 @@ The first version should save the user's data only in browser storage.
 
 The implementation should use the stable storage key `cash-money-organizer-website-data` and the first data version value `1`.
 
+The first version should load saved browser data only when the data version value is exactly `1`. Saved browser data with a missing, wrong, future, unreadable, or unrecognized data version should be treated as broken saved data.
+
+If saved browser data is broken or cannot be read, the website should show `Saved data could not be loaded.` with a `Start again` action. When the user chooses `Start again`, the website should delete the broken saved data and immediately create fresh browser storage data with the money amount set to `0$`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`.
+
 When no saved data exists yet, the website should show the default `0$` money amount without saving it just because the website opened. The website should start saving data after the first successful saved user action. In the normal first money flow, this is the first successful `Add`.
 
 Browser storage is an internal implementation detail. The website should not tell the user where saved information is stored.
@@ -58,6 +62,10 @@ The `Subtract` action should be available only when the money amount is greater 
 
 `Add` and `Subtract` should accept only money amounts greater than `0$`.
 
+If the user tries to save an empty money amount in `Add`, `Subtract`, or `Modify`, the website should do nothing. No message should appear, the money amount should stay unchanged, saved data should stay unchanged, no `Balance Changes` entry should be created, and the same money amount input step should stay open until the user enters a valid money amount or cancels.
+
+If the user tries to save `0$` in `Add` or `Subtract`, the website should do nothing. No message should appear, the money amount should stay unchanged, saved data should stay unchanged, no `Balance Changes` entry should be created, and the same money amount input step should stay open until the user enters a money amount greater than `0$` or cancels.
+
 Negative money amounts should be blocked for all money actions.
 
 Money inputs should allow cents, with up to two digits after the decimal point.
@@ -66,7 +74,13 @@ The user should enter only the number. The user may type a decimal point, such a
 
 Money amount inputs should request a decimal numeric keyboard on devices that support it, so the user gets number keys `0` through `9` and a decimal point.
 
-Money amount inputs should filter typing while the user types. The first accepted character must be a number from `0` through `9`. If the field is empty and the user types a letter or decimal point, the field should not change. After a number is entered, the input should accept only numbers and one decimal point, while still blocking more than two digits after the decimal point.
+Money amount inputs should filter typing while the user types. The first accepted character must be a number from `0` through `9`. If the field is empty and the user types a letter or decimal point, the field should not change. After a number is entered, the input should accept only numbers and one decimal point, while still blocking more than two digits after the decimal point. Blocked typed characters should not appear in the field, and no message should appear for those blocked typed characters.
+
+The user should not be able to paste into money amount inputs. If the user tries to paste letters, numbers, symbols, or any other content into a money amount input, the pasted content should not appear, the input should keep its previous value, and no message should appear.
+
+`Add`, `Subtract`, and `Modify` money amount input flows should show two text actions at the bottom: `Save` and `Cancel`.
+
+In `Add`, `Subtract`, and `Modify`, `Save` should try to save the entered money amount using the money amount rules. `Cancel` should close the money amount input flow, return to the dashboard money amount view, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
 
 The website should save and show that money amount with the `$` sign at the end, such as `14.56$`.
 
@@ -94,15 +108,23 @@ The website should help users review recent money changes using the user-facing 
 
 `Add` and `Subtract` entries should stay separate in `Balance Changes` and remain visible for 30 days.
 
+Each visible `Balance Changes` row should show only the signed money amount and action text: `+{money amount} added` or `-{money amount} subtracted`.
+
+Visible `Balance Changes` rows should not show the previous money amount, new money amount, date, or time.
+
 The newest `Balance Changes` entry should appear first.
 
-Old visible history entries should be deleted from browser storage after 30 days without changing the saved money amount.
+Old visible history entries should be deleted from browser storage during cleanup after 30 days without changing the saved money amount.
 
 For `Balance Changes`, one month means 30 days, not a calendar month.
 
 The user should not choose a date for an `Add` or `Subtract` entry.
 
-Dates should matter only for clearing old visible `Balance Changes` entries after 30 days. When a `Balance Changes` entry is created, the website should save the created date and time internally and calculate its visible-until date and time as 30 days later. At or after the visible-until date and time, the entry should be deleted from browser storage and removed from the visible history list.
+Dates should matter only for clearing old visible `Balance Changes` entries after 30 days. When a `Balance Changes` entry is created, the website should save the created date and time internally and calculate its visible-until date and time as 30 days later.
+
+The website should run `Balance Changes` cleanup when it opens and loads saved data, and after every successful saved user action. During cleanup, entries at or after their visible-until date and time should be deleted from browser storage and removed from the visible history list.
+
+The first version does not need a background timer that checks old `Balance Changes` entries while the website stays open with no user action. If the website stays open past an entry's visible-until date and time, that old entry may remain visible until the next website open or successful saved user action runs cleanup.
 
 The user can delete a `Balance Changes` entry when they make a mistake.
 
@@ -152,6 +174,16 @@ If the user enters a duplicate `Saving` name while creating or renaming a `Savin
 
 A `Saving` square should exist only when its planned money amount is greater than `0$`.
 
+If the user tries to save a new `Saving` square with a planned money amount of `0$`, the website should do nothing. No message should appear, no new `Saving` square should be created, saved data should stay unchanged, `Balance Changes` should not get a new entry, and the same `Saving` square create input step should stay open until the user enters a planned money amount greater than `0$` or cancels.
+
+When a new `Saving` square create attempt has more than one invalid value, the website should check the create inputs in this order:
+
+1. Planned money amount is missing or `0$`.
+2. `Saving` name is missing.
+3. `Saving` name is duplicate.
+
+The first matching rule decides what happens. This means a duplicate `Saving` name with a missing or `0$` planned money amount should keep the same `Saving` square create input step open with no message, no saved data change, no new `Saving` square, and no `Balance Changes` entry. The website should check duplicate names only after the planned money amount is greater than `0$` and the `Saving` name is not empty.
+
 The user can use `Saving` squares to see what planned money is fully covered, partly covered, or not covered by the main money amount.
 
 The money amount shown inside `Savings` should start from the main money amount and subtract the planned money amounts in `Saving` squares in their visible order. It should never go below `0$`.
@@ -167,6 +199,10 @@ After a `Saving` square is created, the user can change that square's planned mo
 If the user tries to change an existing `Saving` square's planned money amount with an empty planned money amount, the website should do nothing. No message should appear, the old planned money amount should stay saved, saved data should stay unchanged, and the planned-money-amount change flow should stay open until the user enters a planned money amount or cancels changing that square.
 
 If the user tries to rename an existing `Saving` square with an empty name, the website should do nothing. No message should appear, the old name should stay saved, saved data should stay unchanged, and the rename flow should stay open until the user enters a `Saving` name or cancels renaming that square.
+
+`Saving` square create, rename, and planned-money-amount change input flows should show two text actions at the bottom: `Save` and `Cancel`.
+
+In `Saving` square create, rename, and planned-money-amount change input flows, `Save` should try to save the entered values using the `Saving` square rules. `Cancel` should close the input flow, return to the `Saving` squares view, change nothing, save nothing, create no `Balance Changes` entry, update no dates, and show no message.
 
 Changing a `Saving` square's planned money amount should replace the old planned money amount. It should not add to or subtract from the old planned money amount.
 
@@ -217,6 +253,12 @@ Before a new `Saving` square is created, the user should enter the `Saving` name
 If the user tries to save without a planned money amount, the website should do nothing until the user enters a planned money amount or cancels.
 
 If the user does not enter both a valid name and a planned money amount greater than `0$`, the `Saving` square should not be created.
+
+If the planned money amount is `0$` while creating a new `Saving` square, the same `Saving` square create input step should stay open with no message, no saved data change, and no `Balance Changes` entry.
+
+If the planned money amount is missing or `0$` while creating a new `Saving` square, that planned-money-amount rule should happen before any duplicate-name rule.
+
+The user should not be able to paste into `Saving` square planned money amount inputs. If the user tries to paste letters, numbers, symbols, or any other content into a planned money amount input, the pasted content should not appear, the input should keep its previous value, and no message should appear.
 
 The planned money amount in a `Saving` square does not mean money has moved into a separate place. It does not subtract money and does not lower the main money amount. It only changes planning inside the `Savings` section.
 
@@ -269,11 +311,6 @@ Better wording:
 
 ## Remaining Grey Zones And Mistakes
 
-- Mistake: The active plan still says invalid amounts are blocked with useful feedback. This does not match the newer decisions where some invalid actions show no message and letters simply do not change money amount inputs.
-- Grey zone: The exact result for trying to save an empty money amount in `Add`, `Subtract`, or `Modify` is not fully defined. The specs say invalid money amounts are blocked, but they do not say whether the flow stays open, closes, or shows no message.
-- Grey zone: The exact result for entering `0$` in `Add` or `Subtract` is not fully defined. The specs say `Add` and `Subtract` need a money amount greater than `0$`, but they do not say what the website should do when the user tries to save `0$`.
-- Grey zone: Creating a new `Saving` square with a planned money amount of `0$` is blocked, but the exact behavior is not fully defined. The specs do not say whether the create flow stays open with no message, closes, or returns to the `Saving` squares view.
-- Grey zone: The visible `Balance Changes` row format is not fully defined. The specs define examples like `+56.0$ added` and `-34.0$ subtracted`, but they do not say whether each row should also show previous money amount, new money amount, date, or time.
-- Grey zone: Old `Balance Changes` entries must be deleted at or after their visible-until date and time, but the exact cleanup trigger is not defined. The specs do not say whether cleanup runs only when the website opens, after every saved action, while the website stays open, or all of those.
-- Grey zone: Saved data with a missing, wrong, or future data version is not fully defined. The specs now define storage key `cash-money-organizer-website-data` and data version `1`, but they do not say whether another version should be treated as broken saved data or handled another way.
-- Mistake: The global spec says the website helps users "understand where their cash is going," but the first version does not have notes or categories, so it can show money amount changes but not exactly where money went.
+- Grey zone: Returning from `Savings` to the dashboard is not fully defined if `Savings` is implemented as a separate page or full-screen view. The specs say the user opens `Savings` by clicking `Savings`, but they do not define the back or close action.
+- Grey zone: Very long `Saving` names are not fully defined. The specs say `Saving` names are required, trimmed, and unique, but they do not define a maximum length or how very long names should behave so they do not break the square layout.
+- Grey zone: The active plan includes a money amount last updated date and browser storage last saved date, but the specs do not define when those dates should be created or updated, or whether they are needed in the first version.
