@@ -4,7 +4,9 @@
 
 When a new user has no saved data yet, the website should show the dashboard with the money amount set to `0.00$`.
 
-Visible money amounts should use two digits after the decimal point, such as `0.00$`, `5.00$`, and `14.50$`.
+Visible money amounts should use two digits after the decimal point, such as `0.00$`, `5.00$`, and `14.50$`. Visible money amounts of `1,000.00$` or more should use comma separators every three digits before the decimal point, starting from the right, such as `5,895.50$` and `999,999.99$`.
+
+Money amount values can include cents, but the maximum allowed money amount is `999,999.99$`. The main money amount and each `Saving` square planned money amount should never be saved above `999,999.99$`. Examples of valid visible money amounts include `5.05$`, `00.05$`, and `999,999.99$`. Values above `999,999.99$` are invalid.
 
 Showing the default `0.00$` money amount should not create saved browser data by itself.
 
@@ -42,23 +44,35 @@ The `Current Balance` label is user-facing website text. In the specs, the conce
 
 These controls are manual money tracking actions. They do not represent a real bank deposit, bank withdrawal, or payment.
 
-The user can use the available money actions as often or as rarely as they want. `Add` is available at `0.00$` or more. `Modify` and `Subtract` are available only after the money amount is greater than `0.00$`. There should be no daily, weekly, monthly, or yearly limit on money amount changes.
+The user can use the available money actions as often or as rarely as they want. `Add` is available at `0.00$` or more. `Modify` and `Subtract` are available only after the money amount is greater than `0.00$`. There should be no daily, weekly, monthly, or yearly usage limit on money amount changes, but each money amount and the resulting main money amount must stay at or below `999,999.99$`.
 
 `Add`, `Subtract`, and `Modify` money amount input flows should show a horizontal money amount input square in the middle of the screen.
 
 The main money amount circle should stay visible in the background while the horizontal input square is open.
 
-The horizontal input square should start by showing `0.00$`.
+The horizontal input square should start by showing `0.00` without the `$` sign.
 
-The user should type only numbers from `0` through `9` into the horizontal input square. The user should not type the decimal point or the `$` sign.
+The user should type only the money amount into the horizontal input square, without the `$` sign. If the typed money amount reaches `1,000.00` or more, the input should add comma separators automatically while the user is typing.
 
-The horizontal input square should automatically format the typed number as a whole money amount with `.00$` at the end. For example, if the user types `5`, the square should show `5.00$`. If the user types `50`, the square should show `50.00$`.
+Main money amount inputs should request a decimal numeric keyboard on supported mobile devices, so the user gets number keys `0` through `9` and a decimal point, the same as `Saving` square planned money amount inputs.
 
-If the user deletes one typed number from the horizontal input square, the remaining typed numbers should be formatted again with `.00$`. For example, if the square shows `50.00$` and the user deletes the `0`, the square should show `5.00$`.
+Main money amount inputs should accept numbers from `0` through `9`, one decimal point for cents, and the `Space` key as either a starting zero-position skip before a nonzero digit or a cents-position skip after at least one accepted digit. The first accepted non-`Space` character should be a number from `0` through `9`. The decimal point may appear only once, and the user should not be able to type more than two digits after the decimal point. The user should not manually type comma separators into the input. If a typed character would make the displayed input money amount greater than `999,999.99`, the field should not change and no message should appear.
 
-If the user deletes all typed numbers from the horizontal input square, the square should return to `0.00$`. The horizontal input square should not become empty.
+The horizontal input square should always show the typed value with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. After the user saves, the saved and displayed money amount should show two digits after the decimal point, comma separators for thousands and larger values, and the `$` sign at the end. For example, if the user types `5`, the square should first show `5.00`; after saving, the money amount should be shown as `5.00$`. If the user types `5.05`, the square should show `5.05` and save and show as `5.05$`. If the user types the raw digit sequence `589550`, the square should show `5,895.50` and save and show as `5,895.50$`. If the user types the raw digit sequence `99999999`, the square should show `999,999.99` and save and show as `999,999.99$`.
 
-If the user types letters, a minus sign, a decimal point, the `$` sign, or any other blocked character into a main money amount input, the field should not change and no message should appear.
+At the start of a main money amount input, `0` and `Space` should both count as zero-position skips until the user types a nonzero digit. The user may enter at most three starting zero-position skips before a nonzero digit. If the user tries to enter a fourth starting zero-position skip before a nonzero digit, the field should not change and no message should appear. If the user saves after entering only starting zero-position skips, the typed value should be treated as `0.00` and follow the existing zero-input rules. For example, typing `0005` should show `00.05` in the input and save and show as `00.05$`. Typing `Space`, `Space`, `Space`, then `5` should also show `00.05` in the input and save and show as `00.05$`. Typing `0.05` should show `0.05` in the input and save and show as `0.05$`.
+
+If the user types a whole money amount digit, presses `Space` twice to skip cents positions, and then types a cents digit, skipped cents positions should stay as `0`. For example, typing `5`, then `Space`, then `Space`, then `5` should show `5.05` in the input and save and show as `5.05$`. The `Space` key should not insert visible blank spaces into the input or saved money amount.
+
+If the user deletes one typed character from the horizontal input square, the remaining typed value should be formatted again with two digits after the decimal point, automatic comma separators when needed, and no `$` sign while the input is still open. If the user deletes the final cents digit from the `5`, `Space`, `Space`, `5` example, the square should return to `5.00`.
+
+If the user deletes all typed numbers from the horizontal input square, the square should return to `0.00`. The horizontal input square should not become empty.
+
+If the user types letters, a minus sign, a second decimal point, more than two digits after the decimal point, the `$` sign, a comma separator, a `Space` key press that is not acting as a starting zero-position skip or cents-position skip, or any other blocked character into a main money amount input, the field should not change and no message should appear.
+
+Main money amount inputs should allow any valid money amount from `0.00` through `999,999.99`. A maximum-sized money amount should stay editable in the horizontal input square without making the page overflow horizontally, overlapping `Save Changes`, overlapping `Yes` or `Cancel`, or hiding those controls. The layout may contain, wrap, break, shrink within readable limits, or internally scroll the typed money amount as needed, but it should preserve the full typed money amount.
+
+The dashboard, `Balance Changes`, and `Savings` displays should handle money amounts up to `999,999.99$` without rejecting them, creating horizontal page overflow, overlapping other content, or hiding actions. The layout may wrap, break long number strings, or adjust text size within readable limits, but it should preserve the full visible money amount with required comma separators.
 
 The user should not be able to paste into main money amount inputs. If the user tries to paste letters, numbers, symbols, or any other content into a main money amount input, the pasted content should not appear, the input should keep its previous value, and no message should appear.
 
@@ -75,11 +89,11 @@ Clicking or tapping outside the horizontal input square and its `Save Changes`, 
 When the user chooses `Modify`:
 
 - The website asks for the corrected total money amount.
-- The entered amount must be `0.00$` or more.
-- The horizontal input square should start at `0.00$`.
-- The user should type only numbers, and the website should automatically show the typed amount with `.00$`.
-- If the user deletes all typed numbers, the horizontal input square should return to `0.00$`.
-- If the user clicks `Yes` while the input is `0.00$`, the main money amount should become `0.00$`.
+- The entered amount must be from `0.00$` through `999,999.99$`.
+- The horizontal input square should start at `0.00`.
+- The user should type the money amount using the main money amount input rules, including optional cents.
+- If the user deletes all typed numbers, the horizontal input square should return to `0.00`.
+- If the user clicks `Yes` while the input is `0.00`, the main money amount should become `0.00$`.
 - A negative entered amount should be blocked.
 - The entered amount replaces the current money amount.
 - The new current money amount is saved in browser storage.
@@ -92,13 +106,14 @@ When the user chooses `Modify`:
 When the user chooses `Add`:
 
 - The website asks for the amount to add.
-- The entered amount must be greater than `0.00$`.
-- The horizontal input square should start at `0.00$`.
-- The user should type only numbers, and the website should automatically show the typed amount with `.00$`.
-- If the user deletes all typed numbers, the horizontal input square should return to `0.00$`.
-- If the user clicks `Yes` while the input is `0.00$`, the website should do nothing. No message should appear, the money amount should stay unchanged, saved data should stay unchanged, no `Balance Changes` entry should be created, and the same money amount input step should stay open until the user enters a money amount greater than `0.00$` or cancels.
+- The entered amount must be greater than `0.00$` and not greater than `999,999.99$`.
+- The horizontal input square should start at `0.00`.
+- The user should type the money amount using the main money amount input rules, including optional cents.
+- If the user deletes all typed numbers, the horizontal input square should return to `0.00`.
+- If the user clicks `Yes` while the input is `0.00`, the website should do nothing. No message should appear, the money amount should stay unchanged, saved data should stay unchanged, no `Balance Changes` entry should be created, and the same money amount input step should stay open until the user enters a money amount greater than `0.00$` or cancels.
 - A negative entered amount should be blocked.
 - The entered amount is added to the main money amount.
+- If adding the entered amount would make the main money amount greater than `999,999.99$`, the website should do nothing. No message should appear, the money amount should stay unchanged, saved data should stay unchanged, no `Balance Changes` entry should be created, and the same money amount input step should stay open until the user enters a valid money amount or cancels.
 - The action is saved in `Balance Changes` as a positive entry.
 - The history entry should display as `+{money amount} added`.
 - The history entry should stay separate from other add or subtract entries.
@@ -107,11 +122,11 @@ When the user chooses `Add`:
 When the user chooses `Subtract`:
 
 - The website asks for the amount to subtract.
-- The entered amount must be greater than `0.00$`.
-- The horizontal input square should start at `0.00$`.
-- The user should type only numbers, and the website should automatically show the typed amount with `.00$`.
-- If the user deletes all typed numbers, the horizontal input square should return to `0.00$`.
-- If the user clicks `Yes` while the input is `0.00$`, the website should do nothing. No message should appear, the money amount should stay unchanged, saved data should stay unchanged, no `Balance Changes` entry should be created, and the same money amount input step should stay open until the user enters a money amount greater than `0.00$` or cancels.
+- The entered amount must be greater than `0.00$` and not greater than `999,999.99$`.
+- The horizontal input square should start at `0.00`.
+- The user should type the money amount using the main money amount input rules, including optional cents.
+- If the user deletes all typed numbers, the horizontal input square should return to `0.00`.
+- If the user clicks `Yes` while the input is `0.00`, the website should do nothing. No message should appear, the money amount should stay unchanged, saved data should stay unchanged, no `Balance Changes` entry should be created, and the same money amount input step should stay open until the user enters a money amount greater than `0.00$` or cancels.
 - A negative entered amount should be blocked.
 - The website subtracts up to the current money amount.
 - The action is saved in `Balance Changes` as a negative entry.
@@ -129,7 +144,7 @@ If the user enters a subtract amount greater than the current money amount:
 Example:
 
 - Current money amount is `20.00$`.
-- User enters `50.00$` in `Subtract`.
+- User enters `50.00` in `Subtract`.
 - New money amount becomes `0.00$`.
 - Visible history shows `-20.00$ subtracted`.
 - Visible history should not show `-50.00$ subtracted`.
@@ -380,13 +395,13 @@ When the user clicks the `+` action to add a new `Saving` square, the website sh
 - `Saving` name.
 - Planned money amount.
 
-The `Saving` square should be created only after the user enters a valid name and a planned money amount greater than `0.00$`.
+The `Saving` square should be created only after the user enters a valid name and a planned money amount greater than `0.00$` and not greater than `999,999.99$`.
 
 If the user tries to save a new `Saving` square without a `Saving` name, the website should do nothing. No message should appear, no new `Saving` square should be created, saved data should stay unchanged, and the create flow should stay open until the user enters a `Saving` name or cancels creating that square.
 
 If the user tries to save a new `Saving` square without a planned money amount, the website should do nothing. No message should appear, no new `Saving` square should be created, saved data should stay unchanged, and the create flow should stay open until the user enters a planned money amount or cancels creating that square.
 
-The planned money amount may include cents, with up to two digits after the decimal point. The user should enter only the number, without typing the `$` sign. The user may type a decimal point, such as `14.56`. The planned money amount input should request a decimal numeric keyboard on devices that support it, so the user gets number keys `0` through `9` and a decimal point. The planned money amount input should use its own planned-money typing filter: letters do not change the field, and the first accepted character must be a number from `0` through `9`. The user should not be able to paste into the planned money amount input. If the user tries to paste letters, numbers, symbols, or any other content into the planned money amount input, the pasted content should not appear, the input should keep its previous value, and no message should appear. The website should save and show that money amount with the `$` sign at the end, such as `14.56$`, not as integer cents like `1456`. The zero money amount should show as `0.00$`, nonzero whole money amounts should show with two digits after the decimal point such as `14.00$`, and nonzero money amounts with cents should show with two digits after the decimal point such as `14.50$`.
+The planned money amount may include cents, with up to two digits after the decimal point, but it should not be greater than `999,999.99$`. The user should enter only the number, without typing the `$` sign or comma separators. The user may type a decimal point, such as `14.56`. The planned money amount input should request a decimal numeric keyboard on devices that support it, so the user gets number keys `0` through `9` and a decimal point. The planned money amount input should use its own planned-money typing filter: letters do not change the field, and the first accepted character must be a number from `0` through `9`. The user should not be able to paste into the planned money amount input. If the user tries to paste letters, numbers, symbols, or any other content into the planned money amount input, the pasted content should not appear, the input should keep its previous value, and no message should appear. The website should save and show that money amount with the `$` sign at the end, such as `14.56$`, not as integer cents like `1456`. The zero money amount should show as `0.00$`, nonzero whole money amounts should show with two digits after the decimal point such as `14.00$`, nonzero money amounts with cents should show with two digits after the decimal point such as `14.50$`, and planned money amounts of `1,000.00$` or more should show comma separators such as `5,895.50$`. If the user tries to save a planned money amount greater than `999,999.99$`, nothing should happen: no message, no new or changed `Saving` square, no saved data change, no `Balance Changes` entry, and the same input flow should stay open.
 
 `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows should show two text actions at the bottom: `Save` and `Cancel`.
 
@@ -423,7 +438,7 @@ A broken `Saving` square should not use any money amount inside `Savings`, shoul
 Clicking `Fix` on a broken `Saving` square should ask the user for:
 
 - `Saving` name.
-- Planned money amount greater than `0.00$`.
+- Planned money amount greater than `0.00$` and not greater than `999,999.99$`.
 
 If the user saves valid fix values, the website should turn the broken square into a normal `Saving` square and keep it in the same visible position when possible.
 
@@ -435,17 +450,17 @@ Clicking `Delete` on a broken `Saving` square should ask for confirmation with t
 
 Confirming delete for a broken `Saving` square should remove only that broken square, save browser storage, recalculate the `Savings money amount`, recalculate coverage bars, create no `Balance Changes` entry, update no other `Saving` squares, show no message, and offer no undo.
 
-If the user enters `0.00$` as the planned money amount while creating a `Saving` square, the website should not create the `Saving` square.
+If the user enters `0.00$` or a planned money amount greater than `999,999.99$` while creating a `Saving` square, the website should not create the `Saving` square.
 
-If the user tries to save a new `Saving` square with a planned money amount of `0.00$`, the website should do nothing. No message should appear, no new `Saving` square should be created, saved data should stay unchanged, `Balance Changes` should not get a new entry, and the same `Saving` square create input step should stay open until the user enters a planned money amount greater than `0.00$` or cancels.
+If the user tries to save a new `Saving` square with a planned money amount of `0.00$` or greater than `999,999.99$`, the website should do nothing. No message should appear, no new `Saving` square should be created, saved data should stay unchanged, `Balance Changes` should not get a new entry, and the same `Saving` square create input step should stay open until the user enters a planned money amount greater than `0.00$` and not greater than `999,999.99$` or cancels.
 
 When a new `Saving` square create attempt has more than one invalid value, the website should check the create inputs in this order:
 
-1. Planned money amount is missing or `0.00$`.
+1. Planned money amount is missing, `0.00$`, or greater than `999,999.99$`.
 2. `Saving` name is missing.
 3. `Saving` name is duplicate.
 
-The first matching rule decides what happens. If the user enters a duplicate `Saving` name and also leaves the planned money amount empty or enters `0.00$`, the website should keep the same `Saving` square create input step open with no message, no saved data change, no new `Saving` square, and no `Balance Changes` entry. Duplicate-name create behavior should happen only after the planned money amount is greater than `0.00$` and the `Saving` name is not empty.
+The first matching rule decides what happens. If the user enters a duplicate `Saving` name and also leaves the planned money amount empty, enters `0.00$`, or enters an above-limit planned money amount, the website should keep the same `Saving` square create input step open with no message, no saved data change, no new `Saving` square, and no `Balance Changes` entry. Duplicate-name create behavior should happen only after the planned money amount is greater than `0.00$`, not greater than `999,999.99$`, and the `Saving` name is not empty.
 
 Each `Saving` square stores the planned money amount chosen by the user.
 
@@ -592,7 +607,7 @@ Each `Saving` square should include:
 
 - ID.
 - Name.
-- Planned money amount greater than `0.00$`.
+- Planned money amount greater than `0.00$` and not greater than `999,999.99$`.
 - Order.
 - Created date.
 - Updated date.
@@ -619,7 +634,7 @@ The website should start saving data after the first successful saved user actio
 
 The website should load saved browser data only when the data version value is exactly `1`.
 
-If saved browser data has a missing, wrong, future, unreadable, or unrecognized data version, the website should treat it as broken saved data.
+If saved browser data has a missing, wrong, future, unreadable, or unrecognized data version, or a saved current money amount outside `0.00$` through `999,999.99$`, the website should treat it as broken saved data.
 
 If saved data is broken or cannot be read, the website should show this message:
 
