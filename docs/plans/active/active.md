@@ -16,9 +16,10 @@ Build the first usable version of the Cash Money Organizer website: a browser-ba
 The MVP should help a user:
 - See their money amount with the user-facing label `Current Balance`.
 - Start with the money amount shown as `0.00$` when no saved data exists.
-- Click the main money amount at `0.00$` to show only `Add`.
-- Add money manually, then use `Add`, `Subtract`, and `Modify` after the money amount is greater than `0.00$`.
-- Correct mistakes with `Modify` after the money amount is greater than `0.00$`.
+- Click the main money amount at `0.00$` to show `Add` and `Modify`, but not `Subtract`.
+- Add money manually while the money amount is less than `999,999.99$`, use `Subtract` after the money amount is greater than `0.00$`, and see all three actions when the money amount is greater than `0.00$` and less than `999,999.99$`.
+- Use `Subtract` and `Modify`, without `Add`, when the money amount is exactly `999,999.99$`.
+- Correct mistakes with `Modify` at any valid money amount from `0.00$` through `999,999.99$`.
 - See 30-day visible money amount change history directly under the main money amount.
 - Keep saved money data after closing and reopening the website when saved data is available.
 - Organize the `Savings` section into user-named `Saving` squares.
@@ -32,8 +33,8 @@ Included in the first version:
 - Dashboard with the main money amount as the main focus.
 - Default `0.00$` money amount when no saved data exists.
 - Visible money amounts use two digits after the decimal point, such as `0.00$`, `5.00$`, and `14.50$`, and use comma separators every three digits before the decimal point for values of `1,000.00$` or more, such as `5,895.50$` and `999,999.99$`.
-- Money amount values can include cents, but the maximum allowed money amount is `999,999.99$`. The main money amount and each `Saving` square planned money amount should never be saved above `999,999.99$`. The only other typed digit-count limit for the main money amount input is the leading-zero rule.
-- Clickable main money amount that shows only `Add` at `0.00$`, then shows `Add`, `Subtract`, and `Modify` as horizontal buttons when the money amount is greater than `0.00$`.
+- Money amount values can include cents, but the maximum allowed money amount is `999,999.99$`. The main money amount and each `Saving` square planned money amount should never be saved above `999,999.99$`.
+- Clickable main money amount that shows `Add` and `Modify` as horizontal buttons at `0.00$`, shows `Add`, `Subtract`, and `Modify` as horizontal buttons when the money amount is greater than `0.00$` and less than `999,999.99$`, and shows `Subtract` and `Modify` without `Add` when the money amount is exactly `999,999.99$`.
 - Browser storage for saved money amount, 30-day visible `Balance Changes` history, and `Saving` squares.
 - No saved website settings in the first version because no settings exist yet.
 - Add money flow with amount.
@@ -89,7 +90,7 @@ Primary areas:
 
 Suggested first-screen layout:
 - Top area: website name and trust label such as "Manual cash tracker".
-- Main money amount area: user-facing label `Current Balance`; clicking the money amount reveals horizontal action buttons near the money amount, with only `Add` at `0.00$`, or `Add`, `Subtract`, and `Modify` in that order when the money amount is greater than `0.00$`.
+- Main money amount area: user-facing label `Current Balance`; clicking the money amount reveals horizontal action buttons near the money amount, with `Add` and `Modify` in that order at `0.00$`, `Add`, `Subtract`, and `Modify` in that order when the money amount is greater than `0.00$` and less than `999,999.99$`, or `Subtract` and `Modify` when the money amount is exactly `999,999.99$`.
 - Money amount change history directly under the main money amount.
 - Secondary action: click `Savings`.
 - Overview area: `Balance Changes` and savings summary.
@@ -99,7 +100,7 @@ Suggested first-screen layout:
 Money amount:
 - Money amount.
 - Supports cents from `0.00$` through `999,999.99$` as each money amount rule allows.
-- Store and calculate money amount values with an exact normalized decimal representation so typed values like `5.05` and `00.05`, and raw digit sequences like `99999999` that display as `999,999.99`, keep every accepted digit; visible rendering adds the `$` sign and required comma separators such as `999,999.99$`.
+- Store and calculate money amount values with an exact normalized decimal representation so typed values like `5 Space 5` that display as `5.05`, `58 Space 430 Space 88` that displays as `58,430.88`, and raw digit sequences like `589550` that display as `589,550.00`, keep the parsed money amount exact; visible rendering adds the `$` sign and required comma separators such as `999,999.99$`.
 
 Browser storage:
 - Storage key: `cash-money-organizer-website-data`.
@@ -170,10 +171,14 @@ Tasks:
 - Build the dashboard screen.
 - Display the main money amount prominently with the label `Current Balance`.
 - Make the main money amount clickable.
-- Show only `Add` when the user clicks the main money amount at `0.00$`.
-- Show `Add`, `Subtract`, and `Modify` when the user clicks the main money amount above `0.00$`.
+- Show `Add` and `Modify`, but not `Subtract`, when the user clicks the main money amount at `0.00$`.
+- Show `Add`, `Subtract`, and `Modify` when the user clicks the main money amount above `0.00$` and below `999,999.99$`.
+- Show `Subtract` and `Modify`, but not `Add`, when the user clicks the main money amount at exactly `999,999.99$`.
 - Render visible main money actions as buttons lined together horizontally near the main money amount.
+- Order the two visible main money action buttons at `0.00$` from left to right as `Add`, then `Modify`.
 - Order the three visible main money action buttons from left to right as `Add`, `Subtract`, and `Modify`.
+- Order the two visible main money action buttons at `999,999.99$` from left to right as `Subtract`, then `Modify`.
+- Hide the main money action buttons when the user clicks or taps the main money amount again, without changing anything, saving anything, creating a `Balance Changes` entry, or showing a message.
 - Hide the main money action buttons when the user clicks or taps anywhere else on the screen, without changing anything, saving anything, creating a `Balance Changes` entry, or showing a message.
 - Show money amount change history directly under the main money amount.
 - Add clear manual-tracker wording.
@@ -181,10 +186,14 @@ Tasks:
 
 Acceptance criteria:
 - The main money amount is the most visible item on the first screen.
-- Clicking the main money amount at `0.00$` reveals only `Add`.
-- Clicking the main money amount above `0.00$` reveals `Add`, `Subtract`, and `Modify`.
+- Clicking the main money amount at `0.00$` reveals `Add` and `Modify`, but not `Subtract`.
+- Clicking the main money amount above `0.00$` and below `999,999.99$` reveals `Add`, `Subtract`, and `Modify`.
+- Clicking the main money amount at exactly `999,999.99$` reveals `Subtract` and `Modify`, but not `Add`.
 - The visible money actions are visually connected to the main money amount.
+- At `0.00$`, the visible money actions are horizontal buttons, with the two-button order `Add`, then `Modify`.
 - The visible money actions are horizontal buttons, with the three-button order `Add`, `Subtract`, and `Modify`.
+- At `999,999.99$`, the visible money actions are horizontal buttons, with the two-button order `Subtract`, then `Modify`.
+- Clicking or tapping the main money amount again while the visible money actions are open hides the visible money actions without changing anything.
 - Clicking or tapping anywhere else on the screen hides the visible money actions without changing anything.
 - Money amount change history appears directly under the main money amount.
 - There is no separate `View history` action for money amount change history.
@@ -201,15 +210,16 @@ Tasks:
 - Render `Add`, `Subtract`, and `Modify` money amount inputs as a horizontal square in the middle of the screen.
 - Keep the main money amount circle visible in the background while the horizontal input square is open.
 - Start the horizontal input square at `0.00`.
-- Request a decimal numeric keyboard for main money action inputs on supported mobile devices, using the same mobile keyboard behavior as `Saving` square planned money amount inputs.
-- Let the user type numbers from `0` through `9`, one decimal point for cents, and the `Space` key as either a starting zero-position skip before a nonzero digit or a cents-position skip after at least one accepted digit into main money action inputs, without typing the `$` sign. Add comma separators automatically while the user is typing when the value reaches `1,000.00` or more.
-- Limit starting zero-position skips in main money action inputs to three before a nonzero digit; `0` and `Space` both count as starting zero-position skips.
-- Automatically format typed main money action input values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing, such as `5.00`, `5.05`, `5,895.50`, or `999,999.99`; for large cents examples, typing raw digit sequences like `589550` and `99999999` should show `5,895.50` and `999,999.99`; after saving, show the saved money amount with required comma separators for thousands and larger values and the `$` sign at the end, such as `5.00$`, `5.05$`, `5,895.50$`, or `999,999.99$`.
-- Treat skipped cents positions from the `Space` key as `0`, so typing `5`, then `Space`, then `Space`, then `5` shows `5.05` in the input and saves and shows as `5.05$`.
-- Treat `0005` and `Space`, `Space`, `Space`, then `5` as `00.05` in the input, saving and showing as `00.05$`; saving only starting zero-position skips should follow the existing `0.00` input rules.
+- Request a mobile keyboard suitable for digit entry for main money action inputs on supported devices.
+- Let the user type numbers from `0` through `9` and the `Space` key into main money action inputs, without typing the `$` sign. Block typed decimal points and manually typed comma separators with no message. Add the decimal point and comma separators automatically in the displayed input.
+- Use `Space` as a non-visible separator between digit groups. Accept `Space` only after at least one digit and only when the previous accepted character is a digit. Block starting `Space` key presses and consecutive `Space` key presses with no message.
+- Automatically format typed main money action input values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. Without `Space`, typed digits are whole money amount digits: typing `5` shows `5.00`, `58` shows `58.00`, `589` shows `589.00`, `5895` shows `5,895.00`, `58955` shows `58,955.00`, and `589550` shows `589,550.00`.
+- For accepted input with `Space`, split the accepted input into digit groups at accepted `Space` separators. If the input ends with `Space`, treat all completed groups as the whole money amount and show cents as `00`. If the final group after `Space` has one or two digits, treat that final group as cents and left-pad one cents digit with `0`; join all earlier groups as the whole money amount. If there is only one accepted `Space` and the final group grows to three or more digits, treat that final group as another whole money amount group and show cents as `00`. Once the input has two accepted `Space` separators, the final group is the cents group and should accept at most two digits. Block additional `Space` key presses after two accepted `Space` separators with no message.
+- Treat `0` as a normal digit, not a starting zero-position skip. Normalize away unneeded leading zeros in the whole money amount, so typing `0005` shows `5.00`.
 - Reformat main money action inputs after deletion with two digits after the decimal point and no `$` sign while the input is still open.
 - Return main money action inputs to `0.00` when all typed numbers are deleted, without letting the input become empty.
-- Block letters, minus signs, a second decimal point, more than two digits after the decimal point, `$` signs, manually typed comma separators, fourth starting zero-position skips, `Space` key presses that are not acting as starting zero-position skips or cents-position skips, and paste in main money action inputs with no message.
+- Make main money action inputs append-only: focus can open the input, but cursor movement inside the formatted money amount, partial selection, selection replacement, and direct editing of generated comma separators or the generated decimal point are not supported. Accepted typing adds to the end, and delete removes only the last accepted digit or accepted `Space`.
+- Block letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting `Space`, consecutive `Space`, additional `Space` after two accepted `Space` separators, a third cents digit after the cents group is fixed by two accepted `Space` separators, and paste in main money action inputs with no message.
 - Block typed characters that would make a main money action input greater than `999,999.99`, with no message and no field change.
 - Keep money amounts up to `999,999.99$` contained in the horizontal input square, dashboard, `Balance Changes`, and `Savings` displays without horizontal page overflow, text overlap, hidden actions, rejected valid values, or missing required comma separators while typing or in visible saved/rendered values.
 - Show `Save Changes` under the horizontal input square, with buttons exactly named `Yes` and `Cancel`.
@@ -223,9 +233,10 @@ Tasks:
 
 Acceptance criteria:
 - The default `0.00$` starting state does not create a `Balance Changes` entry.
-- At `0.00$`, the main money amount shows only `Add` when clicked.
+- At `0.00$`, the main money amount shows `Add` and `Modify`, but not `Subtract`, when clicked.
 - Adding money increases the money amount and creates a positive `Balance Changes` entry.
-- After adding money above `0.00$`, the main money amount shows `Add`, `Subtract`, and `Modify` when clicked.
+- After adding money above `0.00$` and below `999,999.99$`, the main money amount shows `Add`, `Subtract`, and `Modify` when clicked.
+- If a successful `Add` makes the money amount exactly `999,999.99$`, the main money amount shows `Subtract` and `Modify`, but not `Add`, when clicked.
 - Subtracting money decreases the money amount and creates a negative `Balance Changes` entry.
 - Subtracting more than the current money amount sets the money amount to `0.00$` instead of creating a negative money amount.
 - Subtracting when the current money amount is `0.00$` keeps the money amount at `0.00$` and does not create a history entry.
@@ -234,14 +245,17 @@ Acceptance criteria:
 - Money changes are still visible after page refresh.
 - `Add`, `Subtract`, and `Modify` money amount input flows show a horizontal input square in the middle of the screen while the main money amount circle stays visible in the background.
 - The horizontal input square starts at `0.00`.
-- Typing `5` in a main money action input shows `5.00`, typing `5.05` shows `5.05`, typing `5`, then `Space`, then `Space`, then `5` shows `5.05`, typing raw digits `589550` shows `5,895.50`, and typing raw digits `99999999` shows `999,999.99`.
-- Typing `0005` or typing `Space`, `Space`, `Space`, then `5` in a main money action input shows `00.05`.
-- Typing `0.05` in a main money action input shows `0.05`.
-- Trying to type a fourth starting zero-position skip before a nonzero digit does not change the input and shows no message.
+- Typing `5` in a main money action input shows `5.00`, typing `58` shows `58.00`, typing `589` shows `589.00`, typing `5895` shows `5,895.00`, typing `58955` shows `58,955.00`, and typing raw digits `589550` shows `589,550.00`.
+- Typing `5`, then `Space`, keeps the display at `5.00`; typing `5`, then `Space`, then `5` shows `5.05`; typing `5`, then `Space`, then `50` shows `5.50`; typing `58`, then `Space`, then `430` shows `58,430.00`; typing `58`, then `Space`, then `430`, then `Space`, then `88` shows `58,430.88`; and typing `999999`, then `Space`, then `99` shows `999,999.99`.
+- Typing `0005` in a main money action input shows `5.00`.
+- Typing `Space`, `Space`, `Space`, then `5` in a main money action input blocks the three `Space` key presses and then shows `5.00` after the `5` is typed.
 - Saving a main money action input shows the saved money amount with the `$` sign at the end and required comma separators for thousands and larger values, such as `5.00$`, `5.05$`, `5,895.50$`, or `999,999.99$`.
 - Deleting one typed character from a main money action input reformats the remaining typed value as a money amount.
 - Deleting all typed numbers in a main money action input returns the horizontal input square to `0.00` instead of making it empty.
-- Main money action inputs keep their previous value when the user types letters, minus signs, a second decimal point, more than two digits after the decimal point, `$` signs, manually typed comma separators, fourth starting zero-position skips, `Space` key presses that are not acting as starting zero-position skips or cents-position skips, or other blocked characters.
+- Clicking or tapping inside a main money action input does not move the cursor into the middle of the formatted money amount.
+- Selecting part of a main money action input and typing does not replace the selected text; accepted typing is added to the end.
+- Backspace or Delete in a main money action input removes only the last accepted digit or accepted `Space`, not generated comma separators or the generated decimal point.
+- Main money action inputs keep their previous value when the user types letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting `Space`, consecutive `Space`, additional `Space` after two accepted `Space` separators, a third cents digit after the cents group is fixed by two accepted `Space` separators, or other blocked characters.
 - Main money action inputs accept valid money amounts up to `999,999.99` and block typed characters that would make the value greater than `999,999.99`.
 - Money amounts up to `999,999.99$` remain visible or editable without horizontal page overflow, overlapping content, hidden controls, or missing required comma separators while typing or in saved/rendered visible values.
 - If the user tries to paste letters, numbers, symbols, or any other content into a main money action input, the pasted content does not appear, the input keeps its previous value, and no message is shown.
@@ -251,6 +265,8 @@ Acceptance criteria:
 - `Add`, `Subtract`, and `Modify` do not save invalid money amounts. Negative money amounts and above-limit money amounts are blocked, `Add` and `Subtract` require more than `0.00$` and not greater than `999,999.99$`, and `Modify` allows `0.00$` through `999,999.99$`.
 - Clicking `Yes` while the input is `0.00` in `Add` or `Subtract` does nothing: no message, no money amount change, no saved data change, no `Balance Changes` entry, and the same money amount input step stays open.
 - Clicking `Yes` while the input is `0.00` in `Modify` replaces the main money amount with `0.00$`.
+- Modifying the money amount to `0.00$` makes the next main money amount click show `Add` and `Modify`, but not `Subtract`.
+- Modifying the money amount to `999,999.99$` makes the next main money amount click show `Subtract` and `Modify`, but not `Add`.
 
 ### Milestone 4: Balance Changes
 
@@ -475,19 +491,20 @@ Acceptance criteria:
 1. User opens the website.
 2. If no saved money amount exists yet, website shows `0.00$` labeled as `Current Balance`.
 3. User clicks the main money amount.
-4. Website shows only `Add`.
+4. Website shows `Add` and `Modify`, but not `Subtract`.
 5. User chooses `Add`.
 6. User enters an amount greater than `0.00$`.
 7. Website updates the money amount and saves the add action as `+{money amount} added`.
 8. After the money amount is greater than `0.00$`, user clicks the main money amount.
-9. Website shows `Add`, `Subtract`, and `Modify`.
-10. User chooses `Add`, `Subtract`, or `Modify`.
-11. User enters an amount.
-12. Website updates the money amount.
-13. If the action is `Add` or `Subtract`, website saves it as its own history entry with the correct display type.
-14. If the action is `Modify`, website updates the current money amount without saving history or showing a notification.
-15. Website shows money amount change history directly under the main money amount.
-16. Website saves the updated data in browser storage.
+9. If the money amount is greater than `0.00$` and less than `999,999.99$`, website shows `Add`, `Subtract`, and `Modify`.
+10. If the money amount is exactly `999,999.99$`, website shows `Subtract` and `Modify`, but not `Add`.
+11. User chooses one visible action.
+12. User enters an amount.
+13. Website updates the money amount.
+14. If the action is `Add` or `Subtract`, website saves it as its own history entry with the correct display type.
+15. If the action is `Modify`, website updates the current money amount without saving history or showing a notification.
+16. Website shows money amount change history directly under the main money amount.
+17. Website saves the updated data in browser storage.
 17. User reviews `Saving` squares.
 18. User can close the website and open it again later to see saved data when it is available.
 
@@ -496,16 +513,17 @@ Acceptance criteria:
 - Main money action input amounts may include cents and must use valid money amount text.
 - Visible money amounts should use two digits after the decimal point, such as `0.00$`, `5.00$`, and `14.50$`, and should use comma separators every three digits before the decimal point for values of `1,000.00$` or more, such as `5,895.50$` and `999,999.99$`.
 - Main money action inputs should start at `0.00`.
-- Main money action inputs should request a decimal numeric keyboard on devices that support it, so the user gets number keys `0` through `9` and a decimal point.
-- Main money action inputs should accept numbers from `0` through `9`, one decimal point for cents, and the `Space` key as either a starting zero-position skip before a nonzero digit or a cents-position skip after at least one accepted digit, without letting the user type the `$` sign. The input should add comma separators automatically while the user is typing when the value reaches `1,000.00` or more.
-- Main money action inputs should allow at most three starting zero-position skips before a nonzero digit. `0` and `Space` both count as starting zero-position skips.
-- Main money action inputs should automatically format typed values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing, such as `5.00`, `5.05`, `5,895.50`, or `999,999.99`; for large cents examples, typing raw digit sequences like `589550` and `99999999` should show `5,895.50` and `999,999.99`; after saving, displayed money amounts should use required comma separators for thousands and larger values and the `$` sign at the end, such as `5.00$`, `5.05$`, `5,895.50$`, or `999,999.99$`.
-- Main money action inputs should treat skipped cents positions from the `Space` key as `0`, so typing `5`, then `Space`, then `Space`, then `5` shows `5.05` in the input and saves and shows as `5.05$`.
-- Main money action inputs should treat `0005` and `Space`, `Space`, `Space`, then `5` as `00.05` in the input, saving and showing as `00.05$`.
-- Saving only starting zero-position skips in a main money action input should be treated as input `0.00`.
+- Main money action inputs should request a mobile keyboard suitable for digit entry on supported devices.
+- Main money action inputs should accept only numbers from `0` through `9` and the `Space` key, without letting the user type the `$` sign. Typed decimal points and manually typed comma separators should be blocked with no message. The input should add the decimal point and comma separators automatically while the user is typing.
+- Main money action inputs should accept `Space` only after at least one digit and only when the previous accepted character is a digit. Starting `Space` key presses and consecutive `Space` key presses should be blocked with no message.
+- Main money action inputs should automatically format typed values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. Without `Space`, typed digits are whole money amount digits: typing `5` should show `5.00`, `58` should show `58.00`, `589` should show `589.00`, `5895` should show `5,895.00`, `58955` should show `58,955.00`, and `589550` should show `589,550.00`.
+- Main money action inputs should use accepted `Space` separators to split digit groups. If the input ends with `Space`, all completed groups should be whole money amount digits and cents should show as `00`. If the final group after `Space` has one or two digits, it should be cents and should be left-padded with `0` when it has one digit. Earlier groups should join into the whole money amount. If there is only one accepted `Space` and the final group grows to three or more digits, that final group should become another whole money amount group and cents should show as `00`. Once the input has two accepted `Space` separators, the final group is the cents group and should accept at most two digits.
+- Main money action inputs should treat `0` as a normal digit, not a starting zero-position skip. Unneeded leading zeros in the whole money amount should be normalized away, so typing `0005` shows `5.00`.
 - Deleting one typed character from a main money action input should reformat the remaining typed value with two digits after the decimal point and no `$` sign while the input is still open.
 - Deleting all typed numbers from a main money action input should return it to `0.00` instead of making it empty.
-- Main money action inputs should block letters, minus signs, a second decimal point, more than two digits after the decimal point, `$` signs, manually typed comma separators, fourth starting zero-position skips, `Space` key presses that are not acting as starting zero-position skips or cents-position skips, and other invalid typed characters.
+- Main money action inputs should be append-only: users should not move the cursor into the formatted value, select part of it, replace selected text, or directly edit generated comma separators or the generated decimal point.
+- Main money action input typing should add only to the end, and Backspace or Delete should remove only the last accepted digit or accepted `Space`.
+- Main money action inputs should block letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting `Space`, consecutive `Space`, additional `Space` after two accepted `Space` separators, a third cents digit after the cents group is fixed by two accepted `Space` separators, and other invalid typed characters.
 - Main money action inputs should block typed characters that would make the input greater than `999,999.99`, with no message and no field change.
 - The dashboard, horizontal input square, `Balance Changes`, and `Savings` displays should contain money amounts up to `999,999.99$` without horizontal page overflow, overlapping content, hidden actions, rejected valid values, or missing required comma separators while typing or in visible saved/rendered values.
 - Main money action inputs should block paste. Pasted content should not appear, the input should keep its previous value, and no message should appear.
@@ -521,6 +539,10 @@ Acceptance criteria:
 - `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows should show bottom text actions `Save` and `Cancel`.
 - In `Saving` square input flows, `Save` should try to save the entered values using the rules for that action.
 - In `Saving` square input flows, `Cancel` should close the input flow, return to the view the user was already using, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
+- `Add` should be available only when the money amount is less than `999,999.99$`, including when the money amount is `0.00$`.
+- `Modify` should be available when the money amount is from `0.00$` through `999,999.99$`.
+- `Subtract` should be available only when the money amount is greater than `0.00$`.
+- At exactly `999,999.99$`, the visible main money actions should be `Subtract` and `Modify`, with no `Add`.
 - Add and subtract amounts must be greater than `0.00$` and not greater than `999,999.99$`.
 - Clicking `Yes` while the input is `0.00` in `Add` or `Subtract` should do nothing: no message, no money amount change, no saved data change, no `Balance Changes` entry, and the same money amount input step stays open.
 - Modify amounts must be from `0.00$` through `999,999.99$`.
@@ -615,30 +637,46 @@ Use:
 - New user sees the money amount as `0.00$` when no saved data exists.
 - Showing the default `0.00$` money amount does not create saved browser data by itself.
 - The default `0.00$` starting state does not create a `Balance Changes` entry.
-- Clicking the main money amount at `0.00$` shows only `Add`.
-- After a successful add above `0.00$`, clicking the main money amount shows `Add`, `Subtract`, and `Modify`.
+- Clicking the main money amount at `0.00$` shows `Add` and `Modify`, but not `Subtract`.
+- After a successful add above `0.00$` and below `999,999.99$`, clicking the main money amount shows `Add`, `Subtract`, and `Modify`.
+- After a successful `Add` makes the money amount exactly `999,999.99$`, clicking the main money amount shows `Subtract` and `Modify`, but not `Add`.
+- After `Modify` sets the money amount to `0.00$`, clicking the main money amount shows `Add` and `Modify`, but not `Subtract`.
+- After `Modify` sets the money amount to `999,999.99$`, clicking the main money amount shows `Subtract` and `Modify`, but not `Add`.
+- At `0.00$`, main money actions appear as horizontal buttons ordered `Add`, then `Modify`.
 - Main money actions appear as horizontal buttons near the main money amount, ordered `Add`, `Subtract`, and `Modify` when all three are visible.
+- At `999,999.99$`, main money actions appear as horizontal buttons ordered `Subtract`, then `Modify`.
+- Clicking or tapping the main money amount again while the visible main money action buttons are open hides those buttons without changing anything.
 - Clicking or tapping anywhere else on the screen hides the visible main money action buttons without changing anything.
 - Add money updates the money amount correctly.
 - `Add`, `Subtract`, and `Modify` money amount inputs open as a horizontal square in the middle of the screen.
 - The main money amount circle stays visible in the background while the horizontal input square is open.
 - The horizontal input square starts at `0.00`.
-- Main money action inputs request a decimal numeric keyboard on supported mobile devices.
+- Main money action inputs request a mobile keyboard suitable for digit entry on supported devices.
 - Typing `5` in a main money action input shows `5.00`.
-- Typing `5.05` in a main money action input shows `5.05`.
-- Typing `5`, then `Space`, then `Space`, then `5` in a main money action input shows `5.05` and saves and shows as `5.05$`.
-- Typing `0005` in a main money action input shows `00.05` and saves and shows as `00.05$`.
-- Typing `Space`, `Space`, `Space`, then `5` in a main money action input shows `00.05` and saves and shows as `00.05$`.
-- Typing `0.05` in a main money action input shows `0.05` and saves and shows as `0.05$`.
-- Trying to type a fourth starting zero-position skip before a nonzero digit does not change the input and shows no message.
-- Typing raw digits `589550` in a main money action input shows `5,895.50`.
-- Typing raw digits `99999999` in a main money action input shows `999,999.99`.
-- Saving raw digits `589550` in a main money action input shows `5,895.50$`.
-- Saving raw digits `99999999` in a main money action input shows `999,999.99$`.
+- Typing `58` in a main money action input shows `58.00`.
+- Typing `589` in a main money action input shows `589.00`.
+- Typing `5895` in a main money action input shows `5,895.00`.
+- Typing `58955` in a main money action input shows `58,955.00`.
+- Typing raw digits `589550` in a main money action input shows `589,550.00`.
+- Typing `5`, then `Space`, in a main money action input keeps the display at `5.00`.
+- Typing `5`, then `Space`, then `5` in a main money action input shows `5.05` and saves and shows as `5.05$`.
+- Typing `5`, then `Space`, then `50` in a main money action input shows `5.50` and saves and shows as `5.50$`.
+- Typing `58`, then `Space`, then `430` in a main money action input shows `58,430.00` and saves and shows as `58,430.00$`.
+- Typing `58`, then `Space`, then `430`, then `Space`, then `88` in a main money action input shows `58,430.88` and saves and shows as `58,430.88$`.
+- Typing `0`, then `Space`, then `5` in a main money action input shows `0.05` and saves and shows as `0.05$`.
+- Typing `999999`, then `Space`, then `99` in a main money action input shows `999,999.99` and saves and shows as `999,999.99$`.
+- Typing `0005` in a main money action input shows `5.00` and saves and shows as `5.00$`.
+- Typing `Space`, `Space`, `Space`, then `5` in a main money action input blocks the three `Space` key presses and then shows `5.00` after the `5` is typed.
+- Trying to type another `Space` after `58`, `Space`, `430`, `Space`, `88` does not change the input and shows no message.
+- Trying to type a third cents digit after the cents group is fixed by two accepted `Space` separators does not change the input and shows no message.
+- Saving raw digits `589550` in a main money action input shows `589,550.00$`.
 - Saving a main money action input shows the saved money amount with the `$` sign at the end.
 - Deleting one typed character from a main money action input reformats the remaining typed value as a money amount.
 - Deleting all typed numbers in a main money action input returns it to `0.00` instead of making it empty.
-- Typing letters, minus signs, a second decimal point, more than two digits after the decimal point, `$` signs, manually typed comma separators, fourth starting zero-position skips, `Space` key presses that are not acting as starting zero-position skips or cents-position skips, or other blocked characters into a main money action input does not change the field, and no message appears for that typed character.
+- Clicking or tapping inside `58,430.88` keeps the main money action input append-only, so the next accepted typed character is handled at the end.
+- Selecting `430` in `58,430.88` and typing `9` does not replace `430`; accepted typing uses append-only behavior.
+- Backspace or Delete with the cursor or selection inside the formatted value removes only the last accepted digit or accepted `Space`.
+- Typing letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting `Space`, consecutive `Space`, additional `Space` after two accepted `Space` separators, a third cents digit after the cents group is fixed by two accepted `Space` separators, or other blocked characters into a main money action input does not change the field, and no message appears for that typed character.
 - Trying to type a main money action input value greater than `999,999.99` does not change the field and shows no message.
 - Money amounts up to `999,999.99$` stay contained in the horizontal input square, dashboard, `Balance Changes`, and `Savings` displays without horizontal page overflow, overlap, hidden actions, or missing required comma separators while typing or in visible saved/rendered values.
 - Trying to paste letters, numbers, symbols, or any other content into a main money action input does not change the field and shows no message.
@@ -654,7 +692,8 @@ Use:
 - Subtracting more than the current money amount saves the actual removed amount in history.
 - Subtracting when the current money amount is `0.00$` does not create a history entry.
 - The website never shows a negative money amount.
-- Modify updates the current money amount without creating history or notification entries after the money amount is greater than `0.00$`.
+- Modify updates the current money amount without creating history or notification entries at any valid money amount from `0.00$` through `999,999.99$`.
+- Modify can set the money amount to any value from `0.00$` through `999,999.99$`.
 - Add and subtract entries stay separate in history.
 - Newest `Balance Changes` entries appear first.
 - Empty `Balance Changes` shows no rows, sentence, placeholder, icon, or other empty-state content.
