@@ -100,7 +100,7 @@ Suggested first-screen layout:
 Money amount:
 - Money amount.
 - Supports cents from `0.00$` through `999,999.99$` as each money amount rule allows.
-- Store and calculate money amount values with an exact normalized decimal representation so typed values like `5 Space 5` that display as `5.05`, `58 Space 430 Space 88` that displays as `58,430.88`, and raw digit sequences like `589550` that display as `589,550.00`, keep the parsed money amount exact; visible rendering adds the `$` sign and required comma separators such as `999,999.99$`.
+- Store and calculate money amount values with an exact normalized decimal representation so typed values like `5 Space 5` or mobile `5 Cent 5` that display as `5.05`, `58 Space 430 Space 88` or mobile `58 Cent 430 Cent 88` that display as `58,430.88`, and raw digit sequences like `589550` that display as `589,550.00`, keep the parsed money amount exact; visible rendering adds the `$` sign and required comma separators such as `999,999.99$`.
 
 Browser storage:
 - Storage key: `cash-money-organizer-website-data`.
@@ -211,15 +211,16 @@ Tasks:
 - Keep the main money amount circle visible in the background while the horizontal input square is open.
 - Start the horizontal input square at `0.00`.
 - Request a mobile keyboard suitable for digit entry for main money action inputs on supported devices.
-- Let the user type numbers from `0` through `9` and the `Space` key into main money action inputs, without typing the `$` sign. Block typed decimal points and manually typed comma separators with no message. Add the decimal point and comma separators automatically in the displayed input.
-- Use `Space` as a non-visible separator between digit groups. Accept `Space` only after at least one digit and only when the previous accepted character is a digit. Block starting `Space` key presses and consecutive `Space` key presses with no message.
-- Automatically format typed main money action input values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. Without `Space`, typed digits are whole money amount digits: typing `5` shows `5.00`, `58` shows `58.00`, `589` shows `589.00`, `5895` shows `5,895.00`, `58955` shows `58,955.00`, and `589550` shows `589,550.00`.
-- For accepted input with `Space`, split the accepted input into digit groups at accepted `Space` separators. If the input ends with `Space`, treat all completed groups as the whole money amount and show cents as `00`. If the final group after `Space` has one or two digits, treat that final group as cents and left-pad one cents digit with `0`; join all earlier groups as the whole money amount. If there is only one accepted `Space` and the final group grows to three or more digits, treat that final group as another whole money amount group and show cents as `00`. Once the input has two accepted `Space` separators, the final group is the cents group and should accept at most two digits. Block additional `Space` key presses after two accepted `Space` separators with no message.
+- Show a rectangular `Cent` button directly above the mobile keyboard while a main money action input is open on mobile, and do not show that `Cent` button for computer users.
+- Let the user type numbers from `0` through `9` and the `Space` key into main money action inputs, without typing the `$` sign. Let mobile users tap the `Cent` button for cents. Block typed decimal points and manually typed comma separators with no message. Add the decimal point and comma separators automatically in the displayed input.
+- Use `Space` and mobile `Cent` as non-visible separators between digit groups. Accept separator input only after at least one digit and only when the previous accepted input is a digit. Block starting separators and consecutive separators with no message.
+- Automatically format typed main money action input values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. Without separator input, typed digits are whole money amount digits: typing `5` shows `5.00`, `58` shows `58.00`, `589` shows `589.00`, `5895` shows `5,895.00`, `58955` shows `58,955.00`, and `589550` shows `589,550.00`.
+- For accepted input with separator input from `Space` or mobile `Cent`, split the accepted input into digit groups at accepted separators. If the input ends with a separator, treat all completed groups as the whole money amount and show cents as `00`. If the final group after a separator has one or two digits, treat that final group as cents and left-pad one cents digit with `0`; join all earlier groups as the whole money amount. If there is only one accepted separator and the final group grows to three or more digits, treat that final group as another whole money amount group and show cents as `00`. Once the input has two accepted separators, the final group is the cents group and should accept at most two digits. Block additional separator input after two accepted separators with no message.
 - Treat `0` as a normal digit, not a starting zero-position skip. Normalize away unneeded leading zeros in the whole money amount, so typing `0005` shows `5.00`.
 - Reformat main money action inputs after deletion with two digits after the decimal point and no `$` sign while the input is still open.
 - Return main money action inputs to `0.00` when all typed numbers are deleted, without letting the input become empty.
-- Make main money action inputs append-only: focus can open the input, but cursor movement inside the formatted money amount, partial selection, selection replacement, and direct editing of generated comma separators or the generated decimal point are not supported. Accepted typing adds to the end, and delete removes only the last accepted digit or accepted `Space`.
-- Block letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting `Space`, consecutive `Space`, additional `Space` after two accepted `Space` separators, a third cents digit after the cents group is fixed by two accepted `Space` separators, and paste in main money action inputs with no message.
+- Make main money action inputs append-only: focus can open the input, but cursor movement inside the formatted money amount, partial selection, selection replacement, and direct editing of generated comma separators or the generated decimal point are not supported. Accepted typing adds to the end, and delete removes only the last accepted digit or accepted separator.
+- Block letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting separators, consecutive separators, additional separator input after two accepted separators, a third cents digit after the cents group is fixed by two accepted separators, and paste in main money action inputs with no message.
 - Block typed characters that would make a main money action input greater than `999,999.99`, with no message and no field change.
 - Keep money amounts up to `999,999.99$` contained in the horizontal input square, dashboard, `Balance Changes`, and `Savings` displays without horizontal page overflow, text overlap, hidden actions, rejected valid values, or missing required comma separators while typing or in visible saved/rendered values.
 - Show `Save Changes` under the horizontal input square, with buttons exactly named `Yes` and `Cancel`.
@@ -245,8 +246,11 @@ Acceptance criteria:
 - Money changes are still visible after page refresh.
 - `Add`, `Subtract`, and `Modify` money amount input flows show a horizontal input square in the middle of the screen while the main money amount circle stays visible in the background.
 - The horizontal input square starts at `0.00`.
+- On mobile, `Add`, `Subtract`, and `Modify` money amount input flows show a rectangular `Cent` button directly above the mobile keyboard.
+- The mobile `Cent` button is not shown for computer users.
 - Typing `5` in a main money action input shows `5.00`, typing `58` shows `58.00`, typing `589` shows `589.00`, typing `5895` shows `5,895.00`, typing `58955` shows `58,955.00`, and typing raw digits `589550` shows `589,550.00`.
 - Typing `5`, then `Space`, keeps the display at `5.00`; typing `5`, then `Space`, then `5` shows `5.05`; typing `5`, then `Space`, then `50` shows `5.50`; typing `58`, then `Space`, then `430` shows `58,430.00`; typing `58`, then `Space`, then `430`, then `Space`, then `88` shows `58,430.88`; and typing `999999`, then `Space`, then `99` shows `999,999.99`.
+- On mobile, typing `5`, tapping `Cent`, then typing `5` shows `5.05`; typing `5`, tapping `Cent`, then typing `50` shows `5.50`; and typing `58`, tapping `Cent`, typing `430`, tapping `Cent`, then typing `88` shows `58,430.88`.
 - Typing `0005` in a main money action input shows `5.00`.
 - Typing `Space`, `Space`, `Space`, then `5` in a main money action input blocks the three `Space` key presses and then shows `5.00` after the `5` is typed.
 - Saving a main money action input shows the saved money amount with the `$` sign at the end and required comma separators for thousands and larger values, such as `5.00$`, `5.05$`, `5,895.50$`, or `999,999.99$`.
@@ -254,8 +258,9 @@ Acceptance criteria:
 - Deleting all typed numbers in a main money action input returns the horizontal input square to `0.00` instead of making it empty.
 - Clicking or tapping inside a main money action input does not move the cursor into the middle of the formatted money amount.
 - Selecting part of a main money action input and typing does not replace the selected text; accepted typing is added to the end.
-- Backspace or Delete in a main money action input removes only the last accepted digit or accepted `Space`, not generated comma separators or the generated decimal point.
-- Main money action inputs keep their previous value when the user types letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting `Space`, consecutive `Space`, additional `Space` after two accepted `Space` separators, a third cents digit after the cents group is fixed by two accepted `Space` separators, or other blocked characters.
+- Backspace or Delete in a main money action input removes only the last accepted digit or accepted separator, not generated comma separators or the generated decimal point.
+- Main money action inputs keep their previous value when the user types letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting separators, consecutive separators, additional separator input after two accepted separators, a third cents digit after the cents group is fixed by two accepted separators, or other blocked characters.
+- Tapping `Cent` when a separator would be blocked keeps the previous input value and shows no message.
 - Main money action inputs accept valid money amounts up to `999,999.99` and block typed characters that would make the value greater than `999,999.99`.
 - Money amounts up to `999,999.99$` remain visible or editable without horizontal page overflow, overlapping content, hidden controls, or missing required comma separators while typing or in saved/rendered visible values.
 - If the user tries to paste letters, numbers, symbols, or any other content into a main money action input, the pasted content does not appear, the input keeps its previous value, and no message is shown.
@@ -514,16 +519,17 @@ Acceptance criteria:
 - Visible money amounts should use two digits after the decimal point, such as `0.00$`, `5.00$`, and `14.50$`, and should use comma separators every three digits before the decimal point for values of `1,000.00$` or more, such as `5,895.50$` and `999,999.99$`.
 - Main money action inputs should start at `0.00`.
 - Main money action inputs should request a mobile keyboard suitable for digit entry on supported devices.
-- Main money action inputs should accept only numbers from `0` through `9` and the `Space` key, without letting the user type the `$` sign. Typed decimal points and manually typed comma separators should be blocked with no message. The input should add the decimal point and comma separators automatically while the user is typing.
-- Main money action inputs should accept `Space` only after at least one digit and only when the previous accepted character is a digit. Starting `Space` key presses and consecutive `Space` key presses should be blocked with no message.
-- Main money action inputs should automatically format typed values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. Without `Space`, typed digits are whole money amount digits: typing `5` should show `5.00`, `58` should show `58.00`, `589` should show `589.00`, `5895` should show `5,895.00`, `58955` should show `58,955.00`, and `589550` should show `589,550.00`.
-- Main money action inputs should use accepted `Space` separators to split digit groups. If the input ends with `Space`, all completed groups should be whole money amount digits and cents should show as `00`. If the final group after `Space` has one or two digits, it should be cents and should be left-padded with `0` when it has one digit. Earlier groups should join into the whole money amount. If there is only one accepted `Space` and the final group grows to three or more digits, that final group should become another whole money amount group and cents should show as `00`. Once the input has two accepted `Space` separators, the final group is the cents group and should accept at most two digits.
+- Main money action inputs should show a rectangular `Cent` button directly above the mobile keyboard on mobile, and should not show the `Cent` button for computer users.
+- Main money action inputs should accept only numbers from `0` through `9` and separator input from the `Space` key or mobile `Cent` button, without letting the user type the `$` sign. Typed decimal points and manually typed comma separators should be blocked with no message. The input should add the decimal point and comma separators automatically while the user is typing.
+- Main money action inputs should accept separator input only after at least one digit and only when the previous accepted input is a digit. Starting separators and consecutive separators should be blocked with no message.
+- Main money action inputs should automatically format typed values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. Without separator input, typed digits are whole money amount digits: typing `5` should show `5.00`, `58` should show `58.00`, `589` should show `589.00`, `5895` should show `5,895.00`, `58955` should show `58,955.00`, and `589550` should show `589,550.00`.
+- Main money action inputs should use accepted separators from `Space` or mobile `Cent` to split digit groups. If the input ends with a separator, all completed groups should be whole money amount digits and cents should show as `00`. If the final group after a separator has one or two digits, it should be cents and should be left-padded with `0` when it has one digit. Earlier groups should join into the whole money amount. If there is only one accepted separator and the final group grows to three or more digits, that final group should become another whole money amount group and cents should show as `00`. Once the input has two accepted separators, the final group is the cents group and should accept at most two digits.
 - Main money action inputs should treat `0` as a normal digit, not a starting zero-position skip. Unneeded leading zeros in the whole money amount should be normalized away, so typing `0005` shows `5.00`.
 - Deleting one typed character from a main money action input should reformat the remaining typed value with two digits after the decimal point and no `$` sign while the input is still open.
 - Deleting all typed numbers from a main money action input should return it to `0.00` instead of making it empty.
 - Main money action inputs should be append-only: users should not move the cursor into the formatted value, select part of it, replace selected text, or directly edit generated comma separators or the generated decimal point.
-- Main money action input typing should add only to the end, and Backspace or Delete should remove only the last accepted digit or accepted `Space`.
-- Main money action inputs should block letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting `Space`, consecutive `Space`, additional `Space` after two accepted `Space` separators, a third cents digit after the cents group is fixed by two accepted `Space` separators, and other invalid typed characters.
+- Main money action input typing should add only to the end, and Backspace or Delete should remove only the last accepted digit or accepted separator.
+- Main money action inputs should block letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting separators, consecutive separators, additional separator input after two accepted separators, a third cents digit after the cents group is fixed by two accepted separators, and other invalid typed characters.
 - Main money action inputs should block typed characters that would make the input greater than `999,999.99`, with no message and no field change.
 - The dashboard, horizontal input square, `Balance Changes`, and `Savings` displays should contain money amounts up to `999,999.99$` without horizontal page overflow, overlapping content, hidden actions, rejected valid values, or missing required comma separators while typing or in visible saved/rendered values.
 - Main money action inputs should block paste. Pasted content should not appear, the input should keep its previous value, and no message should appear.
@@ -652,6 +658,8 @@ Use:
 - The main money amount circle stays visible in the background while the horizontal input square is open.
 - The horizontal input square starts at `0.00`.
 - Main money action inputs request a mobile keyboard suitable for digit entry on supported devices.
+- On mobile, main money action inputs show a rectangular `Cent` button directly above the mobile keyboard.
+- The mobile `Cent` button is not shown for computer users.
 - Typing `5` in a main money action input shows `5.00`.
 - Typing `58` in a main money action input shows `58.00`.
 - Typing `589` in a main money action input shows `589.00`.
@@ -665,18 +673,23 @@ Use:
 - Typing `58`, then `Space`, then `430`, then `Space`, then `88` in a main money action input shows `58,430.88` and saves and shows as `58,430.88$`.
 - Typing `0`, then `Space`, then `5` in a main money action input shows `0.05` and saves and shows as `0.05$`.
 - Typing `999999`, then `Space`, then `99` in a main money action input shows `999,999.99` and saves and shows as `999,999.99$`.
+- On mobile, typing `5`, tapping `Cent`, then typing `5` in a main money action input shows `5.05` and saves and shows as `5.05$`.
+- On mobile, typing `5`, tapping `Cent`, then typing `50` in a main money action input shows `5.50` and saves and shows as `5.50$`.
+- On mobile, typing `58`, tapping `Cent`, typing `430`, tapping `Cent`, then typing `88` in a main money action input shows `58,430.88` and saves and shows as `58,430.88$`.
 - Typing `0005` in a main money action input shows `5.00` and saves and shows as `5.00$`.
 - Typing `Space`, `Space`, `Space`, then `5` in a main money action input blocks the three `Space` key presses and then shows `5.00` after the `5` is typed.
-- Trying to type another `Space` after `58`, `Space`, `430`, `Space`, `88` does not change the input and shows no message.
-- Trying to type a third cents digit after the cents group is fixed by two accepted `Space` separators does not change the input and shows no message.
+- Tapping `Cent`, `Cent`, `Cent`, then typing `5` in a main money action input blocks the three `Cent` taps and then shows `5.00` after the `5` is typed.
+- Trying to type another `Space` or tap `Cent` after `58`, `Space`, `430`, `Space`, `88` does not change the input and shows no message.
+- Trying to type a third cents digit after the cents group is fixed by two accepted separators does not change the input and shows no message.
 - Saving raw digits `589550` in a main money action input shows `589,550.00$`.
 - Saving a main money action input shows the saved money amount with the `$` sign at the end.
 - Deleting one typed character from a main money action input reformats the remaining typed value as a money amount.
 - Deleting all typed numbers in a main money action input returns it to `0.00` instead of making it empty.
 - Clicking or tapping inside `58,430.88` keeps the main money action input append-only, so the next accepted typed character is handled at the end.
 - Selecting `430` in `58,430.88` and typing `9` does not replace `430`; accepted typing uses append-only behavior.
-- Backspace or Delete with the cursor or selection inside the formatted value removes only the last accepted digit or accepted `Space`.
-- Typing letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting `Space`, consecutive `Space`, additional `Space` after two accepted `Space` separators, a third cents digit after the cents group is fixed by two accepted `Space` separators, or other blocked characters into a main money action input does not change the field, and no message appears for that typed character.
+- Backspace or Delete with the cursor or selection inside the formatted value removes only the last accepted digit or accepted separator.
+- Typing letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting separators, consecutive separators, additional separator input after two accepted separators, a third cents digit after the cents group is fixed by two accepted separators, or other blocked characters into a main money action input does not change the field, and no message appears for that typed character.
+- Tapping `Cent` when separator input is blocked does not change the field, and no message appears.
 - Trying to type a main money action input value greater than `999,999.99` does not change the field and shows no message.
 - Money amounts up to `999,999.99$` stay contained in the horizontal input square, dashboard, `Balance Changes`, and `Savings` displays without horizontal page overflow, overlap, hidden actions, or missing required comma separators while typing or in visible saved/rendered values.
 - Trying to paste letters, numbers, symbols, or any other content into a main money action input does not change the field and shows no message.
