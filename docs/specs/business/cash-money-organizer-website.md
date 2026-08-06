@@ -18,6 +18,8 @@ A new user should see the money amount as `0.00$` the first time they open the w
 
 Visible money amounts should use two digits after the decimal point, such as `0.00$`, `5.00$`, and `14.50$`. Visible money amounts of `1,000.00$` or more should use comma separators every three digits before the decimal point, starting from the right, such as `5,895.50$` and `999,999.99$`.
 
+Saved browser storage money amount values are internal and should use normalized plain decimal strings without the `$` sign or comma separators, such as `0.00`, `5.00`, `5895.50`, and `999999.99`. User-facing website display should still add comma separators and the `$` sign, such as `5,895.50$`.
+
 Money amount values can include cents, but the maximum allowed money amount is `999,999.99$`. The main money amount and each `Saving` square planned money amount should never be saved above `999,999.99$`. Examples of valid visible money amounts include `5.05$`, `0.05$`, and `999,999.99$`. Values above `999,999.99$` are invalid.
 
 The website should not ask for a starting amount before showing the dashboard.
@@ -38,7 +40,9 @@ The main money action buttons should not appear as a modal, bottom sheet, separa
 
 If the main money action buttons are visible and the user clicks or taps the main money amount again, the buttons should go away without changing the money amount, saving anything, creating a `Balance Changes` entry, or showing a message.
 
-If the main money action buttons are visible and the user clicks or taps anywhere else on the screen, the buttons should go away without changing the money amount, saving anything, creating a `Balance Changes` entry, or showing a message.
+If the main money action buttons are visible and the user clicks or taps outside the main money amount and outside the visible action buttons, the buttons should go away without changing the money amount, saving anything, creating a `Balance Changes` entry, or showing a message.
+
+Clicking `Add`, `Subtract`, or `Modify` should start that selected money amount input flow and should not be treated as an outside click.
 
 The website should make the main money actions easy to understand without using real banking language.
 
@@ -48,9 +52,9 @@ The first version should save the user's data only in browser storage.
 
 The implementation should use the stable storage key `cash-money-organizer-website-data` and the first data version value `1`.
 
-The first version should load saved browser data only when the data version value is exactly `1`. Saved browser data with a missing, wrong, future, unreadable, or unrecognized data version, or a saved current money amount outside `0.00$` through `999,999.99$`, should be treated as broken saved data.
+The first version should load saved browser data only when the data version value is exactly `1`. A saved current money amount is valid only when it is a normalized plain decimal string from `0.00` through `999999.99`, with no `$` sign, no comma separators, exactly two digits after the decimal point, and no unneeded leading zeros before the decimal point except the single `0` in `0.00`. Saved browser data with a missing, wrong, future, unreadable, or unrecognized data version, or a saved current money amount outside that range or not in that exact saved format, should be treated as broken saved data. Examples of broken saved current money amount values include `5`, `5.0`, `005.00`, `5,000.00`, `5.000`, `1000000.00`, and `-5.00`.
 
-If saved browser data is broken or cannot be read, the website should show `Saved data could not be loaded.` with a `Start again` action. When the user chooses `Start again`, the website should delete the broken saved data and immediately create fresh browser storage data with the money amount set to `0.00$`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`.
+If saved browser data is broken or cannot be read, the website should show `Saved data could not be loaded.` with a `Start again` action. When the user chooses `Start again`, the website should delete the broken saved data and immediately create fresh browser storage data with the saved money amount set to `0.00`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`.
 
 When no saved data exists yet, the website should show the default `0.00$` money amount without saving it just because the website opened. The website should start saving data after the first successful saved user action. In the normal first money flow, this is the first successful `Add`.
 
@@ -90,21 +94,21 @@ The horizontal input square should start by showing `0.00` without the `$` sign.
 
 The user should type only the money amount into the horizontal input square, without the `$` sign. If the typed money amount reaches `1,000.00` or more, the input should add comma separators automatically while the user is typing.
 
-Main money amount inputs should request a mobile keyboard suitable for digit entry on supported devices. Computer users should enter cents in main money amount inputs with `Space`. Mobile users should be able to enter cents with a rectangular `Cent` button shown directly above the mobile keyboard while a main money amount input is open. The `Cent` button should not be shown for computer users. The `Cent` button should behave the same as pressing `Space` and should not add visible text to the input. The user should not enter cents in main money amount inputs by typing a decimal point.
+Main money amount inputs should request a mobile keyboard suitable for digit entry on supported devices. All users should be able to enter cents with `Space` or with a rectangular `Cent` button shown as part of the main money amount input controls while a main money amount input is open. On mobile, the `Cent` button should appear directly above the mobile keyboard when possible. The `Cent` button should behave the same as pressing `Space`, should not add visible text to the input, and should not cancel or close the input flow. The user should not enter cents in main money amount inputs by typing a decimal point.
 
-Main money amount inputs should accept only numbers from `0` through `9` and separator input from the `Space` key or mobile `Cent` button. The first accepted character should be a number from `0` through `9`. Typed decimal points, comma separators, `$` signs, letters, minus signs, and other blocked characters should not change the field and should show no message. The decimal point and comma separators in the displayed input should be generated by the website only.
+Main money amount inputs should accept only numbers from `0` through `9` and separator input from the `Space` key or `Cent` button. The first accepted character should be a number from `0` through `9`. Typed decimal points, comma separators, `$` signs, letters, minus signs, and other blocked characters should not change the field and should show no message. The decimal point and comma separators in the displayed input should be generated by the website only.
 
 Digits typed before an accepted separator should be whole money amount digits. Typed digits should not automatically become cents because more digits were typed. `0` should be a normal digit, not a starting zero-position skip. Unneeded leading zeros in the whole money amount should be normalized away, so typing `0005` should show `5.00`, not `00.05`.
 
-The `Space` key and mobile `Cent` button should act as a non-visible separator between digit groups. A separator should be accepted only after at least one digit and only when the previous accepted input is a digit. Starting `Space` key presses, starting `Cent` taps, consecutive `Space` key presses, consecutive `Cent` taps, or mixed consecutive separator inputs should be blocked with no message. Typing `Space`, `Space`, `Space`, then `5` should block the three `Space` key presses and then show `5.00` after the `5` is typed. Tapping `Cent`, `Cent`, `Cent`, then typing `5` on mobile should block the three `Cent` taps and then show `5.00` after the `5` is typed.
+The `Space` key and `Cent` button should act as a non-visible separator between digit groups. A separator should be accepted only after at least one digit and only when the previous accepted input is a digit. Starting `Space` key presses, starting `Cent` taps, consecutive `Space` key presses, consecutive `Cent` taps, or mixed consecutive separator inputs should be blocked with no message. Typing `Space`, `Space`, `Space`, then `5` should block the three `Space` key presses and then show `5.00` after the `5` is typed. Tapping `Cent`, `Cent`, `Cent`, then typing `5` should block the three `Cent` taps and then show `5.00` after the `5` is typed.
 
-Main money amount inputs should always show the typed value with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. After the user saves, the saved and displayed money amount should show two digits after the decimal point, comma separators for thousands and larger values, and the `$` sign at the end.
+Main money amount inputs should always show the typed value with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. After the user saves, browser storage should save the money amount as a normalized plain decimal string without the `$` sign or comma separators, and the displayed money amount should show two digits after the decimal point, comma separators for thousands and larger values, and the `$` sign at the end.
 
 For accepted input without separator input, all digits are whole money amount digits: typing `5` should show `5.00`, `58` should show `58.00`, `589` should show `589.00`, `5895` should show `5,895.00`, `58955` should show `58,955.00`, and `589550` should show `589,550.00`.
 
-For accepted input with separator input from `Space` or mobile `Cent`, the website should split the accepted digits into groups at each accepted separator. If the input ends with a separator, all completed digit groups should be treated as the whole money amount and cents should show as `00`. If the final group after a separator has one or two digits, that final group should be treated as cents and should be left-padded with `0` when it has one digit. All earlier groups should be joined together as the whole money amount. If there is only one accepted separator and the final group grows to three or more digits, that final group should be treated as another whole money amount group and cents should show as `00`. Once the input has two accepted separators, the final group is the cents group and should accept at most two digits. Additional separator input after two accepted separators should be blocked with no message.
+For accepted input with separator input from `Space` or `Cent`, the website should split the accepted digits into groups at each accepted separator. If the input ends with a separator, all completed digit groups should be treated as the whole money amount and cents should show as `00`. If the final group after a separator has one or two digits, that final group should be treated as cents and should be left-padded with `0` when it has one digit. All earlier groups should be joined together as the whole money amount. If there is only one accepted separator and the final group grows to three or more digits, that final group should be treated as another whole money amount group and cents should show as `00`. Once the input has two accepted separators, the final group is the cents group and should accept at most two digits. Additional separator input after two accepted separators should be blocked with no message.
 
-Examples: typing `5`, then `Space`, should keep the display at `5.00`; typing `5`, then `Space`, then `5` should show `5.05`; typing `5`, then `Space`, then `50` should show `5.50`; typing `58`, then `Space`, then `430` should show `58,430.00`; typing `58`, then `Space`, then `430`, then `Space`, then `88` should show `58,430.88`; typing `0`, then `Space`, then `5` should show `0.05`; and typing `999999`, then `Space`, then `99` should show `999,999.99`. On mobile, tapping `Cent` should work the same as pressing `Space`, so typing `5`, tapping `Cent`, then typing `50` should show `5.50`.
+Examples: typing `5`, then `Space`, should keep the display at `5.00`; typing `5`, then `Space`, then `5` should show `5.05`; typing `5`, then `Space`, then `50` should show `5.50`; typing `58`, then `Space`, then `430` should show `58,430.00`; typing `58`, then `Space`, then `430`, then `Space`, then `88` should show `58,430.88`; typing `0`, then `Space`, then `5` should show `0.05`; and typing `999999`, then `Space`, then `99` should show `999,999.99`. Tapping or clicking `Cent` should work the same as pressing `Space`, so typing `5`, then choosing `Cent`, then typing `50` should show `5.50`.
 
 If the user deletes one typed character from the horizontal input square, the remaining accepted input should be formatted again with two digits after the decimal point, automatic comma separators when needed, and no `$` sign while the input is still open. Deleting should remove the last accepted digit or accepted separator. For example, deleting from `5.50` after typing `5`, `Space`, `50` or typing `5`, tapping `Cent`, then typing `50` should return to `5.05`; deleting again should return to `5.00`.
 
@@ -128,11 +132,13 @@ Clicking `Yes` should try to apply the typed money amount using the selected act
 
 Clicking `Cancel` should close the horizontal input square, return to the dashboard money amount view, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
 
-Clicking or tapping outside the horizontal input square and its `Save Changes`, `Yes`, and `Cancel` controls should act like `Cancel`.
+Clicking or tapping outside the horizontal input square, `Save Changes`, `Yes`, `Cancel`, and the `Cent` button should act like `Cancel`.
 
 If the user clicks `Yes` while the input is `0.00` in `Add` or `Subtract`, the website should do nothing. No message should appear, the money amount should stay unchanged, saved data should stay unchanged, no `Balance Changes` entry should be created, and the same money amount input step should stay open until the user enters a money amount greater than `0.00$` or cancels.
 
-If the user clicks `Yes` while the input is `0.00` in `Modify`, the website should replace the main money amount with `0.00$`.
+If the user clicks `Yes` in `Modify` with the same money amount that is already shown, the website should do nothing. No message should appear, the money amount should stay unchanged, saved data should stay unchanged, browser storage should not be created or updated, no `Balance Changes` entry should be created, `Balance Changes` cleanup should not run, and the same money amount input step should stay open until the user enters a different valid money amount or cancels.
+
+If the user clicks `Yes` while the input is `0.00` in `Modify` and the current money amount is greater than `0.00$`, the website should replace the main money amount with `0.00$`.
 
 If the user subtracts more than the current money amount, the website should set the money amount to `0.00$`.
 
@@ -208,6 +214,8 @@ This is for setting the displayed total to the correct real cash amount when the
 
 `Modify` should allow a corrected money amount from `0.00$` through `999,999.99$`. It should not allow a negative money amount or a money amount above `999,999.99$`.
 
+If the corrected money amount entered in `Modify` is the same as the money amount already shown, the website should treat it as no action. It should not close the input flow, change the money amount, save browser storage, create browser storage, create a `Balance Changes` entry, run `Balance Changes` cleanup, create a notification, or show a message.
+
 If `Modify` changes the main money amount to `0.00$`, the next click on the main money amount should show `Add` and `Modify`, but should not show `Subtract`.
 
 If `Modify` changes the main money amount to `999,999.99$`, the next click on the main money amount should show `Subtract` and `Modify`, but should not show `Add`.
@@ -236,7 +244,7 @@ Clicking a `Saving` square should change that same square into its action state.
 
 In the action state, clicking the `Saving` name should open the rename flow for that square. Clicking the planned money amount should open the planned-money-amount change flow for that square. Clicking `Delete` should start the delete confirmation for that square. The website should not open a separate action menu or larger action square for rename, planned-money-amount change, and delete.
 
-Planned money amounts in `Saving` squares should use the planned-money amount display format: `0.00$` for zero, two decimal digits for nonzero whole money amounts such as `14.00$`, two decimal digits for nonzero money amounts with cents such as `14.50$`, and comma separators for planned money amounts of `1,000.00$` or more such as `5,895.50$`. A planned money amount should not be greater than `999,999.99$`.
+Planned money amounts in `Saving` squares should use the planned-money amount display format: `0.00$` for zero, two decimal digits for nonzero whole money amounts such as `14.00$`, two decimal digits for nonzero money amounts with cents such as `14.50$`, and comma separators for planned money amounts of `1,000.00$` or more such as `5,895.50$`. Browser storage should save `Saving` square planned money amounts as normalized plain decimal strings without the `$` sign or comma separators, such as `14.50` or `5895.50`. A planned money amount should not be greater than `999,999.99$`.
 
 If the user tries to save a `Saving` square planned money amount greater than `999,999.99$`, the website should do nothing. No message should appear, the `Saving` square should not be created or changed, saved data should stay unchanged, and `Balance Changes` should not get a new entry.
 
@@ -414,7 +422,10 @@ Better wording:
 - Grey zone: The exact website name and trust label are not fully defined. The active plan suggests wording such as `Manual cash tracker`, but the specs do not define the exact website name or the exact short trust label shown to the user.
 - Grey zone: Browser back behavior from full-screen `Savings` is not fully defined. The specs define returning to the dashboard with the small `<` sign, but they do not define what should happen if the user uses the browser back button while `Savings` is open.
 
-### Main Money Amount Grey Zones And Mistakes
+### Main Money Amount Grey Zones
 
-- Grey zone: Saved current money amount validation for in-range but non-normalized values is not fully defined. The specs say saved money amounts should be normalized and that values outside `0.00$` through `999,999.99$` are broken, but they do not define whether saved values such as `5`, `5.0`, `005.00`, `5,000.00`, or `5.000` should be normalized during load or treated as broken saved data.
-- Mistake: The functional spec's main money amount controls section contains prohibited real banking wording in its sentence explaining what the controls are not. This conflicts with the project rule to avoid real banking wording in specs.
+- Grey zone: The successful main money amount input close behavior is not fully defined. The specs say `Yes` applies the selected `Add`, `Subtract`, or `Modify` action when the typed money amount is valid, and they say invalid or no-action attempts keep the same input step open, but they do not explicitly say whether a successful save should close the horizontal input square, return to the dashboard money amount view, reset the input, or stay open for another money amount change.
+- Grey zone: The selected main money action is not fully identified inside the input flow. The specs say the same horizontal input square, `Save Changes`, `Yes`, and `Cancel` controls are used for `Add`, `Subtract`, and `Modify`, but they do not define whether the input flow should visibly remind the user which action they selected before they click `Yes`.
+- Grey zone: Initial focus for main money amount input flows is not fully defined. The specs say the input square opens and should request a mobile keyboard suitable for digit entry on supported devices, but they do not define whether the input is automatically focused when the flow opens or whether the user must tap or click the input square before typing.
+- Grey zone: The main money amount circle remains visible behind the input flow, but its behavior while the input flow is open is not fully defined. The outside-cancel rule may imply that tapping the visible main money amount circle acts like `Cancel`, but the specs do not explicitly say whether that tap cancels, does nothing, or opens the action buttons again.
+- Grey zone: The all-users `Cent` button placement outside mobile is not fully defined. The specs say the `Cent` button shows for all users while a main money amount input is open and appears directly above the mobile keyboard when possible, but they do not define where the button should appear on desktop or large screens.
