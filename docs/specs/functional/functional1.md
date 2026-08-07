@@ -64,6 +64,10 @@ If the main money action buttons are visible and the user clicks or taps outside
 
 Clicking `Add`, `Subtract`, or `Modify` should start that selected money amount input flow and should not be treated as an outside click.
 
+When a selected main money amount input flow starts, the visible main money action buttons should go away.
+
+The selected action should be remembered internally only. The open input flow should not show a visible reminder of whether the user selected `Add`, `Subtract`, or `Modify`.
+
 The dashboard should use `Current Balance` as the label for the main money amount.
 
 The `Current Balance` label is user-facing website text. In the specs, the concept should be described as the money amount.
@@ -77,6 +81,8 @@ The user can use the available money actions as often or as rarely as they want.
 The main money amount circle should stay visible in the background while the horizontal input square is open.
 
 The horizontal input square should start by showing `0.00` without the `$` sign.
+
+When the horizontal input square opens, it should be focused and ready for typing immediately. On supported mobile devices, opening the input flow should request the mobile keyboard immediately.
 
 The user should type only the money amount into the horizontal input square, without the `$` sign. If the typed money amount reaches `1,000.00` or more, the input should add comma separators automatically while the user is typing.
 
@@ -115,6 +121,8 @@ Under the horizontal input square, the website should show the exact text `Save 
 Under `Save Changes`, the website should show two buttons exactly named `Yes` and `Cancel`.
 
 In `Add`, `Subtract`, and `Modify`, clicking `Yes` should try to apply the typed money amount using the rules for that action.
+
+After a successful `Add`, `Subtract`, or `Modify` that changes the money amount, the website should close the horizontal input square, reset the temporary typed input so the next main money amount input starts at `0.00`, return to the dashboard money amount view, hide the main money action buttons, show the updated money amount, save only the data required by that action, and show no message.
 
 In `Add`, `Subtract`, and `Modify`, clicking `Cancel` should close the money amount input flow, return to the dashboard money amount view, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
 

@@ -183,6 +183,7 @@ Tasks:
 - Hide the main money action buttons when the user clicks or taps the main money amount again, without changing anything, saving anything, creating a `Balance Changes` entry, or showing a message.
 - Hide the main money action buttons when the user clicks or taps outside the main money amount and outside the visible action buttons, without changing anything, saving anything, creating a `Balance Changes` entry, or showing a message.
 - Start the selected money amount input flow when the user clicks `Add`, `Subtract`, or `Modify`; these action-button clicks should not be treated as outside clicks.
+- Hide the visible main money action buttons when the selected money amount input flow starts, remember the selected action internally only, and do not show a visible `Add`, `Subtract`, or `Modify` reminder inside the open input flow.
 - Show money amount change history directly under the main money amount.
 - Add clear manual-tracker wording.
 - Keep `Balance Changes` empty with no empty-state content when no history entries exist, and use a centered circle `+` as the empty state when no `Saving` squares exist.
@@ -199,6 +200,7 @@ Acceptance criteria:
 - Clicking or tapping the main money amount again while the visible money actions are open hides the visible money actions without changing anything.
 - Clicking or tapping outside the main money amount and outside the visible action buttons hides the visible money actions without changing anything.
 - Clicking `Add`, `Subtract`, or `Modify` starts the selected money amount input flow instead of hiding the visible money actions as an outside click.
+- When the selected money amount input flow starts, the visible main money action buttons are hidden and the open input flow does not show a visible `Add`, `Subtract`, or `Modify` reminder.
 - Money amount change history appears directly under the main money amount.
 - There is no separate `View history` action for money amount change history.
 - The interface does not use misleading bank wording.
@@ -214,6 +216,7 @@ Tasks:
 - Render `Add`, `Subtract`, and `Modify` money amount inputs as a horizontal square in the middle of the screen.
 - Keep the main money amount circle visible in the background while the horizontal input square is open.
 - Start the horizontal input square at `0.00`.
+- Focus the horizontal input square immediately when it opens so the user can start typing without another tap or click, and request the mobile keyboard immediately on supported mobile devices.
 - Request a mobile keyboard suitable for digit entry for main money action inputs on supported devices.
 - Show a rectangular `Cent` button for all users while a main money action input is open. The `Cent` button should be part of the main money amount input controls. On mobile, it should appear directly above the mobile keyboard when possible.
 - Let the user type numbers from `0` through `9` and the `Space` key into main money action inputs, without typing the `$` sign. Let all users choose the `Cent` button for cents. Block typed decimal points and manually typed comma separators with no message. Add the decimal point and comma separators automatically in the displayed input.
@@ -229,6 +232,7 @@ Tasks:
 - Keep money amounts up to `999,999.99$` contained in the horizontal input square, dashboard, `Balance Changes`, and `Savings` displays without horizontal page overflow, text overlap, hidden actions, rejected valid values, or missing required comma separators while typing or in visible saved/rendered values.
 - Show `Save Changes` under the horizontal input square, with buttons exactly named `Yes` and `Cancel`.
 - Make `Yes` apply the selected `Add`, `Subtract`, or `Modify` action.
+- After a successful `Add`, `Subtract`, or `Modify` that changes the money amount, close the horizontal input square, reset the temporary typed input so the next main money amount input starts at `0.00`, return to the dashboard money amount view, hide the main money action buttons, show the updated money amount, save only the data required by that action, and show no message.
 - Make `Cancel` and outside click or tap close the main money amount input flow, return to the dashboard money amount view, and change nothing.
 - Save each `Add` and `Subtract` action to `Balance Changes` as its own separate entry.
 - Do not combine separate `Add` and `Subtract` actions into one net history result.
@@ -250,6 +254,7 @@ Acceptance criteria:
 - Money changes are still visible after page refresh.
 - `Add`, `Subtract`, and `Modify` money amount input flows show a horizontal input square in the middle of the screen while the main money amount circle stays visible in the background.
 - The horizontal input square starts at `0.00`.
+- The horizontal input square is focused and ready for typing immediately when it opens.
 - `Add`, `Subtract`, and `Modify` money amount input flows show a rectangular `Cent` button for all users.
 - On mobile, the `Cent` button appears directly above the mobile keyboard when possible.
 - Typing `5` in a main money action input shows `5.00`, typing `58` shows `58.00`, typing `589` shows `589.00`, typing `5895` shows `5,895.00`, typing `58955` shows `58,955.00`, and typing raw digits `589550` shows `589,550.00`.
@@ -524,6 +529,7 @@ Acceptance criteria:
 - Main money action input amounts may include cents and must use valid money amount text.
 - Visible money amounts should use two digits after the decimal point, such as `0.00$`, `5.00$`, and `14.50$`, and should use comma separators every three digits before the decimal point for values of `1,000.00$` or more, such as `5,895.50$` and `999,999.99$`.
 - Main money action inputs should start at `0.00`.
+- Main money action inputs should focus immediately when they open so the user can start typing without another tap or click.
 - Main money action inputs should request a mobile keyboard suitable for digit entry on supported devices.
 - Main money action inputs should show a rectangular `Cent` button for all users while a main money action input is open. On mobile, the `Cent` button should appear directly above the mobile keyboard when possible.
 - Main money action inputs should accept only numbers from `0` through `9` and separator input from the `Space` key or `Cent` button, without letting the user type the `$` sign. Typed decimal points and manually typed comma separators should be blocked with no message. The input should add the decimal point and comma separators automatically while the user is typing.
@@ -666,6 +672,7 @@ Use:
 - `Add`, `Subtract`, and `Modify` money amount inputs open as a horizontal square in the middle of the screen.
 - The main money amount circle stays visible in the background while the horizontal input square is open.
 - The horizontal input square starts at `0.00`.
+- The horizontal input square is focused and ready for typing immediately when it opens, without requiring another tap or click.
 - Main money action inputs request a mobile keyboard suitable for digit entry on supported devices.
 - Main money action inputs show a rectangular `Cent` button for all users while the input is open.
 - On mobile, the `Cent` button appears directly above the mobile keyboard when possible.
@@ -706,6 +713,7 @@ Use:
 - Trying to paste letters, numbers, symbols, or any other content into a `Saving` square planned money amount input does not change the field and shows no message.
 - `Add`, `Subtract`, and `Modify` money amount input flows show `Save Changes`, `Yes`, and `Cancel`.
 - Clicking `Yes` applies the selected `Add`, `Subtract`, or `Modify` action when the typed amount is valid for that action and, for `Modify`, different from the money amount already shown.
+- After a successful `Add`, `Subtract`, or `Modify` that changes the money amount, the horizontal input square closes, the temporary typed input resets for the next input, the dashboard money amount view returns, the main money action buttons are hidden, the updated money amount is shown, and no message appears.
 - Clicking `Cancel` or clicking/tapping outside a main money amount input flow changes nothing, saves nothing, creates no `Balance Changes` entry, and shows no message.
 - `Saving` square create, `Saving` square rename, `Saving` square planned-money-amount change, and broken `Saving` square fix input flows show `Save` and `Cancel` text actions at the bottom.
 - Trying to confirm `0.00` in `Add` does not change the money amount, does not save data, does not create a `Balance Changes` entry, and keeps the same money amount input step open.

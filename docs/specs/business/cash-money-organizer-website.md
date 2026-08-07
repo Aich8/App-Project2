@@ -44,6 +44,8 @@ If the main money action buttons are visible and the user clicks or taps outside
 
 Clicking `Add`, `Subtract`, or `Modify` should start that selected money amount input flow and should not be treated as an outside click.
 
+When a selected main money amount input flow starts, the visible main money action buttons should go away. The selected action should be remembered internally only. The open input flow should not show a visible reminder of whether the user selected `Add`, `Subtract`, or `Modify`.
+
 The website should make the main money actions easy to understand without using real banking language.
 
 ### Storage Scope
@@ -92,6 +94,8 @@ The main money amount circle should stay visible in the background while the hor
 
 The horizontal input square should start by showing `0.00` without the `$` sign.
 
+When the horizontal input square opens, it should be focused and ready for typing immediately. On supported mobile devices, opening the input flow should request the mobile keyboard immediately.
+
 The user should type only the money amount into the horizontal input square, without the `$` sign. If the typed money amount reaches `1,000.00` or more, the input should add comma separators automatically while the user is typing.
 
 Main money amount inputs should request a mobile keyboard suitable for digit entry on supported devices. All users should be able to enter cents with `Space` or with a rectangular `Cent` button shown as part of the main money amount input controls while a main money amount input is open. On mobile, the `Cent` button should appear directly above the mobile keyboard when possible. The `Cent` button should behave the same as pressing `Space`, should not add visible text to the input, and should not cancel or close the input flow. The user should not enter cents in main money amount inputs by typing a decimal point.
@@ -129,6 +133,8 @@ Under the horizontal input square, the website should show the exact text `Save 
 Under `Save Changes`, the website should show two buttons exactly named `Yes` and `Cancel`.
 
 Clicking `Yes` should try to apply the typed money amount using the selected action. For `Add`, the typed money amount should be added to the main money amount. For `Subtract`, the typed money amount should be subtracted from the main money amount. For `Modify`, the typed money amount should replace the main money amount.
+
+After a successful `Add`, `Subtract`, or `Modify` that changes the money amount, the website should close the horizontal input square, reset the temporary typed input so the next main money amount input starts at `0.00`, return to the dashboard money amount view, hide the main money action buttons, show the updated money amount, save only the data required by that action, and show no message.
 
 Clicking `Cancel` should close the horizontal input square, return to the dashboard money amount view, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
 
@@ -424,8 +430,5 @@ Better wording:
 
 ### Main Money Amount Grey Zones
 
-- Grey zone: The successful main money amount input close behavior is not fully defined. The specs say `Yes` applies the selected `Add`, `Subtract`, or `Modify` action when the typed money amount is valid, and they say invalid or no-action attempts keep the same input step open, but they do not explicitly say whether a successful save should close the horizontal input square, return to the dashboard money amount view, reset the input, or stay open for another money amount change.
-- Grey zone: The selected main money action is not fully identified inside the input flow. The specs say the same horizontal input square, `Save Changes`, `Yes`, and `Cancel` controls are used for `Add`, `Subtract`, and `Modify`, but they do not define whether the input flow should visibly remind the user which action they selected before they click `Yes`.
-- Grey zone: Initial focus for main money amount input flows is not fully defined. The specs say the input square opens and should request a mobile keyboard suitable for digit entry on supported devices, but they do not define whether the input is automatically focused when the flow opens or whether the user must tap or click the input square before typing.
 - Grey zone: The main money amount circle remains visible behind the input flow, but its behavior while the input flow is open is not fully defined. The outside-cancel rule may imply that tapping the visible main money amount circle acts like `Cancel`, but the specs do not explicitly say whether that tap cancels, does nothing, or opens the action buttons again.
 - Grey zone: The all-users `Cent` button placement outside mobile is not fully defined. The specs say the `Cent` button shows for all users while a main money amount input is open and appears directly above the mobile keyboard when possible, but they do not define where the button should appear on desktop or large screens.
