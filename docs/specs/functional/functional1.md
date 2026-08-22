@@ -219,11 +219,11 @@ Visible `Balance Changes` rows should show both the created date and created tim
 
 Each visible `Balance Changes` entry should be compact, not too large. The signed money amount and action text should appear in the top-left corner. The visible created date and created time should appear in the bottom-right corner of the same entry, below the money change text and not too far from it. On mobile, the entry should keep the same layout. Text may wrap only as needed to stay readable, but the money change text should remain in the top-left area and the visible date and time should remain in the bottom-right area.
 
-Visible `Balance Changes` rows should not show the internal visible until date and time.
+Visible `Balance Changes` rows should not show the internal exact created date and time, seconds, milliseconds, or the internal visible until date and time.
 
 Visible add and subtract history entries should be kept for 30 days.
 
-The newest visible `Balance Changes` entry should appear first.
+Visible `Balance Changes` entries should be ordered newest first by their internal exact created date and time. The newest change should appear at the top of the list, and older changes should go lower. If two entries have the exact same internal exact created date and time, the saved list order should decide the tie, with entries earlier in the saved list appearing first. New entries should be saved before older entries in the saved list.
 
 For visible `Balance Changes` history, one month means 30 days, not a calendar month.
 
@@ -235,9 +235,9 @@ The visible date and time format should use the full month name, day, year, `at`
 
 Visible `Balance Changes` dates and times should use the user's browser/device local date and time.
 
-When a `Balance Changes` entry is created, the website should save both the created date and created time using the user's browser/device local date and time so it can show both values in the visible row and clear the entry after 30 days.
+When a `Balance Changes` entry is created, the website should save both the visible created date and visible created time using the user's browser/device local date and time so it can show both values in the visible row. It should also save an internal exact created date and time with seconds and milliseconds using the user's browser/device local date and time so it can order entries and clear them after 30 days.
 
-The visible until date should be the created date and time plus 30 days using the same browser/device local date and time rule.
+The visible until date should be the internal exact created date and time plus 30 days using the same browser/device local date and time rule.
 
 The website should run `Balance Changes` cleanup when it opens and loads saved data.
 
@@ -255,7 +255,8 @@ Each add or subtract action should include:
 
 - Amount.
 - Action type: added or subtracted.
-- Created date and created time shown in the visible row using the format `July 21, 2026 at 3:45 PM` and used for 30-day clearing.
+- Created date and created time shown in the visible row using the format `July 21, 2026 at 3:45 PM` for display.
+- Internal exact created date and time with seconds and milliseconds for ordering and 30-day clearing.
 - Internal visible until date and time.
 
 Each `Modify` action should require:
@@ -266,13 +267,21 @@ Each `Modify` action should require:
 
 Each saved `Balance Changes` entry should include these data fields:
 
+- ID.
+- Action type: added or subtracted.
+- Amount.
 - Previous money amount.
 - New money amount.
 - Difference.
-- Created date and created time shown in the visible row using the format `July 21, 2026 at 3:45 PM` and used for 30-day clearing.
+- Created date and created time shown in the visible row using the format `July 21, 2026 at 3:45 PM` for display.
+- Internal exact created date and time with seconds and milliseconds for ordering and 30-day clearing.
 - Internal visible until date and time.
 
-The previous money amount, new money amount, and internal visible until date and time should not be shown in the visible `Balance Changes` row.
+When saved browser data can be loaded but one saved `Balance Changes` entry is broken, the website should keep the rest of the saved data and remove only the broken entry from `Balance Changes`. It should not show the full saved-data error message, should not show a broken history row, should not change the main money amount, should not change `Savings`, and should show no message to the user.
+
+A saved `Balance Changes` entry should count as broken if it has a missing ID, duplicate ID, missing or invalid action type, missing or invalid money amount, missing or invalid previous money amount, missing or invalid new money amount, missing created date or created time, invalid created date or created time, missing or invalid internal exact created date and time, or missing or invalid visible until date and time. For duplicate IDs, the first matching saved `Balance Changes` entry in the saved list order should stay if it is otherwise valid, and later matching entries should be removed.
+
+The previous money amount, new money amount, internal exact created date and time, seconds, milliseconds, and internal visible until date and time should not be shown in the visible `Balance Changes` row.
 
 The user should be able to delete a `Balance Changes` entry when they make a mistake.
 
@@ -321,7 +330,7 @@ The `Add`, `Subtract`, and `Modify` actions should appear visually connected to 
 
 `Balance Changes` should appear directly under the main money amount on the dashboard.
 
-`Balance Changes` entries should be ordered newest first by their created date and time.
+`Balance Changes` entries should be ordered newest first by their internal exact created date and time, so older changes go lower. If two entries have the exact same internal exact created date and time, the saved list order should decide the tie, with entries earlier in the saved list appearing first.
 
 If there are no `Balance Changes` entries, the `Balance Changes` history should simply be empty.
 
@@ -404,6 +413,18 @@ Under the money amount shown inside `Savings`, the website should show `Saving` 
 
 The full-screen `Savings` view should keep showing the money amount inside `Savings` and the `Saving` squares together. The money amount shown inside `Savings` should go to the visible `Saving` squares from top to bottom as a planning display only.
 
+If the money amount shown inside `Savings` is `0.00$`, the website should show it with the same visual style used for nonzero `Savings money amount` values. It should not change color, size, weight, add an icon, or show a warning or error message just because the value is `0.00$`.
+
+If total planned money amount in valid `Saving` squares is greater than the main money amount, the website should show a small top note directly under `Savings money amount`. The note should use the exact format `{money amount} needed`, such as `20.00$ needed`. The needed money amount should equal total planned money amount in valid `Saving` squares minus the main money amount.
+
+If total planned money amount in valid `Saving` squares is equal to or less than the main money amount, the website should not show the top `{money amount} needed` note.
+
+The top of the full-screen `Savings` view should stay fixed while the user scrolls. The fixed top area should include the small `<` sign, the `Savings money amount`, and the optional top needed note. Only the `Saving` squares area should scroll, and it should have enough top spacing so no `Saving` square content is hidden behind the fixed top area.
+
+During `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows, the `Savings money amount`, top needed note, and coverage bars should stay based on the last saved `Saving` squares and the current main money amount. Unsaved typed input should not preview or change those calculated values. After a successful `Save`, the website should recalculate the `Savings money amount`, top needed note, and coverage bars. If the user clicks `Cancel`, those calculated values should stay unchanged.
+
+The visible `Saving` squares should appear in one vertical column on mobile and desktop. The website should not show `Saving` squares in multiple columns or a grid.
+
 When there are no visible `Saving` squares in the `Saving` squares area, the website should show the circle `+` action in the middle of that area.
 
 The centered `+` action is the empty state for no `Saving` squares. The website should not show a separate empty-state text sentence for no `Saving` squares.
@@ -435,6 +456,8 @@ The website should not open a separate action menu or larger action square for r
 The user should add a new `Saving` square with a circle action that contains a `+` sign.
 
 Clicking the `+` action should open the same create flow whether the `+` is centered in the empty `Saving` squares area or placed at the top-left when `Saving` squares already exist.
+
+Opening the create flow should replace the clicked `+` action with a temporary `Saving` input square inside the `Saving` squares area. If the clicked `+` was centered, the temporary input square should be centered in that area. If the clicked `+` was at the top-left, the temporary input square should appear at the top-left before the existing squares. The create flow should not open as a modal, bottom sheet, or separate page.
 
 When the user clicks the `+` action to add a new `Saving` square, the website should ask for:
 
@@ -479,22 +502,22 @@ The broken `Saving` square should still appear in `Savings` as an error square w
 
 The broken `Saving` square should show actions exactly named `Fix` and `Delete`.
 
-A broken `Saving` square should not use any money amount inside `Savings`, should not lower the `Savings money amount`, should not show a coverage bar, and should not affect coverage bars for valid `Saving` squares.
+A broken `Saving` square should not use any money amount inside `Savings`, should not lower the `Savings money amount`, should not show a top needed note, should not show a coverage bar, and should not affect coverage bars for valid `Saving` squares.
 
-Clicking `Fix` on a broken `Saving` square should ask the user for:
+Clicking `Fix` on a broken `Saving` square should change that broken square into a temporary `Saving` input square in the same visible position. The fix input square should not open as a modal, bottom sheet, or separate page. It should ask the user for:
 
 - `Saving` name.
 - Planned money amount greater than `0.00$` and not greater than `999,999.99$`.
 
 If the user saves valid fix values, the website should turn the broken square into a normal `Saving` square and keep it in the same visible position when possible.
 
-Saving a fixed `Saving` square should save browser storage, recalculate the `Savings money amount`, recalculate coverage bars, create no `Balance Changes` entry, and show no message.
+Saving a fixed `Saving` square should save browser storage, recalculate the `Savings money amount`, recalculate the top needed note, recalculate coverage bars, create no `Balance Changes` entry, and show no message.
 
 If the user clicks `Cancel` while fixing a broken `Saving` square, the broken square should stay broken and nothing should change.
 
 Clicking `Delete` on a broken `Saving` square should ask for confirmation with the exact message `Delete this Saving?` and buttons exactly named `Cancel` and `Delete`.
 
-Confirming delete for a broken `Saving` square should remove only that broken square, save browser storage, recalculate the `Savings money amount`, recalculate coverage bars, create no `Balance Changes` entry, update no other `Saving` squares, show no message, and offer no undo.
+Confirming delete for a broken `Saving` square should remove only that broken square, save browser storage, recalculate the `Savings money amount`, recalculate the top needed note, recalculate coverage bars, create no `Balance Changes` entry, update no other `Saving` squares, show no message, and offer no undo.
 
 If the user enters `0.00$` or a planned money amount greater than `999,999.99$` while creating a `Saving` square, the website should not create the `Saving` square.
 
@@ -558,6 +581,7 @@ If the user changes an existing `Saving` square planned money amount to `0.00$`:
 `Saving` squares should have a visible order:
 
 - The first `Saving` square the user creates should stay at the top by default.
+- `Saving` squares should appear one after another in a single vertical column.
 - The visible order should be the coverage order.
 - The website should check `Saving` squares from top to bottom.
 - Touch users should be able to change the order by holding and moving the whole `Saving` square.
@@ -641,6 +665,15 @@ If the user moves `School` to the top in this example:
 - `Food` shows `15.00$ needed` at the top-left of its bottom coverage bar.
 - Money amount shown inside `Savings` stays `0.00$`.
 
+Example with top needed note:
+
+- Current money amount is `100.00$`.
+- Total planned money amount in valid `Saving` squares is `120.00$`.
+- Money amount shown inside `Savings` is `0.00$`.
+- The top `Savings` area shows `20.00$ needed` directly under `Savings money amount`.
+
+If current money amount is `100.00$` and total planned money amount in valid `Saving` squares is also `100.00$`, money amount shown inside `Savings` is `0.00$`, but the top `Savings` area should not show `0.00$ needed` or any other top needed note.
+
 Creating a `Saving` square with a planned money amount is a planning action. It is not an `Add`, `Subtract`, or `Modify` action.
 
 Changing a `Saving` square planned money amount is a planning action. It is not an `Add`, `Subtract`, or `Modify` action.
@@ -666,7 +699,7 @@ The user should be able to:
 - Delete a `Saving` square.
 - Reorder `Saving` squares by holding and moving the whole square or by mouse dragging the whole square.
 
-If the current money amount becomes lower than the total planned money amount in `Saving` squares, the website should not change the `Saving` square planned money amounts automatically. It should update the coverage bars and show the money amount inside `Savings` as `0.00$`.
+If the current money amount becomes lower than the total planned money amount in valid `Saving` squares, the website should not change the `Saving` square planned money amounts automatically. It should update the coverage bars, show the money amount inside `Savings` as `0.00$`, and show the top `{money amount} needed` note with the difference.
 
 ## Saved Data User Behavior
 
@@ -698,6 +731,8 @@ When the user clicks `Start again`:
 - `Savings` should have no saved `Saving` squares.
 
 If the saved browser data file can be read and has data version `1`, but one saved `Saving` square inside it is broken, the website should not show the full saved-data error message just because of that one broken square. It should load the rest of the saved data and show the broken `Saving` square error state in `Savings`.
+
+If the saved browser data file can be read and has data version `1`, but one saved `Balance Changes` entry inside it is broken, the website should not show the full saved-data error message just because of that one broken history entry. It should load the rest of the saved data and remove only the broken `Balance Changes` entry from visible and saved history.
 
 The website should not show user-facing text that explains where saved data is stored.
 
