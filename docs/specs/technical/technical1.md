@@ -1,5 +1,15 @@
 # Technical Spec: Cash Money Organizer Website
 
+## Website Identity And Trust Text
+
+The implementation should render the exact website name and short trust label as `Manual Cash Tracker` wherever that first-screen identity or trust wording appears. The capitalization should match exactly.
+
+## Interaction Input Scope
+
+The first version should implement clickable controls for mouse clicks and finger taps. Keyboard support is required only for typing inside money amount inputs and `Saving` square inputs, including the specified `Space` key behavior inside main money amount inputs.
+
+The implementation does not need custom keyboard navigation for clickable controls, custom `Tab` order rules, `Enter` or `Space` activation rules for clickable controls, focus-return rules after save/cancel/delete, or keyboard support for reordering `Saving` squares. Normal browser behavior may exist, but it is not a first-version requirement.
+
 ## Money Amount Storage
 
 The current money amount should be saved separately from the visible history list.
@@ -63,11 +73,11 @@ When a selected main money action input flow starts, the implementation should h
 
 Money action validation should block negative values and values greater than `999,999.99$`. `Add` and `Subtract` should require a money amount greater than `0.00$` and not greater than `999,999.99$`. `Modify` should allow money amounts from `0.00$` through `999,999.99$`. Clicking `Yes` while the main money action input is `0.00` in `Add` or `Subtract` should be treated as no action: no message, no money amount change, no browser storage write, no `Balance Changes` entry, and the same money amount input step stays open. Clicking `Yes` in `Modify` with the same money amount that is already shown should also be treated as no action: no message, no money amount change, no browser storage creation or write, no `Balance Changes` entry, no `Balance Changes` cleanup, and the same money amount input step stays open until the user enters a different valid money amount or cancels. If an `Add` action would make the current money amount greater than `999,999.99$`, the website should do nothing: no message, no money amount change, no browser storage write, no `Balance Changes` entry, and the same money amount input step stays open.
 
-`Add`, `Subtract`, and `Modify` money amount input flows should render a horizontal money amount input square in the middle of the screen. The main money amount circle should remain visible in the background while the horizontal input square is open. The square should start by showing `0.00` without the `$` sign.
+`Add`, `Subtract`, and `Modify` money amount input flows should render a horizontal money amount input square in the middle of the screen. The main money amount circle should remain visible only as a dimmed, inactive background element while the horizontal input square is open. The input flow should be the active part of the screen. Clicking or tapping the visible main money amount circle behind the input flow should be handled by the same outside-cancel behavior as other outside areas: close the input flow, return to the dashboard money amount view, leave saved data unchanged, create no `Balance Changes` entry, and show no message. Clicking or tapping the visible main money amount circle should not reopen the main money action buttons. The square should start by showing `0.00` without the `$` sign.
 
 When a main money action input flow opens, the implementation should focus the horizontal input square immediately so accepted typing is handled without requiring a second tap or click. On supported mobile devices, this focus should request the mobile keyboard immediately. The cursor should stay at the end when shown.
 
-Main money action input fields should request a mobile keyboard suitable for digit entry on supported devices. The implementation should still validate the entered value because desktop keyboards, physical keyboards, and browser differences can bypass the mobile keyboard layout. The implementation should render a rectangular `Cent` button for all users while a main money action input is open, without using device or keyboard detection to decide whether the button appears. The `Cent` button should be part of the main money amount input controls. On mobile, the `Cent` button should appear directly above the mobile keyboard when possible. The `Cent` button should behave the same as pressing `Space` in the accepted input sequence and should not trigger input-flow cancellation.
+Main money action input fields should request a mobile keyboard suitable for digit entry on supported devices. The implementation should still validate the entered value because desktop keyboards, physical keyboards, and browser differences can bypass the mobile keyboard layout. The implementation should render a rectangular `Cent` button for all users while a main money action input is open, without using device or keyboard detection to decide whether the button appears. The `Cent` button should be part of the main money amount input controls and should appear directly under the horizontal input square on mobile and desktop. On mobile, when the browser and keyboard allow it, this placement should also keep the `Cent` button directly above the mobile keyboard. The `Cent` button should behave the same as pressing `Space` in the accepted input sequence and should not trigger input-flow cancellation.
 
 Main money action input fields should accept only digits from `0` through `9` and separator input from the `Space` key or `Cent` button. The first accepted character should be a digit from `0` through `9`. The decimal point, comma separators, `$` signs, letters, minus signs, and other blocked characters should keep the previous input value and show no message. The decimal point and comma separators shown while editing should be generated by the implementation only.
 
@@ -97,7 +107,7 @@ Money amount values up to `999,999.99$` should stay contained in the horizontal 
 
 Main money action input fields should block paste. If the user tries to paste letters, numbers, symbols, or any other content into a main money action input, the pasted content should not appear, the field should keep its previous value, and no message should appear.
 
-`Add`, `Subtract`, and `Modify` money amount input flows should render the exact text `Save Changes` under the horizontal input square, with buttons exactly named `Yes` and `Cancel` under that text. `Yes` should run the validation and save rules for the selected action. `Cancel` should close the money amount input flow, return to the dashboard money amount view, leave all saved data unchanged, create no `Balance Changes` entry, and show no message. Clicking or tapping outside the horizontal input square, `Save Changes`, `Yes`, `Cancel`, and the `Cent` button should act like `Cancel`. The outside-cancel handler should ignore taps or clicks on the `Cent` button so the `Cent` button can update the accepted input sequence before any dismissal behavior runs.
+`Add`, `Subtract`, and `Modify` money amount input flows should render the rectangular `Cent` button under the horizontal input square, the exact text `Save Changes` under `Cent`, and buttons exactly named `Yes` and `Cancel` under `Save Changes`. `Yes` should run the validation and save rules for the selected action. `Cancel` should close the money amount input flow, return to the dashboard money amount view, leave all saved data unchanged, create no `Balance Changes` entry, and show no message. Clicking or tapping outside the horizontal input square, `Save Changes`, `Yes`, `Cancel`, and the `Cent` button should act like `Cancel`, including clicking or tapping the dimmed, inactive main money amount circle behind the input flow. The outside-cancel handler should ignore taps or clicks on the `Cent` button so the `Cent` button can update the accepted input sequence before any dismissal behavior runs.
 
 After a successful `Add`, `Subtract`, or `Modify` that changes the money amount, the implementation should close the horizontal input square, reset the temporary accepted input sequence so the next main money action input starts at `0.00`, return to the dashboard money amount view, hide the main money action buttons, render the updated money amount, write only the data required by that action, and show no message. Invalid attempts and no-action attempts should keep the same money amount input step open according to their specific validation rules.
 
@@ -113,8 +123,8 @@ Each `Saving` square should be saved with:
 - Name.
 - Planned money amount greater than `0.00$` and not greater than `999,999.99$`.
 - Order.
-- Created date.
-- Updated date.
+
+The first version should not save created date or updated date fields on `Saving` squares. If saved browser data contains extra `Saving` square date fields anyway, those extra fields should be ignored and should not make that `Saving` square broken.
 
 The website should not save `Saving` squares with a planned money amount of `0.00$`.
 
@@ -126,11 +136,11 @@ Trying to save a new `Saving` square with a planned money amount of `0.00$` or g
 
 `Saving` square planned money amount inputs should enforce the `999,999.99$` maximum and should not save values above that limit. Saved planned money amounts should use the same exact normalized plain decimal representation as the main money amount.
 
-If the planned money amount is empty when creating a `Saving` square, the create flow should stay open without showing an error message. The failed save should not write browser storage, should not create a `Saving` square, should not update any dates, and should not create a `Balance Changes` entry.
+If the planned money amount is empty when creating a `Saving` square, the create flow should stay open without showing an error message. The failed save should not write browser storage, should not create a `Saving` square, and should not create a `Balance Changes` entry.
 
-If the planned money amount is empty when changing an existing `Saving` square, the planned-money-amount change flow should stay open without showing an error message. The failed save should not write browser storage, should not change the saved planned money amount, should not update any dates, and should not create a `Balance Changes` entry.
+If the planned money amount is empty when changing an existing `Saving` square, the planned-money-amount change flow should stay open without showing an error message. The failed save should not write browser storage, should not change the saved planned money amount, and should not create a `Balance Changes` entry.
 
-If the planned money amount is greater than `999,999.99$` when creating or changing a `Saving` square, the flow should stay open without showing an error message. The failed save should not write browser storage, should not create a new `Saving` square, should not change the saved planned money amount, should not update any dates, and should not create a `Balance Changes` entry.
+If the planned money amount is greater than `999,999.99$` when creating or changing a `Saving` square, the flow should stay open without showing an error message. The failed save should not write browser storage, should not create a new `Saving` square, should not change the saved planned money amount, and should not create a `Balance Changes` entry.
 
 `Saving` square planned money amount inputs should request a decimal numeric keyboard on devices that support it. The implementation should still validate the entered value because desktop keyboards and browser differences can bypass the mobile keyboard layout.
 
@@ -138,7 +148,7 @@ If the planned money amount is greater than `999,999.99$` when creating or chang
 
 `Saving` square planned money amount inputs should block paste. If the user tries to paste letters, numbers, symbols, or any other content into a planned money amount input, the pasted content should not appear, the input should keep its previous value, and no message should appear.
 
-`Saving` square create, rename, planned-money-amount change, and broken-square fix input flows should render two text actions at the bottom: `Save` and `Cancel`. `Save` should run the validation and save rules for that action. `Cancel` should close the input flow, return to the `Saving` squares view, leave all saved data unchanged, create no `Balance Changes` entry, update no dates, and show no message.
+`Saving` square create, rename, planned-money-amount change, and broken-square fix input flows should render two text actions at the bottom: `Save` and `Cancel`. `Save` should run the validation and save rules for that action. `Cancel` should close the input flow, return to the `Saving` squares view, leave all saved data unchanged, create no `Balance Changes` entry, and show no message.
 
 Saved `Saving` square names should be unique inside `Savings`.
 
@@ -148,15 +158,15 @@ Before creating or renaming a `Saving` square, the website should trim spaces at
 
 Spaces inside the trimmed `Saving` square name should be preserved in saved browser data.
 
-If the trimmed name is empty when creating a `Saving` square, the create flow should stay open without showing an error message. The failed save should not write browser storage, should not create a `Saving` square, should not update any dates, and should not create a `Balance Changes` entry.
+If the trimmed name is empty when creating a `Saving` square, the create flow should stay open without showing an error message. The failed save should not write browser storage, should not create a `Saving` square, and should not create a `Balance Changes` entry.
 
-If the trimmed name is empty when renaming a `Saving` square, the rename flow should stay open without showing an error message. The failed save should not write browser storage, should not rename the `Saving` square, should not update any dates, and should not create a `Balance Changes` entry.
+If the trimmed name is empty when renaming a `Saving` square, the rename flow should stay open without showing an error message. The failed save should not write browser storage, should not rename the `Saving` square, and should not create a `Balance Changes` entry.
 
 The website should check duplicate `Saving` square names by comparing trimmed names without uppercase or lowercase differences.
 
 If a create or rename action would duplicate another saved `Saving` square name, the website should not save that duplicate name.
 
-If a create or rename action would duplicate another saved `Saving` square name, the website should close the create or rename flow and return to the `Saving` squares view without showing a duplicate-name error message. The failed duplicate-name action should not write browser storage, should not create a `Saving` square, should not rename an existing `Saving` square, should not update any dates, and should not create a `Balance Changes` entry.
+If a create or rename action would duplicate another saved `Saving` square name, the website should close the create or rename flow and return to the `Saving` squares view without showing a duplicate-name error message. The failed duplicate-name action should not write browser storage, should not create a `Saving` square, should not rename an existing `Saving` square, and should not create a `Balance Changes` entry.
 
 For new `Saving` square creation, validation should run in this order:
 
@@ -186,11 +196,13 @@ Activating `Fix` on a broken `Saving` square should replace that broken square w
 
 When a broken `Saving` square is fixed successfully, the implementation should replace the broken saved square with a valid normal `Saving` square, save browser storage, recalculate the `Savings money amount`, recalculate the top needed note, recalculate coverage bars, create no `Balance Changes` entry, and show no message. The fixed square should keep the broken square's current displayed position when possible. If the broken square had a missing or duplicate ID, the fixed square should get a valid unique ID. If the broken square had a missing, invalid, or duplicate order, the fixed square should get a valid order based on its current displayed position.
 
-Activating `Delete` on a broken `Saving` square should use the normal `Saving` square delete confirmation: exact message `Delete this Saving?`, buttons `Cancel` and `Delete`. Confirming delete should remove only that broken square from saved browser data, save browser storage, recalculate the `Savings money amount`, recalculate the top needed note, recalculate coverage bars, create no `Balance Changes` entry, update no other `Saving` squares, show no message, and offer no undo.
+Activating `Delete` on a broken `Saving` square should use the normal `Saving` square delete confirmation: a small confirmation square in the middle of the screen with the exact message `Delete this Saving?` and buttons exactly named `Cancel` and `Delete`. Clicking `Cancel` or clicking or tapping outside the small confirmation square should close the confirmation, keep the broken square visible, write no browser storage, create no `Balance Changes` entry, and show no message. Confirming delete should close the confirmation, remove only that broken square from saved browser data, save browser storage, recalculate the `Savings money amount`, recalculate the top needed note, recalculate coverage bars, create no `Balance Changes` entry, update no other `Saving` squares, show no message, and offer no undo.
 
 Opening `Savings` should render a full-screen `Savings` view instead of leaving `Savings` as only an inline dashboard section. The full-screen `Savings` view should include the `Savings money amount` and the visible `Saving` squares.
 
-The full-screen `Savings` view should render a small `<` sign in the top-left corner as the back action. Activating `<` should return to the dashboard without writing browser storage, changing saved data, creating a `Balance Changes` entry, or updating dates.
+The full-screen `Savings` view should render a small `<` sign in the top-left corner as the back action. Activating `<` should return to the dashboard without writing browser storage, changing saved data, or creating a `Balance Changes` entry.
+
+The implementation should handle the browser Back button, mobile browser back gesture, or system Back action while the full-screen `Savings` view is open by closing `Savings` and returning to the dashboard. This browser Back behavior should not write browser storage, change saved data, create a `Balance Changes` entry, or show a message.
 
 The implementation should render the full-screen `Savings` view with a fixed top area containing the small `<` sign, the `Savings money amount`, and the optional top needed note. The `Saving` squares container should scroll below the fixed top area. The scrollable area should include enough top spacing or layout offset so no `Saving` square, temporary input square, confirmation state, or coverage bar is hidden underneath the fixed top area.
 
@@ -208,13 +220,25 @@ Activating a `Saving` square should change that same square into its action stat
 
 In the action state, activating the rendered `Saving` name should open the rename flow for that square. Activating the rendered planned money amount should open the planned-money-amount change flow for that square. Activating `Delete` should start the delete confirmation for that square. The implementation should not open a separate action menu or larger action square for rename, planned-money-amount change, and delete.
 
-When a normal `Saving` square is in action state, the implementation should close that action state if the user clicks or taps outside that same square. This outside-action-state dismissal should return the square to its default state, write no browser storage, create no `Balance Changes` entry, update no dates, and show no message.
+The `Saving` square delete confirmation should render as a small confirmation square in the middle of the screen, not inside the `Saving` square, not as a temporary square state, not as a bottom sheet, and not as a separate page. It should render the exact message `Delete this Saving?` and buttons exactly named `Cancel` and `Delete`. Only one `Saving` square delete confirmation should be open at a time.
+
+Opening a `Saving` square delete confirmation from a normal `Saving` square should clear that square's action state. Clicking `Cancel` or clicking or tapping outside the small confirmation square should close the confirmation, return the selected normal `Saving` square to its default state, write no browser storage, create no `Balance Changes` entry, and show no message. Clicking `Delete` in the small confirmation square should close the confirmation and run the delete confirmation behavior for only the selected `Saving` square.
+
+Opening rename for an existing `Saving` square should replace that same square with a temporary `Saving` input square in the same visible position. The rename input square should render only the new `Saving` name input and the bottom text actions `Save` and `Cancel`. It should not render as a modal, bottom sheet, separate page, or separate floating input.
+
+Opening planned-money-amount change for an existing `Saving` square should replace that same square with a temporary `Saving` input square in the same visible position. The planned-money-amount change input square should render only the new total planned money amount input and the bottom text actions `Save` and `Cancel`. It should not render as a modal, bottom sheet, separate page, or separate floating input.
+
+When a normal `Saving` square is in action state, the implementation should close that action state if the user clicks or taps outside that same square. This outside-action-state dismissal should return the square to its default state, write no browser storage, create no `Balance Changes` entry, and show no message.
 
 Clicks or taps inside the open action-state square should not be handled as outside-action-state dismissal. Activating the rendered `Saving` name, rendered planned money amount, or `Delete` should run the matching square action instead.
 
 If the user clicks or taps another normal default `Saving` square while one square is in action state, the implementation should close the old action state and open the clicked square in its own action state. Scrolling the `Saving` squares container should not close the action state by itself. Activating the small `<` sign should clear any open `Saving` square action state as part of returning to the dashboard.
 
-The whole `Saving` square should be draggable for touch and mouse users. Touch users should reorder by holding and moving the whole square. Mouse users should reorder by clicking, holding, and dragging the whole square. Holding or dragging should not open rename, planned-money-amount change, or delete.
+The whole normal default `Saving` square should be draggable for touch and mouse users. Touch users should reorder by holding the whole square for `600ms`, then moving it. Mouse users should reorder by clicking and holding the whole square for `600ms`, then dragging it. After the `600ms` hold completes, dragging should start only after the pointer or finger moves at least `8px`. Holding or dragging should not open rename, planned-money-amount change, or delete.
+
+During reorder, the dragged `Saving` square should follow the user's finger or mouse pointer. The original position should render a placeholder the same size as the dragged square. If the pointer or finger is near the top or bottom of the scrollable `Saving` squares container during reorder, that container should auto-scroll.
+
+The implementation should disable reordering while any `Saving` square is in action state, input state, or delete confirmation state. The user should close, cancel, save, or finish that state before any reorder can start.
 
 `Saving` square order should be saved in browser storage so the same order appears after refresh.
 
@@ -255,8 +279,6 @@ Changing the current money amount should update coverage bars and the money amou
 
 Changing a `Saving` square planned money amount should replace the saved planned money amount for that square with the new total planned money amount.
 
-Changing a `Saving` square planned money amount should update that square's updated date.
-
 Changing a `Saving` square planned money amount should recalculate coverage bars, the top needed note, and the money amount shown inside `Savings`.
 
 Changing a `Saving` square planned money amount should not create a `Balance Changes` entry and should not change the current money amount.
@@ -270,6 +292,10 @@ Deleting a `Saving` square should remove only that square and its saved details 
 Deleting a `Saving` square should require user confirmation before deletion.
 
 The confirmation message should be exactly `Delete this Saving?`, with buttons exactly named `Cancel` and `Delete`.
+
+The confirmation should render as a small confirmation square in the middle of the screen. It should not render inside the `Saving` square, as a temporary square state, as a bottom sheet, or as a separate page. Only one `Saving` square delete confirmation should be open at a time.
+
+Clicking `Cancel` or clicking or tapping outside the small confirmation square should close the confirmation without writing browser storage, changing saved data, creating a `Balance Changes` entry, or showing a message.
 
 Deleting a `Saving` square should not change the current money amount, should not create a `Balance Changes` entry, and should not change the saved name or planned money amount of any other `Saving` square.
 
@@ -307,6 +333,12 @@ The website should save data after every successful:
 - `Modify`.
 - `Saving` square change.
 - `Balance Changes` delete that removes only the visible history entry.
+
+A user action should count as successful only after the required browser storage write succeeds.
+
+If browser storage is unavailable, full, blocked, or throws an error while saving a valid user action, the implementation should block that action and keep or restore the last successfully saved in-memory state. It should render the exact message `Changes could not be saved.`. It should not create, update, delete, or reorder saved data, should not create a `Balance Changes` entry, and should not run `Balance Changes` cleanup as a successful saved user action.
+
+For main money amount input flows, a save failure should keep the same input flow open with the same accepted typed value. For `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows, a save failure should keep the same input flow open with the same typed values. For `Saving` square delete and `Balance Changes` delete confirmations, a save failure should keep the confirmation open and keep the selected item visible. For completed `Saving` square reorder, a save failure should restore the last successfully saved order.
 
 A `Modify` attempt with the same money amount that is already shown is not a successful saved user action and should not write browser storage or run `Balance Changes` cleanup.
 
