@@ -40,12 +40,12 @@ Included in the first version:
 - Add money flow with amount.
 - Subtract money flow with amount.
 - Silent modify flow with corrected total amount.
-- 30-day visible money amount change history shown directly under the main money amount, where each add and subtract action stays as its own entry.
+- 30-day visible money amount change history shown in a large scrollable `Balance Changes` square directly under the main money amount, where each add and subtract action stays as its own entry and `Savings` appears below that square.
 - Newest `Balance Changes` entries shown first.
-- Full-screen `Savings` planning view with a money amount shown inside `Savings` using the label `Savings money amount`, a fixed top `Savings` area while `Saving` squares scroll, normal visual styling when `Savings money amount` is `0.00$`, small top `{money amount} needed` text when total planned money amount in valid `Saving` squares is greater than the main money amount, ordered user-named `Saving` squares in one vertical column on mobile and desktop, coverage bars, a centered circle `+` empty state when no `Saving` squares exist, a top-left circle `+` action when `Saving` squares exist, temporary `Saving` input squares for create and broken-square fix, saved-data-only `Savings money amount`, top needed text, and coverage updates while `Saving` input flows are open, and a top-left `<` back action to return to the dashboard.
+- Full-screen `Savings` planning view with a money amount shown inside `Savings` using the label `Savings money amount`, a fixed top `Savings` area while `Saving` squares scroll, normal visual styling when `Savings money amount` is `0.00$`, small top `{money amount} needed` text when total planned money amount in valid `Saving` squares is greater than the main money amount, ordered user-named `Saving` squares in one vertical column on mobile and desktop, coverage bars, outside-click dismissal for `Saving` square action state, a centered circle `+` empty state only when no normal or broken saved `Saving` squares are visible, a top-left circle `+` action when normal or broken saved `Saving` squares are visible, temporary `Saving` input squares for create and broken-square fix, saved-data-only `Savings money amount`, top needed text, and coverage updates while `Saving` input flows are open, and a top-left `<` back action to return to the dashboard.
 - `Balance Changes` history for added money and subtracted money.
 - Saved `Balance Changes` entry validation that removes only broken saved history entries while keeping the rest of the saved data.
-- Delete support for `Balance Changes` entries that opens from press-and-hold or click-and-hold, shows a little square with `Delete` and `Cancel`, asks for confirmation with `Delete this Balance Change?` after `Delete` is chosen, shows `Cancel` and `Delete` in the confirmation, removes only the visible history entry, and does not offer undo.
+- Delete support for `Balance Changes` entries that opens from `600ms` press-and-hold or click-and-hold, shows one little `Delete` and `Cancel` square in the middle of the screen, closes that little square on `Cancel` or outside click, keeps it open during pointer or finger movement and scrolling, asks for confirmation with `Delete this Balance Change?` after `Delete` is chosen, shows `Cancel` and `Delete` in the confirmation, removes only the visible history entry, and does not offer undo.
 - Responsive layout for mobile and desktop.
 - Clear trust wording that this is a manual cash tracking tool, not a real bank.
 
@@ -92,9 +92,9 @@ Primary areas:
 Suggested first-screen layout:
 - Top area: website name and trust label such as "Manual cash tracker".
 - Main money amount area: user-facing label `Current Balance`; clicking the money amount reveals horizontal action buttons near the money amount, with `Add` and `Modify` in that order at `0.00$`, `Add`, `Subtract`, and `Modify` in that order when the money amount is greater than `0.00$` and less than `999,999.99$`, or `Subtract` and `Modify` when the money amount is exactly `999,999.99$`.
-- Money amount change history directly under the main money amount.
+- Large scrollable `Balance Changes` square directly under the main money amount.
 - Secondary action: click `Savings`.
-- Overview area: `Balance Changes` and savings summary.
+- Overview area: the large `Balance Changes` square, then `Savings` below it.
 
 ## Core Data Model
 
@@ -148,6 +148,7 @@ Broken saved `Balance Changes` entry:
 Broken saved `Saving` square:
 - Exact text: `Saving could not be loaded.`
 - Actions: `Fix` and `Delete`.
+- Counts as visible content for circle `+` placement only.
 - Does not use money amount inside `Savings`.
 - Does not show a coverage bar.
 - Does not affect coverage calculations until fixed.
@@ -298,7 +299,12 @@ Acceptance criteria:
 ### Milestone 4: Balance Changes
 
 Tasks:
-- Build the `Balance Changes` list directly under the main money amount.
+- Build the `Balance Changes` list as a large square directly under the main money amount.
+- Make the large `Balance Changes` square use most of the dashboard page space under the main money amount.
+- Make `Balance Changes` entries scroll inside the large square when there are too many entries to fit.
+- Let the dashboard page scroll past the bottom of the large `Balance Changes` square to reach `Savings`.
+- Place `Savings` below the large `Balance Changes` square in the dashboard page flow.
+- Do not set a smaller maximum visible-entry limit for valid 30-day `Balance Changes` entries.
 - When no `Balance Changes` entries exist, show no history rows and no empty-state sentence, placeholder, icon, or other empty-state content.
 - Show each visible `Balance Changes` row with the signed money amount, action text, and both the created date and created time: `+{money amount} added` or `-{money amount} subtracted`, plus the visible created date and created time. A date-only display is not enough. The visible date and time format should be like `July 21, 2026 at 3:45 PM`.
 - Render each visible `Balance Changes` entry as a compact entry box, not a large panel.
@@ -319,16 +325,21 @@ Tasks:
 - During cleanup, delete visible history entries from browser storage at or after their visible until date.
 - Do not add a background timer for checking old `Balance Changes` entries while the website stays open with no user action.
 - Keep the current money amount unchanged when old history entries expire.
-- Let the user scroll down when the history list is longer than the screen.
+- Let the user scroll inside the large `Balance Changes` square when the history list is longer than the square.
 - Add delete support for `Balance Changes` entries.
-- For touch users, open the delete action when the user presses and holds a `Balance Changes` entry.
-- For mouse users, open the delete action when the user clicks and holds a `Balance Changes` entry.
-- After press-and-hold or click-and-hold, show a little square on the screen with the exact action texts `Delete` and `Cancel`.
+- For touch users, open the delete action when the user presses and holds a `Balance Changes` entry for `600ms`.
+- For mouse users, open the delete action when the user clicks and holds a `Balance Changes` entry for `600ms`.
+- After a completed `600ms` press-and-hold or click-and-hold, show a little square in the middle of the screen with the exact action texts `Delete` and `Cancel`.
+- Allow only one `Balance Changes` delete action square to be open at a time.
 - Make clicking `Cancel` in the little square close it without changing anything.
-- Make clicking `Delete` in the little square ask for confirmation with `Delete this Balance Change?`, show `Cancel` and `Delete`, remove only the visible history entry after confirmation, not change the current money amount, and not offer undo.
+- Make clicking or tapping outside the little square close it without changing anything.
+- Keep the little square open during pointer or finger movement and scrolling.
+- Make clicking `Delete` in the little square close it, then ask for confirmation with `Delete this Balance Change?`, show `Cancel` and `Delete`, remove only the visible history entry after confirmation, not change the current money amount, and not offer undo.
 
 Acceptance criteria:
 - The user can understand how their money amount changed over time.
+- `Balance Changes` appears as a large square directly under the main money amount.
+- The large `Balance Changes` square uses most of the dashboard page space under the main money amount.
 - When there are no `Balance Changes` entries, the history list is empty and shows no sentence, placeholder, icon, or other empty-state content.
 - The user sees separate entries such as `+56.00$ added` and `-34.00$ subtracted`.
 - Visible `Balance Changes` rows show both the created date and created time using the format `July 21, 2026 at 3:45 PM`.
@@ -343,12 +354,19 @@ Acceptance criteria:
 - `Balance Changes` cleanup runs after every successful saved user action.
 - During cleanup, entries at or after their visible until date are deleted from browser storage and no longer shown.
 - Removing old history entries does not change the current money amount.
-- The user can scroll down to see more history entries when needed.
-- Touch users can open a `Balance Changes` entry delete action by pressing and holding the entry.
-- Mouse users can open a `Balance Changes` entry delete action by clicking and holding the entry.
-- Press-and-hold or click-and-hold shows a little square with the exact action texts `Delete` and `Cancel`.
+- The user can scroll inside the large `Balance Changes` square to see more history entries when needed.
+- The dashboard page can scroll past the large `Balance Changes` square to reach `Savings`.
+- `Savings` appears below the large `Balance Changes` square.
+- All valid 30-day `Balance Changes` entries remain reachable inside the scrollable square, with no smaller maximum visible-entry limit.
+- Touch users can open a `Balance Changes` entry delete action by pressing and holding the entry for `600ms`.
+- Mouse users can open a `Balance Changes` entry delete action by clicking and holding the entry for `600ms`.
+- A completed `600ms` press-and-hold or click-and-hold shows a little square in the middle of the screen with the exact action texts `Delete` and `Cancel`.
+- Only one `Balance Changes` delete action square can be open at a time.
 - Clicking `Cancel` in the little square closes it without changing anything.
-- Deleting an entry asks for confirmation after `Delete` is clicked with `Delete this Balance Change?`, shows `Cancel` and `Delete`, removes only the visible history entry, does not change the current money amount, and does not offer undo.
+- Clicking outside the little square closes it without changing anything.
+- Pointer or finger movement does not close the little square after it is open.
+- Scrolling does not close the little square after it is open.
+- Deleting an entry asks for confirmation after `Delete` is clicked with `Delete this Balance Change?`, closes the little square, shows `Cancel` and `Delete`, removes only the visible history entry, does not change the current money amount, and does not offer undo.
 - Saved `Balance Changes` entries cannot be edited.
 - Recent money amount change history is visible from the dashboard without a separate `View history` action.
 
@@ -370,6 +388,11 @@ Tasks:
 - In the action state, make clicking the planned money amount open planned-money-amount change.
 - In the action state, make clicking `Delete` start delete confirmation.
 - Do not use a separate action menu or larger action square for rename, planned-money-amount change, and delete.
+- Close an open `Saving` square action state when the user clicks or taps outside that same square, without saving, creating a `Balance Changes` entry, updating dates, or showing a message.
+- Do not treat clicks or taps inside the open action-state square as outside clicks.
+- If the user clicks another normal default `Saving` square while one square is in action state, close the old action state and open the clicked square in its own action state.
+- Keep an open `Saving` square action state open during scrolling by itself.
+- Clear any open `Saving` square action state when the user clicks the small `<` sign to return to the dashboard.
 - Let touch users reorder by holding and moving the whole `Saving` square.
 - Let mouse users reorder by clicking, holding, and dragging the whole `Saving` square.
 - Make holding or dragging a `Saving` square avoid opening rename, planned-money-amount change, or delete.
@@ -392,9 +415,10 @@ Tasks:
 - Show full green bars for fully covered `Saving` squares, left-to-right partly green bars for partly covered squares, and grey bars for uncovered squares.
 - Show a `{money amount} needed` note at the top-left of the bottom coverage bar when a `Saving` square is not fully covered.
 - Build the add-a-saving action as a circle with a `+` sign.
-- When no visible `Saving` squares exist, show the circle `+` action in the middle of the `Saving` squares area as the empty state.
+- When no normal `Saving` squares and no broken saved `Saving` squares are visible, show the circle `+` action in the middle of the `Saving` squares area as the empty state.
 - Do not show a separate empty-state text sentence for no `Saving` squares.
-- After at least one `Saving` square exists, place the circle `+` action at the top-left of the `Saving` squares area, above or before the visible squares.
+- After at least one normal `Saving` square exists, place the circle `+` action at the top-left of the `Saving` squares area, above or before the visible squares.
+- If only broken saved `Saving` squares are visible, still place the circle `+` action at the top-left of the `Saving` squares area, above or before the broken saved `Saving` squares.
 - Make the circle `+` action open the same new `Saving` square create flow from both positions.
 - Make the create flow replace the clicked circle `+` with a temporary `Saving` input square inside the `Saving` squares area.
 - If the clicked `+` was centered, render the temporary create input square centered in the `Saving` squares area.
@@ -458,11 +482,17 @@ Acceptance criteria:
 - Clicking a `Saving` square name in the action state opens rename.
 - Clicking a `Saving` square planned money amount in the action state opens planned-money-amount change.
 - Clicking `Delete` in the action state starts delete confirmation.
+- Clicking or tapping outside an open `Saving` square action state closes that action state, changes nothing, saves nothing, creates no `Balance Changes` entry, updates no dates, and shows no message.
+- Clicking or tapping inside the open action-state square does not close it as an outside click.
+- Clicking another normal default `Saving` square while one square is in action state switches the action state to the clicked square.
+- Scrolling by itself does not close an open `Saving` square action state.
+- Clicking `<` while a `Saving` square is in action state returns to the dashboard and clears the open action state.
 - Rename, planned-money-amount change, and delete do not open from a separate action menu or larger action square.
 - The user can add a `Saving` square with a circle `+` action.
 - When no visible `Saving` squares exist, the circle `+` action appears in the middle of the `Saving` squares area.
-- The no-`Saving`-squares empty state uses the centered circle `+` action and does not show a separate empty-state text sentence.
-- After at least one `Saving` square exists, the circle `+` action appears at the top-left of the `Saving` squares area.
+- The no-`Saving`-squares empty state uses the centered circle `+` action only when no normal or broken saved `Saving` squares are visible, and does not show a separate empty-state text sentence.
+- After at least one normal `Saving` square exists, the circle `+` action appears at the top-left of the `Saving` squares area.
+- If only broken saved `Saving` squares are visible, the circle `+` action appears at the top-left above or before those broken squares.
 - Clicking the circle `+` action opens the same create flow from the centered empty state and from the top-left non-empty state.
 - Clicking the circle `+` action replaces that `+` with a temporary `Saving` input square inside the `Saving` squares area.
 - The temporary create input square appears centered when opened from the centered empty-state `+`, and appears at the top-left before existing squares when opened from the top-left `+`.
@@ -543,7 +573,9 @@ Tasks:
 - Test unreadable or broken browser storage data.
 - Test mobile and desktop layouts.
 - Test invalid inputs.
-- Test `Balance Changes` delete opening behavior for touch press-and-hold and mouse click-and-hold, including the little `Delete` and `Cancel` square, `Cancel` close behavior, and the exact confirmation message `Delete this Balance Change?` with buttons `Cancel` and `Delete`.
+- Test long `Balance Changes` history with entries scrolling inside the large square while the dashboard page can still scroll down to reach `Savings`.
+- Test `Savings` with only broken saved `Saving` squares and confirm the circle `+` action appears at the top-left above or before the broken squares.
+- Test `Balance Changes` delete opening behavior for `600ms` touch press-and-hold and `600ms` mouse click-and-hold, including the centered little `Delete` and `Cancel` square, single-open behavior, `Cancel` close behavior, outside-click close behavior, movement-keeps-open behavior, scroll-keeps-open behavior, and the exact confirmation message `Delete this Balance Change?` with buttons `Cancel` and `Delete`.
 - Confirm out-of-scope banking features are not implied.
 - Move this plan from `docs/plans/active` to `docs/plans/done` after completion.
 
@@ -786,9 +818,12 @@ Use:
 - Newest `Balance Changes` entries appear first.
 - Empty `Balance Changes` shows no rows, sentence, placeholder, icon, or other empty-state content.
 - History does not replace separate entries with only a net result.
-- Money amount change history appears directly under the main money amount.
+- Money amount change history appears as a large `Balance Changes` square directly under the main money amount.
 - There is no separate `View history` action for money amount change history.
-- Long money amount change history can be reached by scrolling down.
+- Long money amount change history can be reached by scrolling inside the large `Balance Changes` square.
+- The dashboard page can scroll past the large `Balance Changes` square to reach `Savings`.
+- `Savings` appears below the large `Balance Changes` square.
+- All valid 30-day `Balance Changes` entries remain reachable inside the scrollable square, with no smaller maximum visible-entry limit.
 - During cleanup, `Balance Changes` entries at or after their visible until date are deleted from browser storage.
 - `Balance Changes` cleanup runs when the website opens and loads saved data.
 - `Balance Changes` cleanup runs after every successful saved user action.
@@ -801,11 +836,15 @@ Use:
 - Visible `Balance Changes` dates and times use the user's browser/device local date and time.
 - Visible `Balance Changes` rows do not show previous money amount, new money amount, internal exact created date and time, seconds, milliseconds, or internal visible until date and time.
 - Deleting a `Balance Changes` entry removes only that visible history entry and does not change the current money amount.
-- Touch users open `Balance Changes` delete by pressing and holding the entry.
-- Mouse users open `Balance Changes` delete by clicking and holding the entry.
-- Opening `Balance Changes` delete shows a little square with the exact action texts `Delete` and `Cancel`.
+- Touch users open `Balance Changes` delete by pressing and holding the entry for `600ms`.
+- Mouse users open `Balance Changes` delete by clicking and holding the entry for `600ms`.
+- Opening `Balance Changes` delete after a completed `600ms` hold shows a centered little square with the exact action texts `Delete` and `Cancel`.
+- Only one `Balance Changes` delete action square can be open at a time.
 - Clicking `Cancel` closes the little square without changing anything.
-- Deleting a `Balance Changes` entry asks for confirmation after `Delete` is clicked with `Delete this Balance Change?`, shows `Cancel` and `Delete`, and does not offer undo.
+- Clicking outside the little square closes it without changing anything.
+- Pointer or finger movement does not close the little square after it is open.
+- Scrolling does not close the little square after it is open.
+- Deleting a `Balance Changes` entry asks for confirmation after `Delete` is clicked with `Delete this Balance Change?`, closes the little square, shows `Cancel` and `Delete`, and does not offer undo.
 - Saved `Balance Changes` entries cannot be edited.
 - Browser storage saves the current money amount and history.
 - Browser storage restores the current money amount and history after refresh.
@@ -846,6 +885,11 @@ Use:
 - `Saving` squares appear in one vertical column on mobile and desktop.
 - Clicking a `Saving` square opens its action state.
 - The `Saving` square action state hides the thin coverage bar and shows `Delete` at the bottom center.
+- Clicking outside the open `Saving` square action state closes it and returns the square to its default state without changing saved data.
+- Clicking inside the open `Saving` square action state does not close it as an outside click.
+- Clicking another normal default `Saving` square switches the action state to that square.
+- Scrolling does not close the open `Saving` square action state.
+- Clicking `<` clears the open `Saving` square action state while returning to the dashboard.
 - Touch users can reorder `Saving` squares by holding and moving the whole square.
 - Mouse users can reorder `Saving` squares by clicking, holding, and dragging the whole square.
 - Holding or dragging a `Saving` square does not open rename, planned-money-amount change, or delete.
@@ -869,8 +913,9 @@ Use:
 - Deleting a `Saving` square asks for confirmation first with `Delete this Saving?`, shows `Cancel` and `Delete`, and does not offer undo.
 - The add-a-saving action appears as a circle with a `+` sign.
 - When `Savings` has no visible `Saving` squares, the circle `+` action appears in the middle of the `Saving` squares area.
-- The no-`Saving`-squares empty state uses the centered circle `+` action and does not show a separate empty-state text sentence.
-- After at least one `Saving` square exists, the circle `+` action appears at the top-left of the `Saving` squares area.
+- The no-`Saving`-squares empty state uses the centered circle `+` action only when no normal or broken saved `Saving` squares are visible, and does not show a separate empty-state text sentence.
+- After at least one normal `Saving` square exists, the circle `+` action appears at the top-left of the `Saving` squares area.
+- If only broken saved `Saving` squares are visible, the circle `+` action appears at the top-left above or before those broken squares.
 - Clicking the circle `+` action opens the same create flow from the centered empty state and from the top-left non-empty state.
 - Clicking the circle `+` action replaces that `+` with a temporary `Saving` input square instead of opening a modal, bottom sheet, or separate page.
 - Default `Saving` squares show thin horizontal coverage bars at the bottom.

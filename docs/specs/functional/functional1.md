@@ -285,19 +285,27 @@ The previous money amount, new money amount, internal exact created date and tim
 
 The user should be able to delete a `Balance Changes` entry when they make a mistake.
 
-Touch users should start deleting a `Balance Changes` entry by pressing and holding that entry.
+Touch users should start deleting a `Balance Changes` entry by pressing and holding that entry for `600ms`.
 
-Mouse users should start deleting a `Balance Changes` entry by clicking and holding that entry.
+Mouse users should start deleting a `Balance Changes` entry by clicking and holding that entry for `600ms`.
 
-After the press-and-hold or click-and-hold, the website should show a little square on the screen with the exact action texts:
+After the completed `600ms` press-and-hold or click-and-hold, the website should show a little square in the middle of the screen with the exact action texts:
 
 `Delete`
 
 `Cancel`
 
-Clicking `Delete` in the little square should not delete the entry immediately.
+Only one `Balance Changes` delete action square should be open at a time.
 
 Clicking `Cancel` in the little square should close the little square, change nothing, save nothing, and show no message.
+
+Clicking or tapping outside the little square should close the little square, change nothing, save nothing, and show no message.
+
+Moving the pointer or finger should not close the little square after it is open.
+
+Scrolling should not close the little square after it is open.
+
+Clicking `Delete` in the little square should close the little square and should not delete the entry immediately.
 
 Before deleting a `Balance Changes` entry, the website should ask the user to confirm the delete action.
 
@@ -328,7 +336,17 @@ The `Add`, `Subtract`, and `Modify` actions should appear visually connected to 
 
 `Balance Changes` should not include `Saving` square changes, because `Saving` square changes do not change the main money amount.
 
-`Balance Changes` should appear directly under the main money amount on the dashboard.
+`Balance Changes` should appear directly under the main money amount on the dashboard as a large square.
+
+Under the main money amount, the dashboard page space should be mainly dedicated to the large `Balance Changes` square.
+
+When there are too many entries to fit inside the large `Balance Changes` square, the entries should scroll inside that square.
+
+The dashboard page itself should still scroll down past the large `Balance Changes` square.
+
+On the dashboard, `Savings` should appear below the large `Balance Changes` square, so the user reaches `Savings` by scrolling the dashboard page down past `Balance Changes`.
+
+All valid `Balance Changes` entries that are still inside the 30-day visible period should remain available inside the scrollable square. The website should not use a smaller maximum visible-entry limit for valid 30-day `Balance Changes` entries.
 
 `Balance Changes` entries should be ordered newest first by their internal exact created date and time, so older changes go lower. If two entries have the exact same internal exact created date and time, the saved list order should decide the tie, with entries earlier in the saved list appearing first.
 
@@ -338,7 +356,7 @@ There should not be a separate `Recent Activity` area for the first version.
 
 There should not be a separate `View history` action or button for `Balance Changes`.
 
-If the history list has too many entries to fit on the screen, the user should be able to scroll down to see more entries.
+If the history list has too many entries to fit inside the large square, the user should be able to scroll inside the `Balance Changes` square to see more entries.
 
 ## Dashboard And User Flow
 
@@ -376,8 +394,9 @@ Main user flow:
 8. If the money amount is exactly `999,999.99$`, clicking the main money amount shows `Subtract` and `Modify`, but not `Add`.
 9. User uses `Add` when it is visible for new cash, `Subtract` for spent or removed cash, and `Modify` to correct mistakes without creating history or notifications.
 10. User sees money amount change history directly under the main money amount.
-11. User scrolls down if the history list is longer than the screen.
-12. User checks `Saving` squares.
+11. User scrolls inside the `Balance Changes` square if the history list is longer than the square.
+12. User scrolls the dashboard page down past the `Balance Changes` square to reach `Savings`.
+13. User checks `Saving` squares.
 
 ## Savings Behavior
 
@@ -427,9 +446,17 @@ The visible `Saving` squares should appear in one vertical column on mobile and 
 
 When there are no visible `Saving` squares in the `Saving` squares area, the website should show the circle `+` action in the middle of that area.
 
-The centered `+` action is the empty state for no `Saving` squares. The website should not show a separate empty-state text sentence for no `Saving` squares.
+The centered `+` action is the empty state for no normal `Saving` squares and no broken saved `Saving` squares. The website should not show a separate empty-state text sentence for no `Saving` squares.
 
 After at least one `Saving` square exists, the circle `+` action should appear at the top-left of the `Saving` squares area, above or before the visible squares.
+
+A broken saved `Saving` square should count as a visible square for circle `+` placement only.
+
+If `Savings` contains one or more broken saved `Saving` squares and no normal `Saving` squares, the circle `+` action should appear at the top-left of the `Saving` squares area, above or before the broken saved `Saving` squares.
+
+The circle `+` action should be centered only when there are no normal `Saving` squares and no broken saved `Saving` squares visible.
+
+Broken saved `Saving` squares should still not affect `Savings money amount`, top needed note, or coverage bars.
 
 In its default state, each visible `Saving` square should show the `Saving` name in the top-left corner.
 
@@ -452,6 +479,18 @@ In the action state, clicking the planned money amount should open the planned-m
 In the action state, clicking `Delete` should start the delete confirmation for that square.
 
 The website should not open a separate action menu or larger action square for rename, planned-money-amount change, and delete.
+
+If a `Saving` square is in action state and the user clicks or taps outside that same square, the website should close the action state and return that square to its default state.
+
+Closing a `Saving` square action state by clicking outside should change nothing, save nothing, create no `Balance Changes` entry, update no dates, and show no message.
+
+Clicking or tapping inside the open action-state square should not count as an outside click.
+
+If the user clicks another normal default `Saving` square while one square is in action state, the website should close the old action state and open the clicked square in its own action state.
+
+Scrolling the `Saving` squares area by itself should not close an open action state.
+
+Clicking the small `<` sign while a `Saving` square is in action state should clear that action state as part of returning to the dashboard. If the user later opens `Savings` again, all normal `Saving` squares should start in their default state.
 
 The user should add a new `Saving` square with a circle action that contains a `+` sign.
 

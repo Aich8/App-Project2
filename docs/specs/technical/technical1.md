@@ -21,9 +21,9 @@ Deleting a `Balance Changes` entry should only remove that visible history entry
 
 Deleting a `Balance Changes` entry should require user confirmation before deletion.
 
-The delete action for a `Balance Changes` entry should open from the entry itself. Touch users should press and hold the entry. Mouse users should click and hold the entry. The implementation should then render a small square on the screen with two actions exactly named `Delete` and `Cancel`.
+The delete action for a `Balance Changes` entry should open from the entry itself. Touch users should press and hold the entry for `600ms`. Mouse users should click and hold the entry for `600ms`. The implementation should then render a small square in the middle of the screen with two actions exactly named `Delete` and `Cancel`. Only one `Balance Changes` delete action square should be open at a time.
 
-Opening, canceling, or closing the small `Delete` and `Cancel` square should not delete the `Balance Changes` entry and should not write browser storage. Only confirming the later delete confirmation should remove the visible history entry.
+Opening, canceling, or closing the small `Delete` and `Cancel` square should not delete the `Balance Changes` entry and should not write browser storage. Clicking `Cancel` should close the small square. Clicking or tapping outside the small square should close it. Moving the pointer or finger should not close the small square after it is open. Scrolling should not close the small square after it is open. Clicking `Delete` should close the small square and open the later delete confirmation. Only confirming the later delete confirmation should remove the visible history entry.
 
 The confirmation message should be exactly `Delete this Balance Change?`, with buttons exactly named `Cancel` and `Delete`.
 
@@ -32,6 +32,10 @@ After a `Balance Changes` entry is deleted, the website should not offer undo.
 The default `0.00$` starting state should not create a visible `Balance Changes` entry.
 
 When the visible `Balance Changes` list is empty after loading, cleanup, or a user action, the implementation should render no `Balance Changes` entry rows and no empty-state text, placeholder, icon, or other empty-state content.
+
+The implementation should render `Balance Changes` as a large square directly under the main money amount on the dashboard. The square should take most of the dashboard page space under the main money amount, and its entry list should have its own internal scroll when the visible entries exceed the square height.
+
+The dashboard page should still be scrollable past the `Balance Changes` square. `Savings` should render below the `Balance Changes` square in the normal dashboard page flow. The implementation should not cap valid 30-day `Balance Changes` entries to a smaller visible maximum; all valid non-expired entries should remain reachable inside the scrollable square.
 
 Visible `Balance Changes` rows should render the signed money amount, action text, and both the created date and created time for that entry: `+{money amount} added` or `-{money amount} subtracted`, plus the visible created date and created time. A date-only display is not enough. The visible date and time format should be like `July 21, 2026 at 3:45 PM`.
 
@@ -192,9 +196,9 @@ The implementation should render the full-screen `Savings` view with a fixed top
 
 The implementation should render visible `Saving` squares in one vertical column on mobile and desktop. It should not use multiple columns or a grid for `Saving` squares. The DOM order, visual column order, saved order, drag order, and coverage order should match after each completed reorder action.
 
-The implementation should render the add-a-saving control as a circular `+` control inside the `Saving` squares area. If there are no visible `Saving` squares, the circular `+` control should be centered in that area and should be the empty state. The implementation should not render a separate empty-state text sentence for no `Saving` squares.
+The implementation should render the add-a-saving control as a circular `+` control inside the `Saving` squares area. If there are no visible normal `Saving` squares and no visible broken saved `Saving` squares, the circular `+` control should be centered in that area and should be the empty state. The implementation should not render a separate empty-state text sentence for no `Saving` squares.
 
-If one or more visible `Saving` squares exist, the circular `+` control should render at the top-left of the `Saving` squares area, before the ordered squares. Activating the `+` control from either position should open the same new `Saving` square create flow and should not save browser storage until the user successfully creates a valid `Saving` square.
+If one or more visible normal `Saving` squares exist, the circular `+` control should render at the top-left of the `Saving` squares area, before the ordered squares. A broken saved `Saving` square should count as visible content for this circle `+` placement rule only. If one or more broken saved `Saving` squares are visible and no normal `Saving` squares are visible, the circular `+` control should still render at the top-left of the `Saving` squares area, before those broken saved `Saving` squares. Broken saved `Saving` squares should still be excluded from `Savings money amount`, top needed note, and coverage bar calculations. Activating the `+` control from either position should open the same new `Saving` square create flow and should not save browser storage until the user successfully creates a valid `Saving` square.
 
 Activating the `+` control should replace that `+` control with a temporary `Saving` input square inside the `Saving` squares area. If the `+` control was centered, the temporary input square should render centered in that area. If the `+` control was at the top-left, the temporary input square should render at the top-left before the existing squares. The create input square should contain the `Saving` name input, planned money amount input, and bottom text actions `Save` and `Cancel`. The create input square should not render as a modal, bottom sheet, or separate page. While the create input square is open, the implementation should not render a second create `+` action. The temporary create input square should not be saved as a `Saving` square, should not affect `Savings money amount`, should not affect the top needed note, and should not affect coverage bars until `Save` succeeds.
 
@@ -203,6 +207,12 @@ In its default state, each visible `Saving` square should render the `Saving` na
 Activating a `Saving` square should change that same square into its action state. In the action state, the square should still render the `Saving` name in the top-left corner and the planned money amount on the right side of the same top row, should render `Delete` at the bottom center, and should not render the thin coverage bar.
 
 In the action state, activating the rendered `Saving` name should open the rename flow for that square. Activating the rendered planned money amount should open the planned-money-amount change flow for that square. Activating `Delete` should start the delete confirmation for that square. The implementation should not open a separate action menu or larger action square for rename, planned-money-amount change, and delete.
+
+When a normal `Saving` square is in action state, the implementation should close that action state if the user clicks or taps outside that same square. This outside-action-state dismissal should return the square to its default state, write no browser storage, create no `Balance Changes` entry, update no dates, and show no message.
+
+Clicks or taps inside the open action-state square should not be handled as outside-action-state dismissal. Activating the rendered `Saving` name, rendered planned money amount, or `Delete` should run the matching square action instead.
+
+If the user clicks or taps another normal default `Saving` square while one square is in action state, the implementation should close the old action state and open the clicked square in its own action state. Scrolling the `Saving` squares container should not close the action state by itself. Activating the small `<` sign should clear any open `Saving` square action state as part of returning to the dashboard.
 
 The whole `Saving` square should be draggable for touch and mouse users. Touch users should reorder by holding and moving the whole square. Mouse users should reorder by clicking, holding, and dragging the whole square. Holding or dragging should not open rename, planned-money-amount change, or delete.
 

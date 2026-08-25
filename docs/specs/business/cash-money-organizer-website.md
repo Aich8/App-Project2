@@ -162,6 +162,14 @@ The website should help users review recent money changes using the user-facing 
 
 If `Balance Changes` has no entries, the history list should simply be empty. The website should not show a sentence, placeholder, icon, or any other empty-state content for empty `Balance Changes`.
 
+The `Balance Changes` area should appear directly under the main money amount as a large square. Under the main money amount, the dashboard page space should be mainly dedicated to this `Balance Changes` square.
+
+When there are too many `Balance Changes` entries to fit inside the large square, the entries should scroll inside that square.
+
+The dashboard page itself should still be able to scroll past the bottom of the large `Balance Changes` square. The `Savings` section should appear below that large `Balance Changes` square, so the user reaches `Savings` by scrolling the dashboard page down past `Balance Changes`.
+
+Every valid `Balance Changes` entry that is still inside its 30-day visible period should remain available inside the scrollable `Balance Changes` square. The first version should not use a smaller maximum visible-entry limit for valid 30-day `Balance Changes` entries.
+
 Each visible `Balance Changes` row should show the signed money amount, action text, and both the created date and created time for that entry: `+{money amount} added` or `-{money amount} subtracted`, plus the visible created date and created time. A date-only display is not enough. The visible date and time format should use the full month name, day, year, `at`, and 12-hour time with uppercase `AM` or `PM`, like `July 21, 2026 at 3:45 PM`.
 
 Each visible `Balance Changes` entry should look compact, not too large. The signed money amount and action text should be placed in the top-left corner of the entry. The visible created date and created time should be placed in the bottom-right corner of the same entry, below the money change text and not too far away from it. Mobile should use the same layout. On small screens, the text may wrap only as needed to stay readable, but the money change text should remain in the top-left area and the visible date and time should remain in the bottom-right area.
@@ -194,15 +202,21 @@ The first version does not need a background timer that checks old `Balance Chan
 
 The user can delete a `Balance Changes` entry when they make a mistake.
 
-Touch users should open the delete action by pressing and holding the `Balance Changes` entry.
+Touch users should open the delete action by pressing and holding the `Balance Changes` entry for `600ms`.
 
-Mouse users should open the delete action by clicking and holding the `Balance Changes` entry.
+Mouse users should open the delete action by clicking and holding the `Balance Changes` entry for `600ms`.
 
-After the press-and-hold or click-and-hold, a little square should pop up on the screen with the exact action texts `Delete` and `Cancel`.
+After the completed `600ms` press-and-hold or click-and-hold, a little square should pop up in the middle of the screen with the exact action texts `Delete` and `Cancel`.
 
-Clicking `Delete` in the little square should not delete the entry immediately. Before deleting a `Balance Changes` entry, the website should ask the user to confirm the delete action.
+Only one `Balance Changes` delete action square should be open at a time.
 
 Clicking `Cancel` in the little square should close the little square without changing anything.
+
+Clicking or tapping outside the little square should close it without changing anything.
+
+Moving the pointer or finger should not close the little square after it is open. Scrolling should not close the little square after it is open.
+
+Clicking `Delete` in the little square should close that little square and should not delete the entry immediately. Before deleting a `Balance Changes` entry, the website should ask the user to confirm the delete action.
 
 The confirmation message should be exactly `Delete this Balance Change?`.
 
@@ -248,15 +262,19 @@ The top `Savings` area with the small `<` sign, the `Savings money amount`, and 
 
 Visible `Saving` squares should appear in one vertical column on mobile and desktop. The website should not lay out `Saving` squares in multiple columns or a grid. The top square in the column is checked first for coverage, then the next square below it, continuing down the column.
 
-When `Savings` has no visible `Saving` squares yet, the `Saving` squares area should show only the circle `+` action centered in that area. The centered `+` action is the empty state for no `Saving` squares. The website should not show a separate empty-state sentence for no `Saving` squares.
+When `Savings` has no visible normal `Saving` squares and no visible broken saved `Saving` squares, the `Saving` squares area should show only the circle `+` action centered in that area. The centered `+` action is the empty state for no `Saving` squares. The website should not show a separate empty-state sentence for no `Saving` squares.
 
 After at least one `Saving` square exists, the circle `+` action should move to the top-left of the `Saving` squares area, above or before the visible squares, so the user can add more `Saving` squares.
+
+A broken saved `Saving` square should count as a visible square for circle `+` placement only. If `Savings` contains one or more broken saved `Saving` squares and no normal `Saving` squares, the circle `+` action should appear at the top-left of the `Saving` squares area, above or before the broken saved `Saving` squares, not centered. This placement rule should not make broken saved `Saving` squares affect the `Savings money amount`, top needed note, or coverage bars.
 
 In its default state, each visible `Saving` square should show the `Saving` name in the top-left corner, the planned money amount on the right side of the same top row, and the thin coverage bar at the bottom.
 
 Clicking a `Saving` square should change that same square into its action state. In the action state, the square should still show the `Saving` name in the top-left corner and the planned money amount on the right side of the same top row, and it should show a `Delete` text action at the bottom center. The thin coverage bar should not be shown while the square is in the action state.
 
 In the action state, clicking the `Saving` name should open the rename flow for that square. Clicking the planned money amount should open the planned-money-amount change flow for that square. Clicking `Delete` should start the delete confirmation for that square. The website should not open a separate action menu or larger action square for rename, planned-money-amount change, and delete.
+
+If a `Saving` square is in its action state and the user clicks or taps outside that same square, the action state should close and the square should return to its default state. This should change nothing, save nothing, create no `Balance Changes` entry, update no dates, and show no message. Clicking inside the open action-state square should not count as an outside click. If the user clicks another normal default `Saving` square while one square is already in action state, the old action state should close and the clicked square should open in its own action state. Scrolling by itself should not close the action state. Clicking the small `<` sign should clear any open `Saving` square action state as part of returning to the dashboard.
 
 Planned money amounts in `Saving` squares should use the planned-money amount display format: `0.00$` for zero, two decimal digits for nonzero whole money amounts such as `14.00$`, two decimal digits for nonzero money amounts with cents such as `14.50$`, and comma separators for planned money amounts of `1,000.00$` or more such as `5,895.50$`. Browser storage should save `Saving` square planned money amounts as normalized plain decimal strings without the `$` sign or comma separators, such as `14.50` or `5895.50`. A planned money amount should not be greater than `999,999.99$`.
 
@@ -437,7 +455,6 @@ Better wording:
 
 ## Remaining Grey Zones
 
-- Grey zone: The circle `+` position when `Savings` contains only broken saved `Saving` squares is not fully defined. The specs say the `+` is centered when there are no visible `Saving` squares and moves to the top-left after at least one `Saving` square exists, but they do not define whether a broken error square counts as a visible `Saving` square for this placement rule.
 - Grey zone: The saved `Saving` square created date and updated date are not fully defined. The data model includes created date and updated date, but the specs do not fully define whether those dates are needed in the first version, whether they are visible or internal only, and exactly when they should update for create, rename, planned-money-amount change, reorder, broken-square fix, or delete.
 - Grey zone: The exact website name and trust label are not fully defined. The active plan suggests wording such as `Manual cash tracker`, but the specs do not define the exact website name or the exact short trust label shown to the user.
 - Grey zone: Browser back behavior from full-screen `Savings` is not fully defined. The specs define returning to the dashboard with the small `<` sign, but they do not define what should happen if the user uses the browser back button while `Savings` is open.
@@ -447,14 +464,8 @@ Better wording:
 - Grey zone: The main money amount circle remains visible behind the input flow, but its behavior while the input flow is open is not fully defined. The outside-cancel rule may imply that tapping the visible main money amount circle acts like `Cancel`, but the specs do not explicitly say whether that tap cancels, does nothing, or opens the action buttons again.
 - Grey zone: The all-users `Cent` button placement outside mobile is not fully defined. The specs say the `Cent` button shows for all users while a main money amount input is open and appears directly above the mobile keyboard when possible, but they do not define where the button should appear on desktop or large screens.
 
-### Money Amount Change History Grey Zones
-
-- Grey zone: The delete action square for `Balance Changes` is not fully defined. The specs say press-and-hold or click-and-hold shows a little square with `Delete` and `Cancel`, but they do not define the hold duration, exact square position, whether moving or scrolling cancels it, whether clicking outside closes it, or whether more than one delete square can be open.
-- Grey zone: Long `Balance Changes` history layout is not fully defined. The specs say the user can scroll when the list is longer than the screen, but they do not define whether the whole dashboard scrolls, whether only the history area scrolls, or whether there is any maximum number of visible 30-day entries.
-
 ### remaining grey zones
 
-- Grey zone: `Saving` square action-state dismissal is not fully defined. The specs say clicking a `Saving` square changes that same square into its action state, but they do not define whether that action state closes when the user clicks the same square again, clicks outside the square, opens another square, scrolls, or uses the small `<` sign.
 - Grey zone: Existing `Saving` square rename and planned-money-amount change input layout is not fully defined. The specs define the temporary input square layout for creating and fixing a `Saving` square, but they do not define whether rename and planned-money-amount change replace the same square, appear inside the existing square, or use another layout.
 - Grey zone: `Saving` square drag-and-reorder behavior is not fully defined. The specs say the user can hold and move the whole `Saving` square, but they do not define the hold duration, movement threshold, visual placeholder, auto-scroll behavior, or how reordering works when a square is already in an action, input, or confirmation state.
 - Grey zone: `Saving` square delete confirmation display is not fully defined. The specs define the delete message and button names, but they do not define whether the confirmation appears inside the square, as a temporary square state, in a modal, in a bottom sheet, or how it closes if the user clicks outside it.
