@@ -284,9 +284,13 @@ A `Saving` stores a planned money amount chosen by the user.
 
 The user should open `Savings` by clicking `Savings` on the dashboard. When `Savings` opens, it should take the entire screen.
 
-The full-screen `Savings` view should show a small `<` sign in the top-left corner. Clicking `<` should return the user to the dashboard, change nothing, save nothing, and create no `Balance Changes` entry.
+The full-screen `Savings` view should show a small `<` sign in the top-left corner. When no `Saving` square input flow or `Saving` square delete confirmation is open, clicking `<` should return the user to the dashboard, change nothing, save nothing, and create no `Balance Changes` entry.
 
-Using the browser Back button, mobile browser back gesture, or system Back action while the full-screen `Savings` view is open should also close `Savings` and return the user to the dashboard. This should behave like clicking `<`: change nothing, save nothing, create no `Balance Changes` entry, and show no message.
+Using the browser Back button, mobile browser back gesture, or system Back action while the full-screen `Savings` view is open should also close `Savings` and return the user to the dashboard when no `Saving` square input flow or `Saving` square delete confirmation is open. This should behave like clicking `<`: change nothing, save nothing, create no `Balance Changes` entry, and show no message.
+
+If a `Saving` square create, rename, planned-money-amount change, or broken-square fix input flow is open, clicking `<` or using the browser Back button, mobile browser back gesture, or system Back action should close that input flow first and keep the user inside the full-screen `Savings` view. This should act like `Cancel` for the open input flow: discard the unsaved typed input, restore the `+`, normal square, or broken square that the input replaced, change nothing, save nothing, create no `Balance Changes` entry, and show no message. If the user clicks `<` or uses Back again after the input flow is closed and no `Saving` square delete confirmation is open, the full-screen `Savings` view should close.
+
+If a `Saving` square delete confirmation is open, clicking `<` or using the browser Back button, mobile browser back gesture, or system Back action should close that confirmation first and keep the user inside the full-screen `Savings` view. For a normal `Saving` square, the selected square should return to its default state. For a broken `Saving` square, the broken square should stay visible. Nothing should be deleted, changed, saved, or added to `Balance Changes`, and no message should appear. If the user clicks `<` or uses Back again after the delete confirmation is closed and no `Saving` square input flow is open, the full-screen `Savings` view should close.
 
 The full-screen `Savings` view should show the `Savings money amount` and the `Saving` squares. The money amount shown inside `Savings` should still start from the main money amount and go to the visible `Saving` squares from top to bottom as planning display only.
 
@@ -393,6 +397,8 @@ Clicking `Delete` on a broken `Saving` square should use the same small centered
 `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows should show two text actions at the bottom: `Save` and `Cancel`.
 
 In `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows, `Save` should try to save the entered values using the `Saving` square rules. `Cancel` should close the input flow, return to the `Saving` squares view, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
+
+The website should not remember unsaved typed `Saving` input as a draft. If the user refreshes the page, closes the browser tab or window, reopens the website later, cancels the input flow, closes the input flow with `<` or Back, or leaves `Savings` after the input flow has been closed before a successful `Save`, the typed `Saving` name and planned money amount should be discarded. The next website load or next time the user opens `Savings` should show only the last successfully saved data. The website should not save draft `Saving` input in browser storage, should not create a `Balance Changes` entry, should not show a browser leave warning, and should show no message. This does not change browser storage save failure behavior: if a valid `Saving` input save fails, the same input flow should stay open with the same typed values so the user can try again or cancel.
 
 Changing a `Saving` square's planned money amount should replace the old planned money amount. It should not add to or subtract from the old planned money amount.
 
@@ -517,11 +523,6 @@ Better wording:
 - Users can use `Savings` to plan money visually without lowering the main money amount.
 - Users can understand that `Savings` is a planning section, not a real account or separate goals feature.
 - Users can understand that the website is a manual cash tracker, not a real bank.
-
-## 'Savings' Grey Zones
-
-- Grey zone: Back behavior while a `Saving` input or delete confirmation is open is not fully defined. The specs say `<` and browser Back close the full-screen `Savings` view, but they do not define whether an open input or delete confirmation should close first or whether the whole `Savings` view closes immediately.
-- Grey zone: Unsaved `Saving` input recovery is not fully defined. The specs say changes save only after pressing `Save`, but they do not define whether typed but unsaved `Saving` names or planned money amounts should be remembered if the user refreshes the page, closes `Savings`, or leaves the input flow.
 
 ## 'Saving' squares Grey Zones
 

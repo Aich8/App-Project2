@@ -458,9 +458,19 @@ When the user opens `Savings`, the `Savings` view should take the entire screen.
 
 The full-screen `Savings` view should show a small `<` sign in the top-left corner.
 
-When the user clicks `<`, the website should return to the dashboard. This back action should change nothing, save nothing, create no `Balance Changes` entry, and show no message.
+When no `Saving` square input flow or `Saving` square delete confirmation is open and the user clicks `<`, the website should return to the dashboard. This back action should change nothing, save nothing, create no `Balance Changes` entry, and show no message.
 
-When the user uses the browser Back button, mobile browser back gesture, or system Back action while the full-screen `Savings` view is open, the website should close `Savings` and return to the dashboard. This should change nothing, save nothing, create no `Balance Changes` entry, and show no message.
+When the user uses the browser Back button, mobile browser back gesture, or system Back action while the full-screen `Savings` view is open and no `Saving` square input flow or `Saving` square delete confirmation is open, the website should close `Savings` and return to the dashboard. This should change nothing, save nothing, create no `Balance Changes` entry, and show no message.
+
+If a `Saving` square create, rename, planned-money-amount change, or broken-square fix input flow is open and the user clicks `<`, uses the browser Back button, uses a mobile browser back gesture, or uses a system Back action, the website should close that input flow first and keep the user inside the full-screen `Savings` view.
+
+Closing a `Saving` square input flow with `<` or Back should act like `Cancel`: discard the unsaved typed input, restore the `+`, normal square, or broken square that the input replaced, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
+
+If a `Saving` square delete confirmation is open and the user clicks `<`, uses the browser Back button, uses a mobile browser back gesture, or uses a system Back action, the website should close that delete confirmation first and keep the user inside the full-screen `Savings` view.
+
+Closing a `Saving` square delete confirmation with `<` or Back should delete nothing, change nothing, save nothing, create no `Balance Changes` entry, and show no message. For a normal `Saving` square, the selected square should return to its default state. For a broken `Saving` square, the broken square should stay visible.
+
+After the open `Saving` square input flow or delete confirmation is closed, clicking `<` or using Back again should close the full-screen `Savings` view if no other `Saving` square input flow or delete confirmation is open.
 
 The `Savings` section is a planning view. It helps the user see which `Saving` squares are fully covered, partly covered, or not covered by the main money amount.
 
@@ -588,6 +598,16 @@ The planned money amount may include cents, with up to two digits after the deci
 In `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows, `Save` should try to save the entered values using the rules for that action.
 
 In `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows, `Cancel` should close the input flow, return to the `Saving` squares view, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
+
+The website should not remember unsaved typed `Saving` input as a draft.
+
+If the user refreshes the page, closes the browser tab or window, reopens the website later, cancels the input flow, closes the input flow with `<` or Back, or leaves `Savings` after the input flow has been closed before a successful `Save`, the website should discard the typed `Saving` name and planned money amount.
+
+After discarded unsaved `Saving` input, the next website load or next time the user opens `Savings` should show only the last successfully saved data.
+
+The website should not save draft `Saving` input in browser storage, should not create a `Balance Changes` entry, should not show a browser leave warning, and should show no message.
+
+This discard rule should not change browser storage save failure behavior. If a valid `Saving` input save fails, the same input flow should stay open with the same typed values so the user can try again or cancel.
 
 The `Saving` square name must be unique inside `Savings`.
 
