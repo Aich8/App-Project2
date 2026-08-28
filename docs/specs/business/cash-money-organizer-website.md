@@ -50,6 +50,22 @@ When a selected main money amount input flow starts, the visible main money acti
 
 The website should make the main money actions easy to understand without using real banking language.
 
+### Open UI Priority
+
+Only one temporary UI should be open at a time.
+
+Temporary UI means main money action buttons, a main money amount input flow, a `Balance Changes` delete action square, a `Balance Changes` delete confirmation, a `Saving` square action state, a `Saving` square input flow, a `Saving` square delete confirmation, or an active `Saving` square reorder drag.
+
+Full-screen `Savings` should count as the current view while it is open, not as a temporary UI layer. Opening full-screen `Savings` from the dashboard should be allowed only when no dashboard temporary UI is open.
+
+If a temporary UI is open, the user should close it, cancel it, save it, delete from it, finish it, or drop/cancel the reorder before another temporary UI can open. A click, tap, or hold that would normally open a different temporary UI should not open that new temporary UI while another one is already open.
+
+If the same click or tap is already defined as an outside-click close or outside-click cancel for the open temporary UI, it should only close or cancel the open temporary UI. It should not also activate the thing behind it or open a different temporary UI from that same click or tap.
+
+Actions inside the current temporary UI may replace it with the next step of the same flow. For example, clicking a main money action button may replace the main money action buttons with the selected input flow, clicking `Delete` in a `Balance Changes` delete action square may replace it with the `Balance Changes` delete confirmation, and clicking the `Saving` name, planned money amount, or `Delete` inside a `Saving` square action state may replace that action state with the matching input flow or delete confirmation. The previous temporary UI should close or be replaced first, so only one temporary UI is visible at once.
+
+If the user refreshes the page, closes the browser tab or window, or reopens the website later while any temporary UI is open, the temporary UI should be silently discarded. The next load should show the latest successfully saved data with no temporary UI open. The website should not restore the open temporary UI, should not save unsaved typed input, should not confirm a pending delete, should not save a pending reorder, should not create a `Balance Changes` entry, should not show a message, and should not show a browser leave warning.
+
 ### Storage Scope
 
 The first version should save the user's data only in browser storage.
@@ -59,6 +75,8 @@ The implementation should use the stable storage key `cash-money-organizer-websi
 The first version should load saved browser data only when the data version value is exactly `1`. A saved current money amount is valid only when it is a normalized plain decimal string from `0.00` through `999999.99`, with no `$` sign, no comma separators, exactly two digits after the decimal point, and no unneeded leading zeros before the decimal point except the single `0` in `0.00`. Saved browser data with a missing, wrong, future, unreadable, or unrecognized data version, or a saved current money amount outside that range or not in that exact saved format, should be treated as broken saved data. Examples of broken saved current money amount values include `5`, `5.0`, `005.00`, `5,000.00`, `5.000`, `1000000.00`, and `-5.00`.
 
 If saved browser data is broken or cannot be read, the website should show `Saved data could not be loaded.` with a `Start again` action. When the user chooses `Start again`, the website should delete the broken saved data and immediately create fresh browser storage data with the saved money amount set to `0.00`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`.
+
+In the first version, normal saved data should not have a user-controlled reset, clear-all-data, or start-fresh action. The `Start again` action should be shown only when saved browser data is broken or cannot be read. If saved browser data is valid, the website should not show `Start again`, `Reset`, `Clear all data`, or similar actions for deleting all saved data at once.
 
 When no saved data exists yet, the website should show the default `0.00$` money amount without saving it just because the website opened. The website should start saving data after the first successful saved user action. In the normal first money flow, this is the first successful `Add`.
 
@@ -73,6 +91,12 @@ If browser storage is unavailable, full, blocked, or fails while saving a valid 
 A user action should count as a successful saved user action only after the required browser storage write succeeds. If saving fails, the website should not create, update, delete, or reorder saved data, should not create a `Balance Changes` entry, should not run `Balance Changes` cleanup as a successful saved action, and should not show the changed result as saved.
 
 If saving fails from a main money amount input flow, the same input flow should stay open with the same typed value so the user can try again or cancel. If saving fails from a `Saving` square create, rename, planned-money-amount change, or broken-square fix input flow, the same input flow should stay open with the same typed values. If saving fails while confirming a `Saving` square delete or `Balance Changes` delete, the confirmation should stay open and the selected item should stay visible. If saving fails after a completed `Saving` square reorder, the visible order should return to the last successfully saved order.
+
+If the same website is open in multiple tabs or windows in the same browser, a successful saved change in one tab or window should automatically update the other open tabs or windows to the latest saved data. The other tabs or windows should update the visible money amount, `Balance Changes`, `Savings`, `Savings money amount`, top needed text, and coverage bars from the latest saved browser data.
+
+This same-browser tab or window update should happen silently. It should not show a message, should not create a `Balance Changes` entry, and should not write browser storage again just because another tab or window changed the saved data.
+
+If another open tab or window has a temporary UI open when the latest saved data arrives, that temporary UI should close like a cancel. Any unsaved typed input in that tab or window should be discarded, nothing should save from that tab or window, nothing should be deleted from that tab or window, no `Balance Changes` entry should be created from that tab or window, and the tab or window should show the latest saved data.
 
 ### Add and Subtract Money Amount
 
@@ -310,6 +334,8 @@ In its default state, each visible `Saving` square should show the `Saving` name
 
 Clicking a `Saving` square should change that same square into its action state. In the action state, the square should still show the `Saving` name in the top-left corner and the planned money amount on the right side of the same top row, and it should show a `Delete` text action at the bottom center. The thin coverage bar should not be shown while the square is in the action state.
 
+For touch users, a finger movement of more than `8px` before the finger is lifted and before the `600ms` reorder hold completes should count as scrolling, not as a tap. This should cancel the pending tap and any pending reorder hold. The `Saving` square should not open its action state, should not start reorder, should not show a drag placeholder, should not change anything, should not save anything, should not create a `Balance Changes` entry, and should show no message. If the finger is lifted before `600ms` without moving more than `8px`, the touch should count as a tap and should open the action state. If a touch user holds for `600ms` but releases before moving at least `8px`, nothing should happen: the `Saving` square should not open its action state, should not start reorder, should not show a drag placeholder, should not change anything, should not save anything, should not create a `Balance Changes` entry, and should show no message.
+
 In the action state, clicking the `Saving` name should open the rename flow for that square. Clicking the planned money amount should open the planned-money-amount change flow for that square. Clicking `Delete` should start the delete confirmation for that square. The website should not open a separate action menu or larger action square for rename, planned-money-amount change, and delete.
 
 The `Saving` square delete confirmation should appear as a small confirmation square in the middle of the screen. It should show the exact message `Delete this Saving?` and buttons exactly named `Cancel` and `Delete`. It should not appear inside the `Saving` square, as a temporary square state, as a bottom sheet, or as a separate page. Only one `Saving` square delete confirmation should be open at a time.
@@ -322,7 +348,7 @@ Opening rename for an existing `Saving` square should replace that same square w
 
 Opening planned-money-amount change for an existing `Saving` square should replace that same square with a temporary `Saving` input square in the same visible position. The planned-money-amount change input square should ask only for the new total planned money amount and should show the bottom text actions `Save` and `Cancel`. It should not appear as a modal, bottom sheet, separate page, or separate floating input.
 
-If a `Saving` square is in its action state and the user clicks or taps outside that same square, the action state should close and the square should return to its default state. This should change nothing, save nothing, create no `Balance Changes` entry, and show no message. Clicking inside the open action-state square should not count as an outside click. If the user clicks another normal default `Saving` square while one square is already in action state, the old action state should close and the clicked square should open in its own action state. Scrolling by itself should not close the action state. Clicking the small `<` sign should clear any open `Saving` square action state as part of returning to the dashboard.
+If a `Saving` square is in its action state and the user clicks or taps outside that same square, the action state should close and the square should return to its default state. This should change nothing, save nothing, create no `Balance Changes` entry, and show no message. Clicking inside the open action-state square should not count as an outside click. Clicking or tapping a blank part of the same open action-state square should do nothing: the square should stay in action state, nothing should change, nothing should save, no `Balance Changes` entry should be created, and no message should appear. If the user clicks another normal default `Saving` square while one square is already in action state, the old action state should close and the clicked square should not open in its own action state from that same click. The user can click that other square again after no temporary UI is open. Scrolling by itself should not close the action state. Clicking the small `<` sign should clear any open `Saving` square action state as part of returning to the dashboard.
 
 Planned money amounts in `Saving` squares should use the planned-money amount display format: `0.00$` for zero, two decimal digits for nonzero whole money amounts such as `14.00$`, two decimal digits for nonzero money amounts with cents such as `14.50$`, and comma separators for planned money amounts of `1,000.00$` or more such as `5,895.50$`. Browser storage should save `Saving` square planned money amounts as normalized plain decimal strings without the `$` sign or comma separators, such as `14.50` or `5895.50`. A planned money amount should not be greater than `999,999.99$`.
 
@@ -344,9 +370,13 @@ If the user tries to save a new `Saving` square without a `Saving` name, the web
 
 Two `Saving` squares cannot use the same name. Names that match after trimming spaces and ignoring uppercase or lowercase letters should count as the same name.
 
-If the user tries to create or rename a `Saving` square with a duplicate name, the website should not save that duplicate name.
+Duplicate-name checks should include all normal `Saving` squares and any visible broken saved `Saving` square whose saved name can be read and is not empty after trimming spaces. A broken `Saving` square with a readable saved name should reserve that name until it is fixed or deleted.
 
-If the user enters a duplicate `Saving` name while creating or renaming a `Saving` square, the website should return to the `Saving` squares view without showing a duplicate-name error message. Nothing should change: no new `Saving` square should be created, an existing `Saving` square should keep its old name, saved data should stay unchanged, and `Balance Changes` should not get a new entry.
+During a broken-square fix, the broken `Saving` square being fixed should not count as a duplicate against itself. Normal `Saving` squares and other broken `Saving` squares with the same trimmed name should still block the fix.
+
+If the user tries to create, rename, or fix a `Saving` square with a duplicate name, the website should not save that duplicate name.
+
+If the user enters a duplicate `Saving` name while creating, renaming, or fixing a `Saving` square, the website should return to the `Saving` squares view without showing a duplicate-name error message. Nothing should change: no new `Saving` square should be created, an existing `Saving` square should keep its old name, the broken `Saving` square should stay broken when a fix name is duplicate, saved data should stay unchanged, and `Balance Changes` should not get a new entry.
 
 A `Saving` square should exist only when its planned money amount is greater than `0.00$` and not greater than `999,999.99$`.
 
@@ -359,6 +389,14 @@ When a new `Saving` square create attempt has more than one invalid value, the w
 3. `Saving` name is duplicate.
 
 The first matching rule decides what happens. This means a duplicate `Saving` name with a missing, `0.00$`, or above-limit planned money amount should keep the same `Saving` square create input step open with no message, no saved data change, no new `Saving` square, and no `Balance Changes` entry. The website should check duplicate names only after the planned money amount is greater than `0.00$`, not greater than `999,999.99$`, and the `Saving` name is not empty.
+
+Broken-square fix validation should use the same order as new `Saving` square creation:
+
+1. Planned money amount is missing, `0.00$`, or greater than `999,999.99$`.
+2. `Saving` name is missing.
+3. `Saving` name is duplicate.
+
+The first matching fix rule decides what happens. This means a broken-square fix with a duplicate `Saving` name and a missing, `0.00$`, or above-limit planned money amount should keep the same broken-square fix input step open with no message, no saved data change, no fixed `Saving` square, no `Balance Changes` entry, and the broken `Saving` square still being fixed. The website should check duplicate names for broken-square fix only after the planned money amount is greater than `0.00$`, not greater than `999,999.99$`, and the `Saving` name is not empty.
 
 The user can use `Saving` squares to see what planned money is fully covered, partly covered, or not covered by the main money amount.
 
@@ -390,7 +428,7 @@ A broken `Saving` square should not use any money amount inside `Savings`, shoul
 
 A broken `Saving` square should stay locked in its current displayed position until the user fixes or deletes it. The user should not be able to drag or reorder a broken `Saving` square. Holding, clicking and holding, moving, or dragging a broken `Saving` square should not start reorder, should not show a drag placeholder, should not change anything, should not save anything, should not create a `Balance Changes` entry, and should show no message. Normal default `Saving` squares can still be reordered while broken `Saving` squares are visible, as long as no `Saving` square is in action state, input state, or delete confirmation state. During normal square reorder, broken `Saving` squares should stay in their displayed positions and should continue to be skipped by `Savings money amount`, top needed note, and coverage calculations.
 
-Clicking `Fix` on a broken `Saving` square should change that broken square into a temporary `Saving` input square in the same visible position. The fix input square should ask the user for a valid `Saving` name and planned money amount greater than `0.00$` and not greater than `999,999.99$`. The fix input square should not appear as a modal, bottom sheet, or separate page. Saving a fixed `Saving` square should turn the broken square into a normal `Saving` square, keep it in the same visible position when possible, save the repaired data in browser storage, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, and show no message.
+Clicking `Fix` on a broken `Saving` square should change that broken square into a temporary `Saving` input square in the same visible position. The fix input square should ask the user for a valid `Saving` name and planned money amount greater than `0.00$` and not greater than `999,999.99$`. The fix input square should use the same duplicate-name rules as creating and renaming a `Saving` square, including readable saved names from other broken `Saving` squares. The fix input square should not appear as a modal, bottom sheet, or separate page. Saving a fixed `Saving` square should turn the broken square into a normal `Saving` square, keep it in the same visible position when possible, save the repaired data in browser storage, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, and show no message.
 
 Clicking `Delete` on a broken `Saving` square should use the same small centered `Saving` square delete confirmation with the exact message `Delete this Saving?` and buttons exactly named `Cancel` and `Delete`. Clicking `Cancel` or clicking or tapping outside the small confirmation square should close the confirmation, keep the broken square visible, change nothing, save nothing, create no `Balance Changes` entry, and show no message. Confirming delete should close the confirmation, remove only that broken square, save the change in browser storage, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, update no other `Saving` squares, and offer no undo.
 
@@ -410,11 +448,11 @@ Removing a `Saving` square because its planned money amount became `0.00$` shoul
 
 `Saving` squares should have an order. The first `Saving` square the user creates should stay at the top by default.
 
-The user should be able to change the order of normal default `Saving` squares by holding the whole `Saving` square for `600ms`, then moving it. Mouse users should be able to reorder by clicking and holding the whole `Saving` square for `600ms`, then dragging it. After the `600ms` hold completes, dragging should start only after the pointer or finger moves at least `8px`. Holding or dragging a `Saving` square should not open rename, planned-money-amount change, or delete.
+The user should be able to change the order of normal default `Saving` squares by holding the whole `Saving` square for `600ms`, then moving it. Mouse users should be able to reorder by clicking and holding the whole `Saving` square for `600ms`, then dragging it. For touch users, moving the finger more than `8px` before the `600ms` hold completes should be treated as scrolling and should cancel the pending reorder hold. After the `600ms` hold completes without being canceled, dragging should start only after the pointer or finger moves at least `8px`. If a touch or mouse user holds for `600ms` but releases before moving at least `8px`, nothing should happen: no action state, no reorder, no drag placeholder, no saved change, no `Balance Changes` entry, and no message. Holding or dragging a `Saving` square should not open rename, planned-money-amount change, or delete.
 
 Broken `Saving` squares should not be part of the reorder action until they are fixed. Reordering normal default `Saving` squares should not move, repair, delete, or update broken `Saving` squares.
 
-While dragging, the dragged `Saving` square should follow the user's finger or mouse pointer. The old position should show a placeholder the same size as the dragged square. If the user drags near the top or bottom of the scrollable `Saving` squares area, that area should auto-scroll so the user can move the square farther up or down.
+While dragging, the dragged `Saving` square should follow the user's finger or mouse pointer. The old position should show a placeholder the same size as the dragged square. If the user's finger or mouse pointer is within `40px` of the top or bottom edge of the scrollable `Saving` squares area during reorder, that area should auto-scroll at a fixed speed of `8px` per animation frame so the user can move the square farther up or down. Top and bottom auto-scroll should use the same `40px` trigger distance and the same fixed `8px`-per-frame speed. The auto-scroll speed should not change based on how close the finger or pointer is to the edge. If the user's finger or mouse pointer leaves the screen, the browser window loses focus, or the drag is interrupted before the square is dropped, the reorder should be canceled. The square should return to its original position, the drag placeholder should be removed, any reorder auto-scroll should stop, nothing should save, no `Balance Changes` entry should be created, and no message should appear.
 
 Reordering should be disabled while any `Saving` square is in action state, input state, or delete confirmation state. The user should close, cancel, save, or finish that state before reordering.
 
@@ -524,24 +562,11 @@ Better wording:
 - Users can understand that `Savings` is a planning section, not a real account or separate goals feature.
 - Users can understand that the website is a manual cash tracker, not a real bank.
 
-## 'Saving' squares Grey Zones
+## Grey Zones
 
-- Grey zone: Empty-area clicks inside an action-state `Saving` square are not fully defined. The specs define what happens when the user clicks the name, planned money amount, or `Delete`, but they do not define whether clicking a blank part of the same open square should do nothing, close the action state, or keep it open.
-- Grey zone: Touch scrolling over `Saving` squares is not fully defined. The specs say tapping a square opens its action state and holding can start reorder, but they do not define how the website should avoid opening the action state when the user is only dragging the list to scroll.
-- Grey zone: Holding a `Saving` square without moving is not fully defined. The specs say reorder starts after a `600ms` hold and at least `8px` of movement, but they do not define what happens if the user holds for `600ms`, does not move far enough, and then releases.
-- Grey zone: `Saving` square reorder auto-scroll details are not fully defined. The specs say the scrollable `Saving` squares area should auto-scroll near the top or bottom, but they do not define the trigger distance, scroll speed, or whether the speed changes based on how close the pointer or finger is to the edge.
-- Grey zone: `Saving` square drag cancellation is not fully defined. The specs do not define what should happen if the user's finger or mouse leaves the screen, the browser window loses focus, or the drag is interrupted before the square is dropped.
-- Grey zone: Duplicate-name checks against broken `Saving` squares are not fully defined. The specs define duplicate names for normal create and rename flows, and define broken saved squares, but they do not define whether a visible broken square with a recoverable name should block create, rename, or fix attempts using that same name.
-- Grey zone: Broken `Saving` square fix validation order is not fully defined. The specs say the fix input needs a valid `Saving` name and planned money amount, but they do not define which rule should happen first when both the name and planned money amount are invalid.
+No additional behavior, data, or interaction-flow grey zones are currently identified. The remaining grey zones are HTML/CSS information-required items.
 
-## OverallGrey Zones
-
-- Grey zone: Open UI priority across the whole website is not fully defined. The specs define many individual input flows, action states, and confirmations, but they do not define one global rule for what should happen if more than one temporary UI could be open at the same time.
-- Grey zone: Same-website use in multiple browser tabs or windows is not fully defined. The specs say browser storage saves data, but they do not define whether one open tab should update when another tab changes the saved money amount, `Balance Changes`, or `Savings`.
-- Grey zone: Normal user-controlled reset is not fully defined. The specs define `Start again` only for broken saved data, but they do not define whether a user with normal saved data should have any way to clear all saved data and start fresh.
-- Grey zone: Refresh or close behavior during temporary UI is not fully defined. The specs define saved data after reopening, and some unsaved input grey zones are listed for specific areas, but they do not define one overall rule for whether the website should warn, silently discard unsaved input, or restore open temporary UI after a page refresh or browser close.
-
-## HTML CSS informations required
+### HTML CSS informations required
 
 - Grey zone: The exact main money amount circle size and position across mobile and desktop is not fully defined. The specs say the main money amount should be the most visible information and should stay contained with large money amounts, but they do not define the exact circle size, screen position, or responsive sizing rules.
 - Grey zone: The exact `Current Balance` label placement is not fully defined. The specs define `Current Balance` as the user-facing label for the main money amount, but they do not define whether that label appears inside the circle, above the circle, below the circle, or beside the money amount on mobile and desktop.
