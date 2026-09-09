@@ -7,10 +7,10 @@ Cash Money Organizer is a browser-based personal cash tracking website. It is no
 - `website/`: Next.js website application.
 - `website/app/`: app pages, layout, and global CSS.
 - `website/public/`: static website assets.
-- `docs/specs/`: all specifications.
-- `docs/specs/business/`: business requirements.
-- `docs/specs/functional/`: user-facing behavior and flows.
-- `docs/specs/technical/`: implementation and storage rules.
+- `docs/specs/`: specification rules and indexes.
+- `docs/specs/accepted/`: approved global, feature, and technical specifications.
+- `docs/specs/drafts/`: specifications waiting for explicit user approval.
+- `docs/raw-data/`: non-authoritative notes, references, legacy documents, and temporary information.
 - `docs/plans/active/`: active implementation plan.
 - `AGENTS.md`: project instructions, source-of-truth paths, and GitFlow.
 

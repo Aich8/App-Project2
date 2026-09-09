@@ -1,4 +1,6 @@
-# Global Spec: Cash Money Organizer Website
+# Raw Data: Legacy Detailed Global Notes
+
+This file preserves the former detailed global document as source material. It is not an accepted specification and must not override files in `docs/specs/accepted/`.
 
 ## For who?
 

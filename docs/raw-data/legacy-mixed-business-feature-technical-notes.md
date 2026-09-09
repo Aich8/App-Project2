@@ -1,4 +1,6 @@
-# Business Spec: Cash Money Organizer Website
+# Raw Data: Legacy Mixed Business, Feature, And Technical Notes
+
+This file preserves the former mixed business document as source material. It is not an accepted specification and must not override files in `docs/specs/accepted/`.
 
 ## Business Goals
 
@@ -52,7 +54,7 @@ The website should not warn the user that saved information may disappear after 
 
 If browser storage is unavailable, full, blocked, or fails while saving a valid user action, the website should not pretend the action was saved.
 
-Detailed browser storage, saved data validation, data format, save failure, and same-browser tab or window update rules are in the final `Technical` section.
+Detailed browser storage, saved data validation, data format, save failure, and same-browser tab or window update rules are in the `Technical` section below.
 
 ### Add and Subtract Money Amount
 
@@ -228,9 +230,194 @@ Better wording:
 - Users can understand that `Savings` is a planning section, not a real account or separate goals feature.
 - Users can understand that the website is a manual cash tracker, not a real bank.
 
-## Belongs to Functional Spec
+## Technical
 
-The items in this section are still inside the business spec for review, but they look more like detailed user-flow and interaction rules than business-level requirements.
+This section collects technical-spec material that is still being tracked in the business spec for review. These items are storage, validation, data model, implementation, or HTML/CSS detail rules rather than business-level requirements.
+
+### Browser Storage And Data Format
+
+Saved browser storage money amount values are internal and should use normalized plain decimal strings without the `$` sign or comma separators, such as `0.00`, `5.00`, `5895.50`, and `999999.99`. User-facing website display should still add comma separators and the `$` sign, such as `5,895.50$`.
+
+The implementation should use the stable storage key `cash-money-organizer-website-data` and the first data version value `1`.
+
+The first version should load saved browser data only when the data version value is exactly `1`. A saved current money amount is valid only when it is a normalized plain decimal string from `0.00` through `999999.99`, with no `$` sign, no comma separators, exactly two digits after the decimal point, and no unneeded leading zeros before the decimal point except the single `0` in `0.00`. Saved browser data with a missing, wrong, future, unreadable, or unrecognized data version, or a saved current money amount outside that range or not in that exact saved format, should be treated as broken saved data. Examples of broken saved current money amount values include `5`, `5.0`, `005.00`, `5,000.00`, `5.000`, `1000000.00`, and `-5.00`.
+
+If saved browser data is broken or cannot be read, the website should show `Saved data could not be loaded.` with a `Start again` action. When the user chooses `Start again`, the website should delete the broken saved data and immediately create fresh browser storage data with the saved money amount set to `0.00`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`.
+
+When no saved data exists yet, the website should show the default `0.00$` money amount without saving it just because the website opened. The website should start saving data after the first successful saved user action. In the normal first money flow, this is the first successful `Add`.
+
+If browser storage is unavailable, full, blocked, or fails while saving a valid user action, the website should block that action. The visible money amount, `Balance Changes`, `Savings`, and saved data should stay on the last successfully saved state. The website should show the exact message `Changes could not be saved.`.
+
+A user action should count as a successful saved user action only after the required browser storage write succeeds. If saving fails, the website should not create, update, delete, or reorder saved data, should not create a `Balance Changes` entry, should not run `Balance Changes` cleanup as a successful saved action, and should not show the changed result as saved.
+
+If saving fails from a main money amount input flow, the same input flow should stay open with the same typed value so the user can try again or cancel. If saving fails from a `Saving` square create, rename, planned-money-amount change, or broken-square fix input flow, the same input flow should stay open with the same typed values. If saving fails while confirming a `Saving` square delete or `Balance Changes` delete, the confirmation should stay open and the selected item should stay visible. If saving fails after a completed `Saving` square reorder, the visible order should return to the last successfully saved order.
+
+If the same website is open in multiple tabs or windows in the same browser, a successful saved change in one tab or window should automatically update the other open tabs or windows to the latest saved data. The other tabs or windows should update the visible money amount, `Balance Changes`, `Savings`, `Savings money amount`, top needed text, and coverage bars from the latest saved browser data.
+
+This same-browser tab or window update should happen silently. It should not show a message, should not create a `Balance Changes` entry, and should not write browser storage again just because another tab or window changed the saved data.
+
+If another open tab or window has a temporary UI open when the latest saved data arrives, that temporary UI should close like a cancel. Any unsaved typed input in that tab or window should be discarded, nothing should save from that tab or window, nothing should be deleted from that tab or window, no `Balance Changes` entry should be created from that tab or window, and the tab or window should show the latest saved data.
+
+A no-action `Modify` attempt using the same money amount that is already shown should not create or update browser storage and should not run `Balance Changes` cleanup.
+
+### Input And Temporary State Rules
+
+Keyboard use is required only for typing inside money amount inputs and `Saving` square inputs, including the specified `Space` key behavior inside main money amount inputs.
+
+The first version does not need custom keyboard navigation for clickable controls, custom `Tab` order rules, `Enter` or `Space` activation rules for clickable controls, focus-return rules after save/cancel/delete, or keyboard support for reordering `Saving` squares.
+
+The user should not be able to paste into `Saving` square planned money amount inputs. If the user tries to paste letters, numbers, symbols, or any other content into a planned money amount input, the pasted content should not appear, the input should keep its previous value, and no message should appear.
+
+The website should not save draft `Saving` input in browser storage. If a valid `Saving` input save fails, the same input flow should stay open with the same typed values so the user can try again or cancel.
+
+### Main Money Amount Input Rules
+
+When the horizontal input square opens, it should be focused and ready for typing immediately. On supported mobile devices, opening the input flow should request the mobile keyboard immediately.
+
+The user should type only the money amount into the horizontal input square, without the `$` sign. If the typed money amount reaches `1,000.00` or more, the input should add comma separators automatically while the user is typing.
+
+Main money amount inputs should request a mobile keyboard suitable for digit entry on supported devices. All users should be able to enter cents with `Space` or with a rectangular `Cent` button shown as part of the main money amount input controls while a main money amount input is open. The `Cent` button should appear directly under the horizontal input square on mobile and desktop. On mobile, when the browser and keyboard allow it, this placement should also keep the `Cent` button directly above the mobile keyboard. The `Cent` button should behave the same as pressing `Space`, should not add visible text to the input, and should not cancel or close the input flow. The user should not enter cents in main money amount inputs by typing a decimal point.
+
+Main money amount inputs should accept only numbers from `0` through `9` and separator input from the `Space` key or `Cent` button. The first accepted character should be a number from `0` through `9`. Typed decimal points, comma separators, `$` signs, letters, minus signs, and other blocked characters should not change the field and should show no message. The decimal point and comma separators in the displayed input should be generated by the website only.
+
+Digits typed before an accepted separator should be whole money amount digits. Typed digits should not automatically become cents because more digits were typed. `0` should be a normal digit, not a starting zero-position skip. Unneeded leading zeros in the whole money amount should be normalized away, so typing `0005` should show `5.00`, not `00.05`.
+
+The `Space` key and `Cent` button should act as a non-visible separator between digit groups. A separator should be accepted only after at least one digit and only when the previous accepted input is a digit. Starting `Space` key presses, starting `Cent` taps, consecutive `Space` key presses, consecutive `Cent` taps, or mixed consecutive separator inputs should be blocked with no message. Typing `Space`, `Space`, `Space`, then `5` should block the three `Space` key presses and then show `5.00` after the `5` is typed. Tapping `Cent`, `Cent`, `Cent`, then typing `5` should block the three `Cent` taps and then show `5.00` after the `5` is typed.
+
+Main money amount inputs should always show the typed value with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing.
+
+For accepted input without separator input, all digits are whole money amount digits: typing `5` should show `5.00`, `58` should show `58.00`, `589` should show `589.00`, `5895` should show `5,895.00`, `58955` should show `58,955.00`, and `589550` should show `589,550.00`.
+
+For accepted input with separator input from `Space` or `Cent`, the website should split the accepted digits into groups at each accepted separator. If the input ends with a separator, all completed digit groups should be treated as the whole money amount and cents should show as `00`. If the final group after a separator has one or two digits, that final group should be treated as cents and should be left-padded with `0` when it has one digit. All earlier groups should be joined together as the whole money amount. If there is only one accepted separator and the final group grows to three or more digits, that final group should be treated as another whole money amount group and cents should show as `00`. Once the input has two accepted separators, the final group is the cents group and should accept at most two digits. Additional separator input after two accepted separators should be blocked with no message.
+
+Examples: typing `5`, then `Space`, should keep the display at `5.00`; typing `5`, then `Space`, then `5` should show `5.05`; typing `5`, then `Space`, then `50` should show `5.50`; typing `58`, then `Space`, then `430` should show `58,430.00`; typing `58`, then `Space`, then `430`, then `Space`, then `88` should show `58,430.88`; typing `0`, then `Space`, then `5` should show `0.05`; and typing `999999`, then `Space`, then `99` should show `999,999.99`. Tapping or clicking `Cent` should work the same as pressing `Space`, so typing `5`, then choosing `Cent`, then typing `50` should show `5.50`.
+
+If the user deletes one typed character from the horizontal input square, the remaining accepted input should be formatted again with two digits after the decimal point, automatic comma separators when needed, and no `$` sign while the input is still open. Deleting should remove the last accepted digit or accepted separator. For example, deleting from `5.50` after typing `5`, `Space`, `50` or typing `5`, tapping `Cent`, then typing `50` should return to `5.05`; deleting again should return to `5.00`.
+
+Main money amount inputs should be append-only. Clicking, tapping, or focusing the horizontal input square should not let the user move the cursor into the middle of the formatted money amount. The cursor should stay at the end when shown. The user should not be able to select part of the displayed money amount, replace selected text, or edit generated comma separators or the generated decimal point. If the browser or device shows a text selection anyway, the website should ignore that selection for money amount input behavior. Accepted typing should still be added to the end of the accepted input sequence, and delete should still remove only the last accepted digit or accepted separator.
+
+If the user deletes all typed numbers from the horizontal input square, the square should return to `0.00`. The horizontal input square should not become empty.
+
+If the user types letters, a minus sign, a decimal point, the `$` sign, a comma separator, a starting `Space`, a consecutive `Space`, an additional `Space` after two accepted separators, a third cents digit after the cents group is fixed by two accepted separators, or any other blocked character into a main money amount input, the field should not change and no message should appear. If the user taps `Cent` when a separator would be blocked by the same rules, the field should not change and no message should appear.
+
+The user should not be able to paste into main money amount inputs. If the user tries to paste letters, numbers, symbols, or any other content into a main money amount input, the pasted content should not appear, the input should keep its previous value, and no message should appear.
+
+### Balance Changes Data And Storage Rules
+
+When saved browser data can be loaded but one saved `Balance Changes` entry is broken, the website should keep the rest of the saved data and remove only the broken entry from `Balance Changes`. It should not show the full saved-data error message, should not show a broken history row, should not change the main money amount, should not change `Savings`, and should show no message to the user.
+
+A saved `Balance Changes` entry should count as broken if it has a missing ID, duplicate ID, missing or invalid action type, missing or invalid money amount, missing or invalid previous money amount, missing or invalid new money amount, missing created date or created time, invalid created date or created time, missing or invalid internal exact created date and time, or missing or invalid visible-until date and time. For duplicate IDs, the first matching saved `Balance Changes` entry in the saved list order should stay if it is otherwise valid, and later matching entries should be removed.
+
+`Balance Changes` entries should be ordered newest first by their internal exact created date and time. The newest change should appear at the top of the list, and older changes should go lower. If two entries have the exact same internal exact created date and time, the entry that appears earlier in the saved list order should appear first. New entries should be saved before older entries in the saved list so this tie-breaker still keeps older changes lower.
+
+Old visible history entries should be deleted from browser storage during cleanup after 30 days without changing the saved money amount.
+
+Every valid `Balance Changes` entry that is still inside its 30-day visible period should remain available inside the scrollable `Balance Changes` square. The first version should not use a smaller maximum visible-entry limit for valid 30-day `Balance Changes` entries.
+
+Scrolling that starts inside the large `Balance Changes` square should stay inside that square. If the internal entry list is already at the top or bottom, continuing to scroll inside the square should not move the dashboard page. To move the dashboard page down to `Savings` or back up, the user should scroll from an area outside the large `Balance Changes` square.
+
+Touch users should open the delete action by pressing and holding the `Balance Changes` entry for `600ms`.
+
+Mouse users should open the delete action by clicking and holding the `Balance Changes` entry for `600ms`.
+
+Before the `600ms` hold completes, releasing the press or click, moving the pointer or finger, or starting to scroll should cancel the pending delete action. Canceling the pending hold should not open the little square, change anything, save anything, delete anything, create a `Balance Changes` entry, or show a message.
+
+After the completed `600ms` press-and-hold or click-and-hold, a little square should pop up in the middle of the screen with the exact action texts `Delete` and `Cancel`.
+
+Moving the pointer or finger should not close the little square after it is open. Scrolling should not close the little square after it is open.
+
+Dates and times should matter for showing when visible `Balance Changes` entries were created, ordering entries, and clearing old visible `Balance Changes` entries after 30 days. When a `Balance Changes` entry is created, the website should save both the visible created date and visible created time using the user's browser/device local date and time, show both values in the visible row, and also save an internal exact created date and time with seconds and milliseconds using the same browser/device local date and time rule. The internal exact created date and time should be used for ordering and for calculating the internal visible-until date and time. The visible row should still show only the minute-level format, like `July 21, 2026 at 3:45 PM`.
+
+Visible `Balance Changes` rows should not show the internal exact created date and time, seconds, milliseconds, or the internal visible-until date and time.
+
+The website should run `Balance Changes` cleanup when it opens and loads saved data, and after every successful saved user action. During cleanup, broken saved entries and entries at or after their visible-until date and time should be deleted from browser storage and removed from the visible history list.
+
+The first version does not need a background timer that checks old `Balance Changes` entries while the website stays open with no user action. If the website stays open past an entry's visible-until date and time, that old entry may remain visible until the next website open or successful saved user action runs cleanup.
+
+### Savings Data And Storage Rules
+
+Planned money amounts in `Saving` squares should use the planned-money amount display format: `0.00$` for zero, two decimal digits for nonzero whole money amounts such as `14.00$`, two decimal digits for nonzero money amounts with cents such as `14.50$`, and comma separators for planned money amounts of `1,000.00$` or more such as `5,895.50$`. Browser storage should save `Saving` square planned money amounts as normalized plain decimal strings without the `$` sign or comma separators, such as `14.50` or `5895.50`. A planned money amount should not be greater than `999,999.99$`.
+
+In the first version, `Saving` squares should not save or show a created date or updated date.
+
+While the user is typing a `Saving` square planned money amount, the input should show the accepted typed value as raw decimal number text. It should accept digits from `0` through `9` and one decimal point. It should block letters, `$` signs, comma separators, a second decimal point, more than two digits after the decimal point, and `Space` with no message. It should not add the `$` sign, comma separators, or automatic two-decimal formatting before `Save`. It should not show a `Cent` button, and the main money amount `Space` key cents behavior should not apply. If there is no decimal point, the typed value should be treated as a whole money amount. If there is one decimal point, digits after the decimal point should be treated as cents. After `Save`, the saved `Saving` square should show the planned money amount with two decimal digits, comma separators when needed, and the `$` sign, so typing `14` becomes `14.00$`, typing `14.5` becomes `14.50$`, typing `5898` becomes `5,898.00$`, and typing `589.80` becomes `589.80$`.
+
+Duplicate-name checks should include all normal `Saving` squares and any visible broken saved `Saving` square whose saved name can be read and is not empty after trimming spaces. A broken `Saving` square with a readable saved name should reserve that name until it is fixed or deleted.
+
+During a broken-square fix, the broken `Saving` square being fixed should not count as a duplicate against itself. Normal `Saving` squares and other broken `Saving` squares with the same trimmed name should still block the fix.
+
+When a new `Saving` square create attempt has more than one invalid value, the website should check the create inputs in this order:
+
+1. Planned money amount is missing, `0.00$`, or greater than `999,999.99$`.
+2. `Saving` name is missing.
+3. `Saving` name is duplicate.
+
+The first matching rule decides what happens. This means a duplicate `Saving` name with a missing, `0.00$`, or above-limit planned money amount should keep the same `Saving` square create input step open with no message, no saved data change, no new `Saving` square, and no `Balance Changes` entry. The website should check duplicate names only after the planned money amount is greater than `0.00$`, not greater than `999,999.99$`, and the `Saving` name is not empty.
+
+Broken-square fix validation should use the same order as new `Saving` square creation:
+
+1. Planned money amount is missing, `0.00$`, or greater than `999,999.99$`.
+2. `Saving` name is missing.
+3. `Saving` name is duplicate.
+
+The first matching fix rule decides what happens. This means a broken-square fix with a duplicate `Saving` name and a missing, `0.00$`, or above-limit planned money amount should keep the same broken-square fix input step open with no message, no saved data change, no fixed `Saving` square, no `Balance Changes` entry, and the broken `Saving` square still being fixed. The website should check duplicate names for broken-square fix only after the planned money amount is greater than `0.00$`, not greater than `999,999.99$`, and the `Saving` name is not empty.
+
+A saved `Saving` square should count as broken if it has a missing or empty name, duplicate name, missing or invalid planned money amount, planned money amount of `0.00$` or less, planned money amount greater than `999,999.99$`, missing or invalid order, duplicate order, missing ID, or duplicate ID.
+
+Saving a fixed `Saving` square should turn the broken square into a normal `Saving` square, keep it in the same visible position when possible, save the repaired data in browser storage, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, and show no message.
+
+Confirming delete for a broken `Saving` square should close the confirmation, remove only that broken square, save the change in browser storage, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, update no other `Saving` squares, and offer no undo.
+
+Normal `Saving` square order should be saved in browser storage so the same normal square order appears after refresh.
+
+Intermediate drag positions should not be saved as the source of truth. When the user finishes moving a `Saving` square and lets go, the website should save the final visible order in browser storage.
+
+For touch users, a finger movement of more than `8px` before the finger is lifted and before the `600ms` reorder hold completes should count as scrolling, not as a tap. This should cancel the pending tap and any pending reorder hold. The `Saving` square should not open its action state, should not start reorder, should not show a drag placeholder, should not change anything, should not save anything, should not create a `Balance Changes` entry, and should show no message. If the finger is lifted before `600ms` without moving more than `8px`, the touch should count as a tap and should open the action state. If a touch user holds for `600ms` but releases before moving at least `8px`, nothing should happen: the `Saving` square should not open its action state, should not start reorder, should not show a drag placeholder, should not change anything, should not save anything, should not create a `Balance Changes` entry, and should show no message.
+
+The user should be able to change the order of normal default `Saving` squares by holding the whole `Saving` square for `600ms`, then moving it. Mouse users should be able to reorder by clicking and holding the whole `Saving` square for `600ms`, then dragging it. For touch users, moving the finger more than `8px` before the `600ms` hold completes should be treated as scrolling and should cancel the pending reorder hold. After the `600ms` hold completes without being canceled, dragging should start only after the pointer or finger moves at least `8px`. If a touch or mouse user holds for `600ms` but releases before moving at least `8px`, nothing should happen: no action state, no reorder, no drag placeholder, no saved change, no `Balance Changes` entry, and no message. Holding or dragging a `Saving` square should not open rename, planned-money-amount change, or delete.
+
+While dragging, the dragged `Saving` square should follow the user's finger or mouse pointer. The old position should show a placeholder the same size as the dragged square. If the user's finger or mouse pointer is within `40px` of the top or bottom edge of the scrollable `Saving` squares area during reorder, that area should auto-scroll at a fixed speed of `8px` per animation frame so the user can move the square farther up or down. Top and bottom auto-scroll should use the same `40px` trigger distance and the same fixed `8px`-per-frame speed. The auto-scroll speed should not change based on how close the finger or pointer is to the edge. If the user's finger or mouse pointer leaves the screen, the browser window loses focus, or the drag is interrupted before the square is dropped, the reorder should be canceled. The square should return to its original position, the drag placeholder should be removed, any reorder auto-scroll should stop, nothing should save, no `Balance Changes` entry should be created, and no message should appear.
+
+The implementation should not persist temporary UI state in browser storage. This includes visible main money action buttons, selected main money action input flow state, accepted typed input, `Balance Changes` delete action square state, `Balance Changes` delete confirmation state, `Saving` square action state, `Saving` input flow state, `Saving` delete confirmation state, pending hold state, active reorder drag state, selected delete targets, and temporary reorder positions.
+
+### HTML/CSS Requirements
+
+Main money amount inputs should allow any valid money amount from `0.00` through `999,999.99`. A maximum-sized money amount should stay editable in the horizontal input square without making the page overflow horizontally, overlapping `Cent`, overlapping `Save Changes`, overlapping `Yes` or `Cancel`, or hiding those controls. The layout may contain, wrap, break, shrink within readable limits, or internally scroll the typed money amount as needed, but it should preserve the full typed money amount.
+
+The dashboard, `Balance Changes`, and `Savings` displays should handle money amounts up to `999,999.99$` without rejecting them, creating horizontal page overflow, overlapping other content, or hiding actions. The layout may wrap, break long number strings, or adjust text size within readable limits, but it should preserve the full visible money amount with required comma separators.
+
+Very long `Saving` square names should be handled by the square layout. The website should wrap or contain long names so they do not create horizontal page overflow, overlap other square content, or break the `Saving` square layout.
+
+### HTML/CSS Open Questions
+
+- Grey zone: The exact main money amount circle size and position across mobile and desktop is not fully defined. The specs say the main money amount should be the most visible information and should stay contained with large money amounts, but they do not define the exact circle size, screen position, or responsive sizing rules.
+- Grey zone: The exact `Current Balance` label placement is not fully defined. The specs define `Current Balance` as the user-facing label for the main money amount, but they do not define whether that label appears inside the circle, above the circle, below the circle, or beside the money amount on mobile and desktop.
+- Grey zone: The exact main money action button placement is not fully defined. The specs say `Add`, `Subtract`, and `Modify` should appear as horizontal buttons near the main money amount and define their left-to-right order, but they do not define whether the button row appears above, below, overlapping, or beside the main money amount circle on mobile and desktop.
+- Grey zone: The main money amount visual state at `0.00$` is not fully defined. The specs define what actions are available at `0.00$`, but they do not define whether the main money amount should look the same as other money amount values or use a special visual style when it is `0.00$`.
+- Grey zone: The exact `Balance Changes` square size across mobile and desktop is not fully defined. The specs say it should be a large square and use most of the dashboard page space under the main money amount, but they do not define exact height, width, minimum size, maximum size, or responsive sizing rules.
+- Grey zone: The exact `Balance Changes` label placement is not fully defined. The specs define `Balance Changes` as the user-facing history label and say the area appears directly under the main money amount, but they do not define whether the label appears inside the large square, above the large square, fixed at the top of the square, or as a normal page heading.
+- Grey zone: The visual style for added and subtracted `Balance Changes` entries is not fully defined. The specs define the exact signed text, compact layout, and date/time display, but they do not define whether added and subtracted entries should use the same color/style or different visual styles.
+- Grey zone: The delete confirmation display for `Balance Changes` is not fully defined. The specs define the confirmation message `Delete this Balance Change?` and the buttons `Cancel` and `Delete`, but they do not define whether the confirmation appears as a small centered square, a modal, inside the history area, or another layout.
+- Grey zone: The dashboard `Savings` entry layout is not fully defined. The specs say the user clicks `Savings` below the `Balance Changes` area to open the full-screen `Savings` view, but they do not define whether `Savings` looks like a button, a section row, a simple text link, or another clickable shape.
+- Grey zone: The exact full-screen `Savings` top area layout is not fully defined. The specs say the small `<`, `Savings money amount`, and optional `{money amount} needed` text stay fixed at the top, but they do not define the exact alignment, spacing, height, or visual weight of that top area.
+- Grey zone: The exact `Saving` square size and spacing is not fully defined. The specs say visible `Saving` squares appear in one vertical column on mobile and desktop, but they do not define the exact square width, minimum height, gaps between squares, or responsive sizing rules.
+- Grey zone: The exact temporary input square field layout is not fully defined. The specs say create, rename, planned-money-amount change, and broken-square fix happen inside a temporary input square, but they do not define the exact order, labels, spacing, and mobile or desktop arrangement of the input fields and `Save` / `Cancel` buttons.
+- Grey zone: Long `Saving` names beside planned money amounts are not fully defined. The specs say the square shows the name on the left and planned money amount on the right, but they do not define whether very long names wrap, shrink, truncate, or make the square taller.
+- Grey zone: The exact `Saving` coverage bar visuals are not fully defined. The specs say each `Saving` square has a thin grey bar filled with green from left to right, but they do not define the exact thickness, colors, corner style, or whether the fill changes instantly or with animation.
+- Grey zone: The normal `Saving` square visual style is not fully defined. The specs define the text and coverage bar inside each square, but they do not define the exact background, border, corner radius, shadow, or text size for the square itself.
+- Grey zone: The `Saving` square action-state visual style is not fully defined. The specs say the same square shows the `Saving` name, planned money amount, and `Delete`, and hides the coverage bar, but they do not define whether the square should change color, border, height, spacing, or highlight while it is in action state.
+- Grey zone: `Saving` square drag placeholder appearance is not fully defined. The specs say the old position should show a placeholder the same size as the dragged square, but they do not define whether that placeholder is empty, dimmed, outlined, or contains copied square content.
+- Grey zone: `Saving` square drag visual feedback is not fully defined. The specs say the dragged square follows the user's finger or mouse pointer, but they do not define whether the dragged square should use opacity, shadow, scaling, or another visible dragging style.
+- Grey zone: The exact overall visual design system is not fully defined. The specs say the website should feel calm, practical, trustworthy, and bank-like without pretending to be a real bank, but they do not define the exact color palette, typography, spacing scale, border style, or shared component style.
+- Grey zone: Responsive breakpoints are not fully defined. The specs say the website should work on mobile and desktop, but they do not define the exact screen widths where layout rules should change.
+- Grey zone: The first loading state is not fully defined. The specs define what should happen after saved browser data is loaded or found broken, but they do not define what the user should see during the short moment while the website is checking saved data.
+- Grey zone: The `Changes could not be saved.` message display is not fully defined. The specs define the exact message and when it appears, but they do not define where it appears, whether it stays until the next action, whether the user can dismiss it, or whether it disappears automatically.
+- Grey zone: The full broken saved-data recovery display is not fully defined. The specs define `Saved data could not be loaded.` and `Start again`, but they do not define whether that recovery UI appears as a full screen, centered panel, dashboard replacement, or another layout.
+- Grey zone: Overall accessibility expectations are not fully defined. The specs define that the first version is mainly for mouse clicks and finger taps, with keyboard typing inside inputs, but they do not define screen reader labels, minimum contrast, reduced-motion behavior, or other non-keyboard accessibility rules.
+
+## Functional
+
+This section collects detailed user-flow and interaction rules that belong with the functional spec.
 
 ### Main Money Amount Interaction Details
 
@@ -262,39 +449,7 @@ While the horizontal input square is open, the input flow is the active part of 
 
 The horizontal input square should start by showing `0.00` without the `$` sign.
 
-When the horizontal input square opens, it should be focused and ready for typing immediately. On supported mobile devices, opening the input flow should request the mobile keyboard immediately.
-
-The user should type only the money amount into the horizontal input square, without the `$` sign. If the typed money amount reaches `1,000.00` or more, the input should add comma separators automatically while the user is typing.
-
-Main money amount inputs should request a mobile keyboard suitable for digit entry on supported devices. All users should be able to enter cents with `Space` or with a rectangular `Cent` button shown as part of the main money amount input controls while a main money amount input is open. The `Cent` button should appear directly under the horizontal input square on mobile and desktop. On mobile, when the browser and keyboard allow it, this placement should also keep the `Cent` button directly above the mobile keyboard. The `Cent` button should behave the same as pressing `Space`, should not add visible text to the input, and should not cancel or close the input flow. The user should not enter cents in main money amount inputs by typing a decimal point.
-
-Main money amount inputs should accept only numbers from `0` through `9` and separator input from the `Space` key or `Cent` button. The first accepted character should be a number from `0` through `9`. Typed decimal points, comma separators, `$` signs, letters, minus signs, and other blocked characters should not change the field and should show no message. The decimal point and comma separators in the displayed input should be generated by the website only.
-
-Digits typed before an accepted separator should be whole money amount digits. Typed digits should not automatically become cents because more digits were typed. `0` should be a normal digit, not a starting zero-position skip. Unneeded leading zeros in the whole money amount should be normalized away, so typing `0005` should show `5.00`, not `00.05`.
-
-The `Space` key and `Cent` button should act as a non-visible separator between digit groups. A separator should be accepted only after at least one digit and only when the previous accepted input is a digit. Starting `Space` key presses, starting `Cent` taps, consecutive `Space` key presses, consecutive `Cent` taps, or mixed consecutive separator inputs should be blocked with no message. Typing `Space`, `Space`, `Space`, then `5` should block the three `Space` key presses and then show `5.00` after the `5` is typed. Tapping `Cent`, `Cent`, `Cent`, then typing `5` should block the three `Cent` taps and then show `5.00` after the `5` is typed.
-
-Main money amount inputs should always show the typed value with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing.
-
-For accepted input without separator input, all digits are whole money amount digits: typing `5` should show `5.00`, `58` should show `58.00`, `589` should show `589.00`, `5895` should show `5,895.00`, `58955` should show `58,955.00`, and `589550` should show `589,550.00`.
-
-For accepted input with separator input from `Space` or `Cent`, the website should split the accepted digits into groups at each accepted separator. If the input ends with a separator, all completed digit groups should be treated as the whole money amount and cents should show as `00`. If the final group after a separator has one or two digits, that final group should be treated as cents and should be left-padded with `0` when it has one digit. All earlier groups should be joined together as the whole money amount. If there is only one accepted separator and the final group grows to three or more digits, that final group should be treated as another whole money amount group and cents should show as `00`. Once the input has two accepted separators, the final group is the cents group and should accept at most two digits. Additional separator input after two accepted separators should be blocked with no message.
-
-Examples: typing `5`, then `Space`, should keep the display at `5.00`; typing `5`, then `Space`, then `5` should show `5.05`; typing `5`, then `Space`, then `50` should show `5.50`; typing `58`, then `Space`, then `430` should show `58,430.00`; typing `58`, then `Space`, then `430`, then `Space`, then `88` should show `58,430.88`; typing `0`, then `Space`, then `5` should show `0.05`; and typing `999999`, then `Space`, then `99` should show `999,999.99`. Tapping or clicking `Cent` should work the same as pressing `Space`, so typing `5`, then choosing `Cent`, then typing `50` should show `5.50`.
-
-If the user deletes one typed character from the horizontal input square, the remaining accepted input should be formatted again with two digits after the decimal point, automatic comma separators when needed, and no `$` sign while the input is still open. Deleting should remove the last accepted digit or accepted separator. For example, deleting from `5.50` after typing `5`, `Space`, `50` or typing `5`, tapping `Cent`, then typing `50` should return to `5.05`; deleting again should return to `5.00`.
-
-Main money amount inputs should be append-only. Clicking, tapping, or focusing the horizontal input square should not let the user move the cursor into the middle of the formatted money amount. The cursor should stay at the end when shown. The user should not be able to select part of the displayed money amount, replace selected text, or edit generated comma separators or the generated decimal point. If the browser or device shows a text selection anyway, the website should ignore that selection for money amount input behavior. Accepted typing should still be added to the end of the accepted input sequence, and delete should still remove only the last accepted digit or accepted separator.
-
-If the user deletes all typed numbers from the horizontal input square, the square should return to `0.00`. The horizontal input square should not become empty.
-
-If the user types letters, a minus sign, a decimal point, the `$` sign, a comma separator, a starting `Space`, a consecutive `Space`, an additional `Space` after two accepted separators, a third cents digit after the cents group is fixed by two accepted separators, or any other blocked character into a main money amount input, the field should not change and no message should appear. If the user taps `Cent` when a separator would be blocked by the same rules, the field should not change and no message should appear.
-
-Main money amount inputs should allow any valid money amount from `0.00` through `999,999.99`. A maximum-sized money amount should stay editable in the horizontal input square without making the page overflow horizontally, overlapping `Cent`, overlapping `Save Changes`, overlapping `Yes` or `Cancel`, or hiding those controls. The layout may contain, wrap, break, shrink within readable limits, or internally scroll the typed money amount as needed, but it should preserve the full typed money amount.
-
-The dashboard, `Balance Changes`, and `Savings` displays should handle money amounts up to `999,999.99$` without rejecting them, creating horizontal page overflow, overlapping other content, or hiding actions. The layout may wrap, break long number strings, or adjust text size within readable limits, but it should preserve the full visible money amount with required comma separators.
-
-The user should not be able to paste into main money amount inputs. If the user tries to paste letters, numbers, symbols, or any other content into a main money amount input, the pasted content should not appear, the input should keep its previous value, and no message should appear.
+The user should type only the money amount into the horizontal input square, without the `$` sign. Detailed typing, separator, keyboard, paste, formatting, and layout containment rules for the horizontal input square are in the `Technical` section above.
 
 Under the horizontal input square, the website should show the rectangular `Cent` button.
 
@@ -334,9 +489,7 @@ When there are too many `Balance Changes` entries to fit inside the large square
 
 The dashboard page itself should still be able to scroll past the bottom of the large `Balance Changes` square. The `Savings` section should appear below that large `Balance Changes` square, so the user reaches `Savings` by scrolling the dashboard page down past `Balance Changes`.
 
-Scrolling that starts inside the large `Balance Changes` square should stay inside that square. If the internal entry list is already at the top or bottom, continuing to scroll inside the square should not move the dashboard page. To move the dashboard page down to `Savings` or back up, the user should scroll from an area outside the large `Balance Changes` square.
-
-Every valid `Balance Changes` entry that is still inside its 30-day visible period should remain available inside the scrollable `Balance Changes` square. The first version should not use a smaller maximum visible-entry limit for valid 30-day `Balance Changes` entries.
+Detailed internal scroll containment and valid-entry availability rules are in the `Technical` section above.
 
 Each visible `Balance Changes` row should show the signed money amount, action text, and both the created date and created time for that entry: `+{money amount} added` or `-{money amount} subtracted`, plus the visible created date and created time. A date-only display is not enough. The visible date and time format should use the full month name, day, year, `at`, and 12-hour time with uppercase `AM` or `PM`, like `July 21, 2026 at 3:45 PM`.
 
@@ -348,13 +501,7 @@ Visible `Balance Changes` dates and times should use the user's browser/device l
 
 After a successful `Add` or `Subtract` creates a new `Balance Changes` entry, the `Balance Changes` square should automatically scroll to the top so the newest entry is visible, even if the user had previously scrolled lower in the history list.
 
-Touch users should open the delete action by pressing and holding the `Balance Changes` entry for `600ms`.
-
-Mouse users should open the delete action by clicking and holding the `Balance Changes` entry for `600ms`.
-
-Before the `600ms` hold completes, releasing the press or click, moving the pointer or finger, or starting to scroll should cancel the pending delete action. Canceling the pending hold should not open the little square, change anything, save anything, delete anything, create a `Balance Changes` entry, or show a message.
-
-After the completed `600ms` press-and-hold or click-and-hold, a little square should pop up in the middle of the screen with the exact action texts `Delete` and `Cancel`.
+The user should open the delete action by holding a `Balance Changes` entry. A completed hold should show a little square in the middle of the screen with the exact action texts `Delete` and `Cancel`. Detailed hold duration, cancellation, pointer, and scroll behavior rules are in the `Technical` section above.
 
 Only one `Balance Changes` delete action square should be open at a time.
 
@@ -363,8 +510,6 @@ Clicking `Cancel` in the little square should close the little square without ch
 Clicking or tapping outside the little square should close it without changing anything.
 
 Using the browser Back button, mobile browser back gesture, or system Back action while the little `Delete` and `Cancel` square is open should close that little square, keep the user on the dashboard, change nothing, save nothing, delete nothing, create no `Balance Changes` entry, and show no message.
-
-Moving the pointer or finger should not close the little square after it is open. Scrolling should not close the little square after it is open.
 
 Clicking `Delete` in the little square should close that little square and should not delete the entry immediately. Before deleting a `Balance Changes` entry, the website should ask the user to confirm the delete action.
 
@@ -404,7 +549,7 @@ In its default state, each visible `Saving` square should show the `Saving` name
 
 Clicking a `Saving` square should change that same square into its action state. In the action state, the square should still show the `Saving` name in the top-left corner and the planned money amount on the right side of the same top row, and it should show a `Delete` text action at the bottom center. The thin coverage bar should not be shown while the square is in the action state.
 
-For touch users, a finger movement of more than `8px` before the finger is lifted and before the `600ms` reorder hold completes should count as scrolling, not as a tap. This should cancel the pending tap and any pending reorder hold. The `Saving` square should not open its action state, should not start reorder, should not show a drag placeholder, should not change anything, should not save anything, should not create a `Balance Changes` entry, and should show no message. If the finger is lifted before `600ms` without moving more than `8px`, the touch should count as a tap and should open the action state. If a touch user holds for `600ms` but releases before moving at least `8px`, nothing should happen: the `Saving` square should not open its action state, should not start reorder, should not show a drag placeholder, should not change anything, should not save anything, should not create a `Balance Changes` entry, and should show no message.
+For touch users, a tap should open the `Saving` square action state. Movement that is treated as scrolling or reorder should not open the action state. Detailed touch movement, hold, and reorder thresholds are in the `Technical` section above.
 
 In the action state, clicking the `Saving` name should open the rename flow for that square. Clicking the planned money amount should open the planned-money-amount change flow for that square. Clicking `Delete` should start the delete confirmation for that square. The website should not open a separate action menu or larger action square for rename, planned-money-amount change, and delete.
 
@@ -420,7 +565,7 @@ Opening planned-money-amount change for an existing `Saving` square should repla
 
 If a `Saving` square is in its action state and the user clicks or taps outside that same square, the action state should close and the square should return to its default state. This should change nothing, save nothing, create no `Balance Changes` entry, and show no message. Clicking inside the open action-state square should not count as an outside click. Clicking or tapping a blank part of the same open action-state square should do nothing: the square should stay in action state, nothing should change, nothing should save, no `Balance Changes` entry should be created, and no message should appear. If the user clicks another normal default `Saving` square while one square is already in action state, the old action state should close and the clicked square should not open in its own action state from that same click. The user can click that other square again after no temporary UI is open. Scrolling by itself should not close the action state. Clicking the small `<` sign should clear any open `Saving` square action state as part of returning to the dashboard.
 
-While the user is typing a `Saving` square planned money amount, the input should show the accepted typed value as raw decimal number text. It should accept digits from `0` through `9` and one decimal point. It should block letters, `$` signs, comma separators, a second decimal point, more than two digits after the decimal point, and `Space` with no message. It should not add the `$` sign, comma separators, or automatic two-decimal formatting before `Save`. It should not show a `Cent` button, and the main money amount `Space` key cents behavior should not apply. If there is no decimal point, the typed value should be treated as a whole money amount. If there is one decimal point, digits after the decimal point should be treated as cents. After `Save`, the saved `Saving` square should show the planned money amount with two decimal digits, comma separators when needed, and the `$` sign, so typing `14` becomes `14.00$`, typing `14.5` becomes `14.50$`, typing `5898` becomes `5,898.00$`, and typing `589.80` becomes `589.80$`.
+Detailed planned money amount typing, paste, formatting, and validation order rules are in the `Technical` section above.
 
 If the user tries to save a `Saving` square planned money amount greater than `999,999.99$`, the website should do nothing. No message should appear, the `Saving` square should not be created or changed, saved data should stay unchanged, and `Balance Changes` should not get a new entry.
 
@@ -430,7 +575,7 @@ If the user tries to save a new `Saving` square without a planned money amount, 
 
 The website should trim spaces at the beginning and end of a `Saving` square name before saving it. Spaces inside the trimmed name should stay because the user may write multiple words or sentences.
 
-Very long `Saving` square names should be handled by the square layout. The website should wrap or contain long names so they do not create horizontal page overflow, overlap other square content, or break the `Saving` square layout. The website should not reject a valid `Saving` name only because it is long.
+Very long `Saving` square names should not be rejected only because they are long. Detailed long-name layout containment rules are in the `Technical` section above.
 
 If the user tries to save a new `Saving` square without a `Saving` name, the website should do nothing. No message should appear, no new `Saving` square should be created, saved data should stay unchanged, and the create flow should stay open until the user enters a `Saving` name or cancels creating that square.
 
@@ -440,21 +585,7 @@ If the user enters a duplicate `Saving` name while creating, renaming, or fixing
 
 If the user tries to save a new `Saving` square with a planned money amount of `0.00$` or greater than `999,999.99$`, the website should do nothing. No message should appear, no new `Saving` square should be created, saved data should stay unchanged, `Balance Changes` should not get a new entry, and the same `Saving` square create input step should stay open until the user enters a planned money amount greater than `0.00$` and not greater than `999,999.99$` or cancels.
 
-When a new `Saving` square create attempt has more than one invalid value, the website should check the create inputs in this order:
-
-1. Planned money amount is missing, `0.00$`, or greater than `999,999.99$`.
-2. `Saving` name is missing.
-3. `Saving` name is duplicate.
-
-The first matching rule decides what happens. This means a duplicate `Saving` name with a missing, `0.00$`, or above-limit planned money amount should keep the same `Saving` square create input step open with no message, no saved data change, no new `Saving` square, and no `Balance Changes` entry. The website should check duplicate names only after the planned money amount is greater than `0.00$`, not greater than `999,999.99$`, and the `Saving` name is not empty.
-
-Broken-square fix validation should use the same order as new `Saving` square creation:
-
-1. Planned money amount is missing, `0.00$`, or greater than `999,999.99$`.
-2. `Saving` name is missing.
-3. `Saving` name is duplicate.
-
-The first matching fix rule decides what happens. This means a broken-square fix with a duplicate `Saving` name and a missing, `0.00$`, or above-limit planned money amount should keep the same broken-square fix input step open with no message, no saved data change, no fixed `Saving` square, no `Balance Changes` entry, and the broken `Saving` square still being fixed. The website should check duplicate names for broken-square fix only after the planned money amount is greater than `0.00$`, not greater than `999,999.99$`, and the `Saving` name is not empty.
+Detailed validation order for new `Saving` square creation and broken-square fix is in the `Technical` section above.
 
 When the `Savings money amount` is `0.00$`, it should look the same as other `Savings money amount` values. The website should not use a special color, warning style, error style, icon, or extra message only because the `Savings money amount` is `0.00$`.
 
@@ -472,25 +603,25 @@ A broken `Saving` square should not use any money amount inside `Savings`, shoul
 
 A broken `Saving` square should stay locked in its current displayed position until the user fixes or deletes it. The user should not be able to drag or reorder a broken `Saving` square. Holding, clicking and holding, moving, or dragging a broken `Saving` square should not start reorder, should not show a drag placeholder, should not change anything, should not save anything, should not create a `Balance Changes` entry, and should show no message. Normal default `Saving` squares can still be reordered while broken `Saving` squares are visible, as long as no `Saving` square is in action state, input state, or delete confirmation state. During normal square reorder, broken `Saving` squares should stay in their displayed positions and should continue to be skipped by `Savings money amount`, top needed note, and coverage calculations.
 
-Clicking `Fix` on a broken `Saving` square should change that broken square into a temporary `Saving` input square in the same visible position. The fix input square should ask the user for a valid `Saving` name and planned money amount greater than `0.00$` and not greater than `999,999.99$`. The fix input square should use the same duplicate-name rules as creating and renaming a `Saving` square, including readable saved names from other broken `Saving` squares. The fix input square should not appear as a modal, bottom sheet, or separate page. Saving a fixed `Saving` square should turn the broken square into a normal `Saving` square, keep it in the same visible position when possible, save the repaired data in browser storage, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, and show no message.
+Clicking `Fix` on a broken `Saving` square should change that broken square into a temporary `Saving` input square in the same visible position. The fix input square should ask the user for a valid `Saving` name and planned money amount greater than `0.00$` and not greater than `999,999.99$`. The fix input square should use the same duplicate-name rules as creating and renaming a `Saving` square, including readable saved names from other broken `Saving` squares. The fix input square should not appear as a modal, bottom sheet, or separate page. Saving a fixed `Saving` square should turn the broken square into a normal `Saving` square, keep it in the same visible position when possible, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, and show no message. Detailed repaired-data storage behavior is in the `Technical` section above.
 
-Clicking `Delete` on a broken `Saving` square should use the same small centered `Saving` square delete confirmation with the exact message `Delete this Saving?` and buttons exactly named `Cancel` and `Delete`. Clicking `Cancel` or clicking or tapping outside the small confirmation square should close the confirmation, keep the broken square visible, change nothing, save nothing, create no `Balance Changes` entry, and show no message. Confirming delete should close the confirmation, remove only that broken square, save the change in browser storage, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, update no other `Saving` squares, and offer no undo.
+Clicking `Delete` on a broken `Saving` square should use the same small centered `Saving` square delete confirmation with the exact message `Delete this Saving?` and buttons exactly named `Cancel` and `Delete`. Clicking `Cancel` or clicking or tapping outside the small confirmation square should close the confirmation, keep the broken square visible, change nothing, create no `Balance Changes` entry, and show no message. Confirming delete should close the confirmation, remove only that broken square, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, update no other `Saving` squares, and offer no undo. Detailed broken-square delete storage behavior is in the `Technical` section above.
 
 `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows should show two text actions at the bottom: `Save` and `Cancel`.
 
 In `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows, `Save` should try to save the entered values using the `Saving` square rules. `Cancel` should close the input flow, return to the `Saving` squares view, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
 
-The website should not remember unsaved typed `Saving` input as a draft. If the user refreshes the page, closes the browser tab or window, reopens the website later, cancels the input flow, closes the input flow with `<` or Back, or leaves `Savings` after the input flow has been closed before a successful `Save`, the typed `Saving` name and planned money amount should be discarded. The next website load or next time the user opens `Savings` should show only the last successfully saved data, should not create a `Balance Changes` entry, should not show a browser leave warning, and should show no message.
+The website should not remember unsaved typed `Saving` input as a draft. If the user refreshes the page, closes the browser tab or window, reopens the website later, cancels the input flow, closes the input flow with `<` or Back, or leaves `Savings` after the input flow has been closed before a successful `Save`, the typed `Saving` name and planned money amount should be discarded. The next website load or next time the user opens `Savings` should show only the last successfully saved data, should not create a `Balance Changes` entry, should not show a browser leave warning, and should show no message. Detailed draft storage and save-failure behavior is in the `Technical` section above.
 
-The user should be able to change the order of normal default `Saving` squares by holding the whole `Saving` square for `600ms`, then moving it. Mouse users should be able to reorder by clicking and holding the whole `Saving` square for `600ms`, then dragging it. For touch users, moving the finger more than `8px` before the `600ms` hold completes should be treated as scrolling and should cancel the pending reorder hold. After the `600ms` hold completes without being canceled, dragging should start only after the pointer or finger moves at least `8px`. If a touch or mouse user holds for `600ms` but releases before moving at least `8px`, nothing should happen: no action state, no reorder, no drag placeholder, no saved change, no `Balance Changes` entry, and no message. Holding or dragging a `Saving` square should not open rename, planned-money-amount change, or delete.
+The user should be able to change the order of normal default `Saving` squares by holding and moving the whole `Saving` square. Holding or dragging a `Saving` square should not open rename, planned-money-amount change, or delete. Detailed hold, movement, and cancellation thresholds are in the `Technical` section above.
 
 Broken `Saving` squares should not be part of the reorder action until they are fixed. Reordering normal default `Saving` squares should not move, repair, delete, or update broken `Saving` squares.
 
-While dragging, the dragged `Saving` square should follow the user's finger or mouse pointer. The old position should show a placeholder the same size as the dragged square. If the user's finger or mouse pointer is within `40px` of the top or bottom edge of the scrollable `Saving` squares area during reorder, that area should auto-scroll at a fixed speed of `8px` per animation frame so the user can move the square farther up or down. Top and bottom auto-scroll should use the same `40px` trigger distance and the same fixed `8px`-per-frame speed. The auto-scroll speed should not change based on how close the finger or pointer is to the edge. If the user's finger or mouse pointer leaves the screen, the browser window loses focus, or the drag is interrupted before the square is dropped, the reorder should be canceled. The square should return to its original position, the drag placeholder should be removed, any reorder auto-scroll should stop, nothing should save, no `Balance Changes` entry should be created, and no message should appear.
+Detailed drag placeholder, auto-scroll, and interrupted reorder rules are in the `Technical` section above.
 
 Reordering should be disabled while any `Saving` square is in action state, input state, or delete confirmation state. The user should close, cancel, save, or finish that state before reordering.
 
-When the user finishes moving a `Saving` square and lets go, the website should save the new order in browser storage.
+When the user finishes moving a `Saving` square and lets go, the new order should be kept. Detailed order storage rules are in the `Technical` section above.
 
 After the move finishes, the money amount shown inside `Savings` and the coverage bars should recalculate from the new visible order of normal `Saving` squares, skipping any broken `Saving` squares.
 
@@ -546,110 +677,3 @@ If the same click or tap is already defined as an outside-click close or outside
 Actions inside the current temporary UI may replace it with the next step of the same flow. For example, clicking a main money action button may replace the main money action buttons with the selected input flow, clicking `Delete` in a `Balance Changes` delete action square may replace it with the `Balance Changes` delete confirmation, and clicking the `Saving` name, planned money amount, or `Delete` inside a `Saving` square action state may replace that action state with the matching input flow or delete confirmation. The previous temporary UI should close or be replaced first, so only one temporary UI is visible at once.
 
 If the user refreshes the page, closes the browser tab or window, or reopens the website later while any temporary UI is open, the temporary UI should be silently discarded. The next load should show the latest successfully saved data with no temporary UI open. The website should not restore the open temporary UI, should not save unsaved typed input, should not confirm a pending delete, should not save a pending reorder, should not create a `Balance Changes` entry, should not show a message, and should not show a browser leave warning.
-
-## Technical
-
-This final section collects technical-spec material that is still being tracked in the business spec for review. These items are storage, validation, data model, implementation, or HTML/CSS detail rules rather than business-level requirements.
-
-### Browser Storage And Data Format
-
-Saved browser storage money amount values are internal and should use normalized plain decimal strings without the `$` sign or comma separators, such as `0.00`, `5.00`, `5895.50`, and `999999.99`. User-facing website display should still add comma separators and the `$` sign, such as `5,895.50$`.
-
-The implementation should use the stable storage key `cash-money-organizer-website-data` and the first data version value `1`.
-
-The first version should load saved browser data only when the data version value is exactly `1`. A saved current money amount is valid only when it is a normalized plain decimal string from `0.00` through `999999.99`, with no `$` sign, no comma separators, exactly two digits after the decimal point, and no unneeded leading zeros before the decimal point except the single `0` in `0.00`. Saved browser data with a missing, wrong, future, unreadable, or unrecognized data version, or a saved current money amount outside that range or not in that exact saved format, should be treated as broken saved data. Examples of broken saved current money amount values include `5`, `5.0`, `005.00`, `5,000.00`, `5.000`, `1000000.00`, and `-5.00`.
-
-If saved browser data is broken or cannot be read, the website should show `Saved data could not be loaded.` with a `Start again` action. When the user chooses `Start again`, the website should delete the broken saved data and immediately create fresh browser storage data with the saved money amount set to `0.00`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`.
-
-When no saved data exists yet, the website should show the default `0.00$` money amount without saving it just because the website opened. The website should start saving data after the first successful saved user action. In the normal first money flow, this is the first successful `Add`.
-
-If browser storage is unavailable, full, blocked, or fails while saving a valid user action, the website should block that action. The visible money amount, `Balance Changes`, `Savings`, and saved data should stay on the last successfully saved state. The website should show the exact message `Changes could not be saved.`.
-
-A user action should count as a successful saved user action only after the required browser storage write succeeds. If saving fails, the website should not create, update, delete, or reorder saved data, should not create a `Balance Changes` entry, should not run `Balance Changes` cleanup as a successful saved action, and should not show the changed result as saved.
-
-If saving fails from a main money amount input flow, the same input flow should stay open with the same typed value so the user can try again or cancel. If saving fails from a `Saving` square create, rename, planned-money-amount change, or broken-square fix input flow, the same input flow should stay open with the same typed values. If saving fails while confirming a `Saving` square delete or `Balance Changes` delete, the confirmation should stay open and the selected item should stay visible. If saving fails after a completed `Saving` square reorder, the visible order should return to the last successfully saved order.
-
-If the same website is open in multiple tabs or windows in the same browser, a successful saved change in one tab or window should automatically update the other open tabs or windows to the latest saved data. The other tabs or windows should update the visible money amount, `Balance Changes`, `Savings`, `Savings money amount`, top needed text, and coverage bars from the latest saved browser data.
-
-This same-browser tab or window update should happen silently. It should not show a message, should not create a `Balance Changes` entry, and should not write browser storage again just because another tab or window changed the saved data.
-
-If another open tab or window has a temporary UI open when the latest saved data arrives, that temporary UI should close like a cancel. Any unsaved typed input in that tab or window should be discarded, nothing should save from that tab or window, nothing should be deleted from that tab or window, no `Balance Changes` entry should be created from that tab or window, and the tab or window should show the latest saved data.
-
-A no-action `Modify` attempt using the same money amount that is already shown should not create or update browser storage and should not run `Balance Changes` cleanup.
-
-### Input And Temporary State Rules
-
-Keyboard use is required only for typing inside money amount inputs and `Saving` square inputs, including the specified `Space` key behavior inside main money amount inputs.
-
-The first version does not need custom keyboard navigation for clickable controls, custom `Tab` order rules, `Enter` or `Space` activation rules for clickable controls, focus-return rules after save/cancel/delete, or keyboard support for reordering `Saving` squares.
-
-The user should not be able to paste into `Saving` square planned money amount inputs. If the user tries to paste letters, numbers, symbols, or any other content into a planned money amount input, the pasted content should not appear, the input should keep its previous value, and no message should appear.
-
-The website should not save draft `Saving` input in browser storage. If a valid `Saving` input save fails, the same input flow should stay open with the same typed values so the user can try again or cancel.
-
-### Balance Changes Data And Storage Rules
-
-When saved browser data can be loaded but one saved `Balance Changes` entry is broken, the website should keep the rest of the saved data and remove only the broken entry from `Balance Changes`. It should not show the full saved-data error message, should not show a broken history row, should not change the main money amount, should not change `Savings`, and should show no message to the user.
-
-A saved `Balance Changes` entry should count as broken if it has a missing ID, duplicate ID, missing or invalid action type, missing or invalid money amount, missing or invalid previous money amount, missing or invalid new money amount, missing created date or created time, invalid created date or created time, missing or invalid internal exact created date and time, or missing or invalid visible-until date and time. For duplicate IDs, the first matching saved `Balance Changes` entry in the saved list order should stay if it is otherwise valid, and later matching entries should be removed.
-
-`Balance Changes` entries should be ordered newest first by their internal exact created date and time. The newest change should appear at the top of the list, and older changes should go lower. If two entries have the exact same internal exact created date and time, the entry that appears earlier in the saved list order should appear first. New entries should be saved before older entries in the saved list so this tie-breaker still keeps older changes lower.
-
-Old visible history entries should be deleted from browser storage during cleanup after 30 days without changing the saved money amount.
-
-Dates and times should matter for showing when visible `Balance Changes` entries were created, ordering entries, and clearing old visible `Balance Changes` entries after 30 days. When a `Balance Changes` entry is created, the website should save both the visible created date and visible created time using the user's browser/device local date and time, show both values in the visible row, and also save an internal exact created date and time with seconds and milliseconds using the same browser/device local date and time rule. The internal exact created date and time should be used for ordering and for calculating the internal visible-until date and time. The visible row should still show only the minute-level format, like `July 21, 2026 at 3:45 PM`.
-
-Visible `Balance Changes` rows should not show the internal exact created date and time, seconds, milliseconds, or the internal visible-until date and time.
-
-The website should run `Balance Changes` cleanup when it opens and loads saved data, and after every successful saved user action. During cleanup, broken saved entries and entries at or after their visible-until date and time should be deleted from browser storage and removed from the visible history list.
-
-The first version does not need a background timer that checks old `Balance Changes` entries while the website stays open with no user action. If the website stays open past an entry's visible-until date and time, that old entry may remain visible until the next website open or successful saved user action runs cleanup.
-
-### Savings Data And Storage Rules
-
-Planned money amounts in `Saving` squares should use the planned-money amount display format: `0.00$` for zero, two decimal digits for nonzero whole money amounts such as `14.00$`, two decimal digits for nonzero money amounts with cents such as `14.50$`, and comma separators for planned money amounts of `1,000.00$` or more such as `5,895.50$`. Browser storage should save `Saving` square planned money amounts as normalized plain decimal strings without the `$` sign or comma separators, such as `14.50` or `5895.50`. A planned money amount should not be greater than `999,999.99$`.
-
-In the first version, `Saving` squares should not save or show a created date or updated date.
-
-Duplicate-name checks should include all normal `Saving` squares and any visible broken saved `Saving` square whose saved name can be read and is not empty after trimming spaces. A broken `Saving` square with a readable saved name should reserve that name until it is fixed or deleted.
-
-During a broken-square fix, the broken `Saving` square being fixed should not count as a duplicate against itself. Normal `Saving` squares and other broken `Saving` squares with the same trimmed name should still block the fix.
-
-A saved `Saving` square should count as broken if it has a missing or empty name, duplicate name, missing or invalid planned money amount, planned money amount of `0.00$` or less, planned money amount greater than `999,999.99$`, missing or invalid order, duplicate order, missing ID, or duplicate ID.
-
-Saving a fixed `Saving` square should turn the broken square into a normal `Saving` square, keep it in the same visible position when possible, save the repaired data in browser storage, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, and show no message.
-
-Confirming delete for a broken `Saving` square should close the confirmation, remove only that broken square, save the change in browser storage, recalculate the `Savings money amount`, top needed note, and coverage bars, create no `Balance Changes` entry, update no other `Saving` squares, and offer no undo.
-
-Normal `Saving` square order should be saved in browser storage so the same normal square order appears after refresh.
-
-Intermediate drag positions should not be saved as the source of truth. When the user finishes moving a `Saving` square and lets go, the website should save the final visible order in browser storage.
-
-The implementation should not persist temporary UI state in browser storage. This includes visible main money action buttons, selected main money action input flow state, accepted typed input, `Balance Changes` delete action square state, `Balance Changes` delete confirmation state, `Saving` square action state, `Saving` input flow state, `Saving` delete confirmation state, pending hold state, active reorder drag state, selected delete targets, and temporary reorder positions.
-
-### HTML/CSS Open Questions
-
-- Grey zone: The exact main money amount circle size and position across mobile and desktop is not fully defined. The specs say the main money amount should be the most visible information and should stay contained with large money amounts, but they do not define the exact circle size, screen position, or responsive sizing rules.
-- Grey zone: The exact `Current Balance` label placement is not fully defined. The specs define `Current Balance` as the user-facing label for the main money amount, but they do not define whether that label appears inside the circle, above the circle, below the circle, or beside the money amount on mobile and desktop.
-- Grey zone: The exact main money action button placement is not fully defined. The specs say `Add`, `Subtract`, and `Modify` should appear as horizontal buttons near the main money amount and define their left-to-right order, but they do not define whether the button row appears above, below, overlapping, or beside the main money amount circle on mobile and desktop.
-- Grey zone: The main money amount visual state at `0.00$` is not fully defined. The specs define what actions are available at `0.00$`, but they do not define whether the main money amount should look the same as other money amount values or use a special visual style when it is `0.00$`.
-- Grey zone: The exact `Balance Changes` square size across mobile and desktop is not fully defined. The specs say it should be a large square and use most of the dashboard page space under the main money amount, but they do not define exact height, width, minimum size, maximum size, or responsive sizing rules.
-- Grey zone: The exact `Balance Changes` label placement is not fully defined. The specs define `Balance Changes` as the user-facing history label and say the area appears directly under the main money amount, but they do not define whether the label appears inside the large square, above the large square, fixed at the top of the square, or as a normal page heading.
-- Grey zone: The visual style for added and subtracted `Balance Changes` entries is not fully defined. The specs define the exact signed text, compact layout, and date/time display, but they do not define whether added and subtracted entries should use the same color/style or different visual styles.
-- Grey zone: The delete confirmation display for `Balance Changes` is not fully defined. The specs define the confirmation message `Delete this Balance Change?` and the buttons `Cancel` and `Delete`, but they do not define whether the confirmation appears as a small centered square, a modal, inside the history area, or another layout.
-- Grey zone: The dashboard `Savings` entry layout is not fully defined. The specs say the user clicks `Savings` below the `Balance Changes` area to open the full-screen `Savings` view, but they do not define whether `Savings` looks like a button, a section row, a simple text link, or another clickable shape.
-- Grey zone: The exact full-screen `Savings` top area layout is not fully defined. The specs say the small `<`, `Savings money amount`, and optional `{money amount} needed` text stay fixed at the top, but they do not define the exact alignment, spacing, height, or visual weight of that top area.
-- Grey zone: The exact `Saving` square size and spacing is not fully defined. The specs say visible `Saving` squares appear in one vertical column on mobile and desktop, but they do not define the exact square width, minimum height, gaps between squares, or responsive sizing rules.
-- Grey zone: The exact temporary input square field layout is not fully defined. The specs say create, rename, planned-money-amount change, and broken-square fix happen inside a temporary input square, but they do not define the exact order, labels, spacing, and mobile or desktop arrangement of the input fields and `Save` / `Cancel` buttons.
-- Grey zone: Long `Saving` names beside planned money amounts are not fully defined. The specs say the square shows the name on the left and planned money amount on the right, but they do not define whether very long names wrap, shrink, truncate, or make the square taller.
-- Grey zone: The exact `Saving` coverage bar visuals are not fully defined. The specs say each `Saving` square has a thin grey bar filled with green from left to right, but they do not define the exact thickness, colors, corner style, or whether the fill changes instantly or with animation.
-- Grey zone: The normal `Saving` square visual style is not fully defined. The specs define the text and coverage bar inside each square, but they do not define the exact background, border, corner radius, shadow, or text size for the square itself.
-- Grey zone: The `Saving` square action-state visual style is not fully defined. The specs say the same square shows the `Saving` name, planned money amount, and `Delete`, and hides the coverage bar, but they do not define whether the square should change color, border, height, spacing, or highlight while it is in action state.
-- Grey zone: `Saving` square drag placeholder appearance is not fully defined. The specs say the old position should show a placeholder the same size as the dragged square, but they do not define whether that placeholder is empty, dimmed, outlined, or contains copied square content.
-- Grey zone: `Saving` square drag visual feedback is not fully defined. The specs say the dragged square follows the user's finger or mouse pointer, but they do not define whether the dragged square should use opacity, shadow, scaling, or another visible dragging style.
-- Grey zone: The exact overall visual design system is not fully defined. The specs say the website should feel calm, practical, trustworthy, and bank-like without pretending to be a real bank, but they do not define the exact color palette, typography, spacing scale, border style, or shared component style.
-- Grey zone: Responsive breakpoints are not fully defined. The specs say the website should work on mobile and desktop, but they do not define the exact screen widths where layout rules should change.
-- Grey zone: The first loading state is not fully defined. The specs define what should happen after saved browser data is loaded or found broken, but they do not define what the user should see during the short moment while the website is checking saved data.
-- Grey zone: The `Changes could not be saved.` message display is not fully defined. The specs define the exact message and when it appears, but they do not define where it appears, whether it stays until the next action, whether the user can dismiss it, or whether it disappears automatically.
-- Grey zone: The full broken saved-data recovery display is not fully defined. The specs define `Saved data could not be loaded.` and `Start again`, but they do not define whether that recovery UI appears as a full screen, centered panel, dashboard replacement, or another layout.
-- Grey zone: Overall accessibility expectations are not fully defined. The specs define that the first version is mainly for mouse clicks and finger taps, with keyboard typing inside inputs, but they do not define screen reader labels, minimum contrast, reduced-motion behavior, or other non-keyboard accessibility rules.

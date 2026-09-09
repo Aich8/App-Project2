@@ -3,11 +3,12 @@
 Status: Active
 
 Source specs:
-- `docs/specs/business/cash-money-organizer-website.md`
-- `docs/specs/global.md`
-- `docs/specs/functional-map.md`
-- `docs/specs/functional/functional1.md`
-- `docs/specs/technical/technical1.md`
+- `docs/specs/accepted/GLOBAL-SPEC-002-manual-cash-tracker.md`
+- `docs/specs/accepted/FEATURE-SPEC-001-adding-money.md`
+- `docs/specs/accepted/FEATURE-SPEC-002-subtracting-money.md`
+- `docs/specs/accepted/FEATURE-SPEC-003-modifying-the-money-amount.md`
+
+No TechnicalSpec is currently accepted for this plan. Other planned feature behavior is not a source of truth until it is covered by explicitly approved FeatureSpecs.
 
 ## Goal
 
@@ -698,7 +699,7 @@ Tasks:
 Acceptance criteria:
 - A user can open the website, see `0.00$`, add cash, subtract cash, create a `Saving` square, and review `Balance Changes`.
 - No real banking language or fake account behavior is present.
-- The MVP satisfies the business spec's first-version goals.
+- The MVP satisfies the accepted `GlobalSpec` direction and `FeatureSpec` requirements for the first version.
 
 ## Main User Flow
 
