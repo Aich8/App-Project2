@@ -106,7 +106,7 @@ Do not recreate the old folders `WebSite Project/`, `BUSINESS-Specs.md/`, root `
 - Do not add email accounts, login, cloud sync, or server database unless explicitly requested.
 - Do not assume users update money on a regular schedule; the website should work for rare use and very frequent use.
 - `Add` and `Subtract` should show separate signed history entries.
-- `Add` and `Subtract` history entries should stay visible for one month.
+- `Add` and `Subtract` history entries should stay visible for 30 days.
 - Subtracting more than the current money amount should set the money amount to `$0`, not a negative amount.
 - Subtracting when the current money amount is already `$0` should not create a history entry.
 - `Modify` should silently correct the current money amount without creating history, activity, or notification entries.

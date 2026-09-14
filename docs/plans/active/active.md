@@ -7,6 +7,23 @@ Source specs:
 - `docs/specs/accepted/FEATURE-SPEC-001-adding-money.md`
 - `docs/specs/accepted/FEATURE-SPEC-002-subtracting-money.md`
 - `docs/specs/accepted/FEATURE-SPEC-003-modifying-the-money-amount.md`
+- `docs/specs/accepted/FEATURE-SPEC-004-viewing-balance-changes.md`
+- `docs/specs/accepted/FEATURE-SPEC-005-deleting-a-balance-change.md`
+- `docs/specs/accepted/FEATURE-SPEC-006-viewing-savings.md`
+- `docs/specs/accepted/FEATURE-SPEC-007-creating-a-saving.md`
+- `docs/specs/accepted/FEATURE-SPEC-008-opening-saving-actions.md`
+- `docs/specs/accepted/FEATURE-SPEC-009-renaming-a-saving.md`
+- `docs/specs/accepted/FEATURE-SPEC-010-changing-the-planned-money-amount-of-a-saving.md`
+- `docs/specs/accepted/FEATURE-SPEC-011-deleting-a-saving.md`
+- `docs/specs/accepted/FEATURE-SPEC-012-reordering-saving-squares.md`
+- `docs/specs/accepted/FEATURE-SPEC-013-viewing-savings-coverage.md`
+- `docs/specs/accepted/FEATURE-SPEC-014-recovering-unreadable-saved-data.md`
+- `docs/specs/accepted/FEATURE-SPEC-015-fixing-a-saving-that-could-not-be-loaded.md`
+- `docs/specs/accepted/FEATURE-SPEC-016-handling-changes-that-cannot-be-saved.md`
+- `docs/specs/accepted/FEATURE-SPEC-017-discarding-unfinished-actions-after-refresh-or-reopen.md`
+- `docs/specs/accepted/FEATURE-SPEC-018-updating-other-open-tabs-and-windows.md`
+- `docs/specs/accepted/FEATURE-SPEC-019-keeping-one-action-open-at-a-time.md`
+- `docs/specs/accepted/FEATURE-SPEC-020-opening-main-money-actions.md`
 
 No TechnicalSpec is currently accepted for this plan. Other planned feature behavior is not a source of truth until it is covered by explicitly approved FeatureSpecs.
 
