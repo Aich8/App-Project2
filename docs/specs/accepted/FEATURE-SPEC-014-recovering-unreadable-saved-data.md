@@ -27,7 +27,16 @@ Recovery starts the website again with empty information.
 - A user with valid saved information does not see `Start again`.
 - A user with no saved information sees the normal dashboard with the main money amount at `0.00$`.
 - `Start again` is not available as a normal reset or clear-all action.
-- One broken item does not cause full recovery when the rest of the saved information can still be loaded.
+- One or more broken list entries do not cause full recovery when the rest of the saved information can still be loaded.
+
+## Broken Balance Changes Entries
+
+- If one or more saved `Balance Changes` entries cannot be loaded but the rest of the saved information can be loaded, the website removes every broken entry.
+- Each broken entry is handled independently, so one broken entry does not remove another usable entry.
+- All usable `Balance Changes` entries stay available.
+- The main money amount, `Savings`, and all other saved information stay unchanged.
+- The broken entries are not shown and do not return after refresh, close, or later reopen.
+- No error message, recovery state, or `Start again` action is shown for those broken entries.
 
 ## Choosing Start Again
 
@@ -52,6 +61,16 @@ Recovery starts the website again with empty information.
 - The exact message `Changes could not be saved.` is shown.
 - The user can choose `Start again` to try again.
 
+## Failure Message Lifetime
+
+- After a failed `Start again` attempt, `Changes could not be saved.` remains visible while the same recovery state remains open.
+- The message does not disappear by itself.
+- Choosing `Start again` again removes the previous failure message while the new attempt is being made.
+- If the new attempt also fails, the message appears again.
+- If recovery succeeds, the recovery state closes and the message is removed.
+- If recovery closes for any other reason, the message is removed.
+- Refreshing, closing, or later reopening the website starts a new recovery state without the previous failure message.
+
 ## Acceptance Expectations
 
 - Unreadable saved information shows `Saved data could not be loaded.` and `Start again`.
@@ -60,3 +79,7 @@ Recovery starts the website again with empty information.
 - Recovery permanently removes the unreadable saved information without creating a history entry.
 - Failed recovery keeps the recovery state and unreadable information unchanged.
 - A failed recovery shows `Changes could not be saved.` and allows another attempt.
+- The failure message remains until another attempt begins or recovery closes.
+- A failed new attempt shows the message again, while a successful attempt removes it.
+- A later new recovery state does not restore an earlier failure message.
+- Every broken `Balance Changes` entry is removed independently without removing usable entries, changing anything else, or showing an error.

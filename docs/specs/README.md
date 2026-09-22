@@ -76,26 +76,34 @@ Do not infer approval from silence, discussion, review feedback, or a request to
 - `accepted/FEATURE-SPEC-001-adding-money.md`: user-visible behavior and rules for manually adding money.
 - `accepted/FEATURE-SPEC-002-subtracting-money.md`: user-visible behavior and rules for manually subtracting money.
 - `accepted/FEATURE-SPEC-003-modifying-the-money-amount.md`: user-visible behavior and rules for silently correcting the complete money amount.
-- `accepted/FEATURE-SPEC-004-viewing-balance-changes.md`: user-visible behavior and rules for reviewing successful `Add` and `Subtract` actions from the last 30 days.
+- `accepted/FEATURE-SPEC-004-viewing-balance-changes.md`: user-visible behavior and rules for reviewing successful `Add` and `Subtract` actions, including exact entry text, fixed English date-and-time output, 720-hour visibility, and newest-entry scrolling.
 - `accepted/FEATURE-SPEC-005-deleting-a-balance-change.md`: user-visible behavior and rules for deleting one `Balance Changes` entry.
 - `accepted/FEATURE-SPEC-006-viewing-savings.md`: user-visible behavior and rules for opening, viewing, and leaving the `Savings` planning section.
-- `accepted/FEATURE-SPEC-007-creating-a-saving.md`: user-visible behavior and rules for creating one new `Saving` square.
+- `accepted/FEATURE-SPEC-007-creating-a-saving.md`: user-visible behavior and rules for creating one new `Saving` square, including planned-money typing, last-place insertion, and save-failure message lifetime.
 - `accepted/FEATURE-SPEC-008-opening-saving-actions.md`: user-visible behavior and rules for opening the available actions of one existing `Saving` square.
 - `accepted/FEATURE-SPEC-009-renaming-a-saving.md`: user-visible behavior and rules for renaming one existing `Saving`.
 - `accepted/FEATURE-SPEC-010-changing-the-planned-money-amount-of-a-saving.md`: user-visible behavior and rules for changing the planned money amount of one existing `Saving`.
 - `accepted/FEATURE-SPEC-011-deleting-a-saving.md`: user-visible behavior and rules for deleting one existing `Saving`.
 - `accepted/FEATURE-SPEC-012-reordering-saving-squares.md`: user-visible behavior and rules for changing the order of existing `Saving` squares.
 - `accepted/FEATURE-SPEC-013-viewing-savings-coverage.md`: user-visible behavior and rules for viewing how the main money amount covers `Saving` plans.
-- `accepted/FEATURE-SPEC-014-recovering-unreadable-saved-data.md`: user-visible behavior and rules for recovering when saved website data cannot be loaded as a whole.
-- `accepted/FEATURE-SPEC-015-fixing-a-saving-that-could-not-be-loaded.md`: user-visible behavior and rules for fixing one saved `Saving` that cannot be loaded normally.
+- `accepted/FEATURE-SPEC-014-recovering-unreadable-saved-data.md`: user-visible behavior and rules for whole-data recovery, `Start again` failure-message timing, and silently removing every broken `Balance Changes` entry when everything else remains usable.
+- `accepted/FEATURE-SPEC-015-fixing-a-saving-that-could-not-be-loaded.md`: user-visible behavior and rules for fixing one saved `Saving` that cannot be loaded normally, including empty starting inputs, save-failure message lifetime, an unavailable target, and complete-list revalidation.
 - `accepted/FEATURE-SPEC-016-handling-changes-that-cannot-be-saved.md`: shared user-visible behavior when the website cannot keep a requested change.
 - `accepted/FEATURE-SPEC-017-discarding-unfinished-actions-after-refresh-or-reopen.md`: shared user-visible behavior for unfinished actions after refresh, close, or later reopen.
 - `accepted/FEATURE-SPEC-018-updating-other-open-tabs-and-windows.md`: user-visible behavior for automatically updating other open copies of the website in the same browser.
 - `accepted/FEATURE-SPEC-019-keeping-one-action-open-at-a-time.md`: shared user-visible behavior for allowing only one unfinished action to be open at a time.
 - `accepted/FEATURE-SPEC-020-opening-main-money-actions.md`: user-visible behavior for opening, choosing, and closing the actions available for the main money amount.
-
-No TechnicalSpec is currently accepted.
+- `accepted/FEATURE-SPEC-021-entering-main-money-amounts.md`: shared user-visible controls and interaction rules for entering a money amount in the `Add`, `Subtract`, and `Modify` flows.
+- `accepted/FEATURE-SPEC-022-viewing-the-dashboard.md`: user-visible behavior for initial loading and the normal dashboard, including the main money amount, recent money changes, and access to `Savings`.
+- `accepted/TECHNICAL-SPEC-001-main-money-amount-entry-state.md`: internal representation, formatting, state transitions, and browser input handling for `FEATURE-SPEC-021`.
+- `accepted/TECHNICAL-SPEC-002-balance-changes-records-and-retention.md`: stored records, exact output formatting, ordering, 720-hour retention, expiration checks, and newest-entry scrolling for `FEATURE-SPEC-004`.
+- `accepted/TECHNICAL-SPEC-003-saving-data-and-creation.md`: saved `Saving` records, temporary creation input, normalization, validation, last-place insertion, failure-message state, and creation results for `FEATURE-SPEC-007`.
+- `accepted/TECHNICAL-SPEC-004-savings-coverage-calculations.md`: exact ordered coverage calculations, remaining `Savings money amount`, and overall amount needed for `FEATURE-SPEC-013`.
+- `accepted/TECHNICAL-SPEC-005-detecting-and-repairing-a-broken-saving.md`: saved-record validation, broken-slot isolation, fix state and validation, safe order allocation, complete-list revalidation, and atomic replacement for `FEATURE-SPEC-015`.
+- `accepted/TECHNICAL-SPEC-006-safe-browser-storage-writes-and-rollback.md`: complete-candidate browser-storage writes, failure isolation, commit handling, and rollback by discarding an unsuccessful candidate for `FEATURE-SPEC-016`.
+- `accepted/TECHNICAL-SPEC-007-loading-validating-and-recovering-saved-data.md`: version-1 saved data, safe loading and validation, item recovery, silent cleanup, and `Start again` execution for `FEATURE-SPEC-014`.
 
 ## Current Draft Specs
 
-There are currently no numbered draft specifications.
+- `drafts/TECHNICAL-SPEC-008-temporary-action-lifetime-and-discard.md`: proposed in-memory boundary and lifecycle discard rules for unfinished actions under `FEATURE-SPEC-017`.
+- `drafts/TECHNICAL-SPEC-009-same-browser-save-coordination-and-updates.md`: proposed exclusive save coordination, stale-write prevention, and received-update handling for `FEATURE-SPEC-018`.

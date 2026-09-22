@@ -45,6 +45,11 @@ A `Saving` records a name and a planned money amount. It does not move cash or c
 - A `Saving` can be for more money than the user currently has. The remaining part is shown as still needed.
 - A `Saving` is only a plan. Creating it does not change the main money amount.
 
+## Entering The Planned Money Amount
+
+- The planned money amount uses the same typing and paste rules as the `Entering The New Amount` section of [`FEATURE-SPEC-010: Changing The Planned Money Amount Of A Saving`](FEATURE-SPEC-010-changing-the-planned-money-amount-of-a-saving.md#entering-the-new-amount).
+- Creation still uses this spec's saved-value rules: `0.00$` is invalid and does not create a `Saving`.
+
 ## Invalid Save Attempts
 
 - The planned money amount is checked before the `Saving` name.
@@ -70,7 +75,9 @@ A `Saving` records a name and a planned money amount. It does not move cash or c
 
 - One new `Saving` square is created with the saved name and planned money amount.
 - The name is saved after spaces at its beginning and end are removed.
-- The new `Saving` becomes available to review inside `Savings`.
+- The new `Saving` is placed after all existing `Saving` squares.
+- Existing `Saving` squares keep their current order.
+- The new `Saving` has the last coverage priority until the user reorders it.
 - The creation flow closes and returns to the `Savings` view.
 - The main money amount remains unchanged.
 - No `Balance Changes` entry is created, and no success message is shown.
@@ -81,13 +88,24 @@ A `Saving` records a name and a planned money amount. It does not move cash or c
 - Existing `Saving` squares and the main money amount remain unchanged.
 - The exact message `Changes could not be saved.` is shown.
 - The creation flow stays open with the entered name and money amount, so the user can try `Save` again or choose `Cancel`.
+- The message remains while the user leaves the failed creation flow unchanged.
+- Changing the entered name or making an accepted change to the entered planned money amount removes the previous message.
+- Rejected planned money amount input does not remove the message because it does not change the entered amount.
+- Choosing `Save` again removes the previous message while the new attempt is made.
+- If the new attempt also fails, the message appears again.
+- A successful retry closes the creation flow and removes the message.
+- Canceling, using either Back action, refreshing, closing, reopening, or receiving newer saved information from another open tab or window removes the message by closing or discarding the flow.
+- A later new creation flow starts without the previous message.
 
 ## Acceptance Expectations
 
 - A valid name and planned money amount create exactly one new `Saving`.
 - The name is saved without surrounding spaces and is unique inside `Savings`.
+- Planned money amount entry follows the same typing and paste rules as changing a planned money amount, while creation still rejects `0.00$`.
 - Invalid planned money amounts and missing names keep creation open without creating a `Saving`.
 - A duplicate name closes creation without creating a `Saving`.
+- A new `Saving` is last in the existing order and has the last coverage priority until reordered.
 - Canceling or leaving the creation flow keeps existing information unchanged.
 - Creating a `Saving` never changes the main money amount or creates a `Balance Changes` entry.
 - A failed creation keeps the entered information available for another attempt.
+- The previous save-failure message disappears after an accepted edit, a retry, or closure, and appears again if the retry fails.

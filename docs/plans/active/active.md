@@ -24,8 +24,17 @@ Source specs:
 - `docs/specs/accepted/FEATURE-SPEC-018-updating-other-open-tabs-and-windows.md`
 - `docs/specs/accepted/FEATURE-SPEC-019-keeping-one-action-open-at-a-time.md`
 - `docs/specs/accepted/FEATURE-SPEC-020-opening-main-money-actions.md`
+- `docs/specs/accepted/FEATURE-SPEC-021-entering-main-money-amounts.md`
+- `docs/specs/accepted/FEATURE-SPEC-022-viewing-the-dashboard.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-001-main-money-amount-entry-state.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-002-balance-changes-records-and-retention.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-003-saving-data-and-creation.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-004-savings-coverage-calculations.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-005-detecting-and-repairing-a-broken-saving.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-006-safe-browser-storage-writes-and-rollback.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-007-loading-validating-and-recovering-saved-data.md`
 
-No TechnicalSpec is currently accepted for this plan. Other planned feature behavior is not a source of truth until it is covered by explicitly approved FeatureSpecs.
+Other planned technical behavior is not a source of truth until it is covered by explicitly approved TechnicalSpecs.
 
 ## Goal
 
@@ -38,7 +47,7 @@ The MVP should help a user:
 - Add money manually while the money amount is less than `999,999.99$`, use `Subtract` after the money amount is greater than `0.00$`, and see all three actions when the money amount is greater than `0.00$` and less than `999,999.99$`.
 - Use `Subtract` and `Modify`, without `Add`, when the money amount is exactly `999,999.99$`.
 - Correct mistakes with `Modify` at any valid money amount from `0.00$` through `999,999.99$`.
-- See 30-day visible money amount change history directly under the main money amount.
+- Review 30-day visible money amount change history from the dashboard.
 - Keep saved money data after closing and reopening the website when saved data is available.
 - Organize the `Savings` section into user-named `Saving` squares.
 - See which `Saving` squares are fully covered, partly covered, or not covered.
@@ -61,7 +70,7 @@ Included in the first version:
 - Add money flow with amount.
 - Subtract money flow with amount.
 - Silent modify flow with corrected total amount.
-- 30-day visible money amount change history shown in a large scrollable `Balance Changes` square directly under the main money amount, where each add and subtract action stays as its own entry and `Savings` appears below that square.
+- 30-day visible money amount change history available in the dashboard's `Balance Changes` section, where each add and subtract action stays as its own entry, every current entry remains reachable, and the `Savings` action remains reachable whether history is empty or contains entries.
 - Newest `Balance Changes` entries shown first.
 - Full-screen `Savings` planning view with a money amount shown inside `Savings` using the label `Savings money amount`, a fixed top `Savings` area while `Saving` squares scroll, normal visual styling when `Savings money amount` is `0.00$`, small top `{money amount} needed` text when total planned money amount in valid `Saving` squares is greater than the main money amount, ordered user-named `Saving` squares in one vertical column on mobile and desktop, coverage bars, outside-click dismissal for `Saving` square action state, blank-area clicks inside an open action-state `Saving` square doing nothing, touch scrolling over `Saving` squares canceling tap and reorder when the finger moves more than `8px` before the `600ms` hold completes, `Saving` square holds for `600ms` without at least `8px` of movement doing nothing, fixed `Saving` reorder auto-scroll within `40px` of the top or bottom edge at `8px` per animation frame, interrupted `Saving` reorder drags canceling back to the original position, duplicate-name checks that include visible broken saved `Saving` squares with readable non-empty saved names, broken-square fix validation order matching new `Saving` square creation, a centered circle `+` empty state only when no normal or broken saved `Saving` squares are visible, a top-left circle `+` action when normal or broken saved `Saving` squares are visible, temporary `Saving` input squares for create, rename, planned-money-amount change, and broken-square fix, raw decimal typing for planned money amount inputs before `Save`, discarded unsaved `Saving` input drafts unless `Save` succeeds, locked broken saved `Saving` squares that cannot be reordered until fixed or deleted, saved-data-only `Savings money amount`, top needed text, and coverage updates while `Saving` input flows are open, a top-left `<` back action, and browser Back behavior that closes an open `Saving` input flow or delete confirmation first before closing full-screen `Savings`.
 - `Balance Changes` history for added money and subtracted money, with newest-entry auto-scroll to the top after a successful `Add` or `Subtract`.
@@ -113,22 +122,22 @@ Out of scope for the first version:
 
 Primary areas:
 - Dashboard
-- Money amount change history under the main money amount
+- Balance Changes
 - Savings
 
-Suggested first-screen layout:
-- Top area: exact website name and short trust label `Manual Cash Tracker`.
-- Main money amount area: user-facing label `Current Balance`; clicking the money amount reveals horizontal action buttons near the money amount, with `Add` and `Modify` in that order at `0.00$`, `Add`, `Subtract`, and `Modify` in that order when the money amount is greater than `0.00$` and less than `999,999.99$`, or `Subtract` and `Modify` when the money amount is exactly `999,999.99$`.
-- Large scrollable `Balance Changes` square directly under the main money amount.
-- Secondary action: click `Savings`.
-- Overview area: the large `Balance Changes` square, then `Savings` below it.
+Dashboard content:
+- Exact website name and short trust label `Manual Cash Tracker`.
+- Visually prominent main money amount with the user-facing label `Current Balance`; selecting it reveals only the actions available for its current value.
+- A `Balance Changes` section that keeps every current entry reachable.
+- The exact action `Savings`, which remains reachable whether `Balance Changes` is empty or contains entries.
+- Component shapes, positions, sizes, and scrolling implementation remain design decisions.
 
 ## Core Data Model
 
 Money amount:
 - Money amount.
 - Supports cents from `0.00$` through `999,999.99$` as each money amount rule allows.
-- Store and calculate money amount values with an exact normalized plain decimal representation so typed values like `5 Space 5` or mobile `5 Cent 5` that display as `5.05`, `58 Space 430 Space 88` or mobile `58 Cent 430 Cent 88` that display as `58,430.88`, and raw digit sequences like `589550` that display as `589,550.00`, keep the parsed money amount exact.
+- Store and calculate money amount values with an exact normalized plain decimal representation so typed values like `5 Space 5` or `5 Cent 5` that display as `5.05`, `58430 Space 88` or `58430 Cent 88` that display as `58,430.88`, and raw digit sequences like `589550` that display as `589,550.00`, keep the parsed money amount exact.
 - Save money amount fields as normalized plain decimal strings with exactly two decimal digits, no `$` sign, no comma separators, and no unneeded leading zeros before the decimal point except the single `0` in values below `1.00`, such as `0.00`, `5.00`, `5895.50`, and `999999.99`.
 - Render visible money amounts with the `$` sign and required comma separators, such as `5,895.50$` and `999,999.99$`.
 
@@ -165,11 +174,12 @@ Broken saved `Balance Changes` entry:
 - Does not show a broken history row or user-facing message.
 
 `Saving` square:
-- ID.
-- Name.
-- Planned money amount greater than `0.00$` and not greater than `999,999.99$`.
-- Order.
+- Unique ID created with `crypto.randomUUID()`.
+- Name saved after surrounding spaces are removed.
+- Planned money amount saved as an exact normalized decimal string greater than `0.00` and not greater than `999999.99`.
+- Unique non-negative safe-integer order.
 - No created date or updated date fields in the first version.
+- No saved coverage, needed money amount, main money amount, or temporary creation input.
 
 Broken saved `Saving` square:
 - Exact text: `Saving could not be loaded.`
@@ -191,7 +201,7 @@ Tasks:
 - Use the stable storage key `cash-money-organizer-website-data` for website data.
 - Add data version `1` for first-version saved data.
 - Define shared data types and exact money amount helpers for money amount values, `Balance Changes` entries, and `Saving` squares.
-- Define broken saved `Balance Changes` entry handling so one broken history entry is removed without breaking the whole saved browser data file.
+- Define broken saved `Balance Changes` entry handling so every broken history entry is removed independently without removing usable entries or breaking the whole saved browser data file.
 - Define broken saved `Saving` square handling so one broken square does not break the whole saved browser data file.
 - Define global open temporary UI priority for main money actions, main money amount inputs, `Balance Changes` delete UI, `Saving` square action state, `Saving` input flows, `Saving` delete confirmations, and active `Saving` reorder drag.
 - Define same-browser multiple tab or window storage updates so other open tabs or windows update after one tab or window successfully saves a change.
@@ -203,10 +213,11 @@ Acceptance criteria:
 - The layout works on desktop and mobile widths.
 - Data can be saved in browser storage and restored after refresh.
 - Data can be restored after closing and reopening the website in the same browser.
+- While the website checks browser storage after opening, show neither the dashboard nor recovery and do not briefly show the default `0.00$` dashboard.
 - If no saved data exists, the website shows the dashboard with the money amount set to `0.00$`.
 - Showing the default `0.00$` money amount does not create saved browser data by itself.
 - Saved browser data with a missing, wrong, future, unreadable, or unrecognized data version, or a saved current money amount outside `0.00` through `999999.99` or not in normalized plain decimal format, shows `Saved data could not be loaded.` and a `Start again` action.
-- If saved browser data has one broken saved `Balance Changes` entry but the rest of the data can be read, the website loads the rest of the saved data and removes only that broken history entry.
+- If saved browser data has one or more broken `Balance Changes` entries but the rest of the data can be read, the website removes every broken entry independently and keeps every usable entry.
 - The first view does not explain where saved data is stored.
 - Only one temporary UI can be open at a time, and a click, tap, or hold cannot open a second temporary UI while another one is open.
 - If the same website is open in multiple tabs or windows in the same browser, a successful saved change in one tab or window updates the other open tabs or windows to the latest saved data.
@@ -231,7 +242,8 @@ Tasks:
 - Hide the main money action buttons when the user scrolls the dashboard page, without changing anything, saving anything, creating a `Balance Changes` entry, or showing a message.
 - Start the selected money amount input flow when the user clicks `Add`, `Subtract`, or `Modify`; these action-button clicks should not be treated as outside clicks.
 - Hide the visible main money action buttons when the selected money amount input flow starts, remember the selected action internally only, and do not show a visible `Add`, `Subtract`, or `Modify` reminder inside the open input flow.
-- Show money amount change history directly under the main money amount.
+- Include a `Balance Changes` section on the dashboard and keep every current entry reachable.
+- Keep the exact `Savings` action reachable whether `Balance Changes` is empty or contains entries.
 - Add clear manual-tracker wording.
 - Keep `Balance Changes` empty with no empty-state content when no history entries exist, and use a centered circle `+` as the empty state when no `Saving` squares exist.
 
@@ -249,7 +261,8 @@ Acceptance criteria:
 - Scrolling the dashboard page while the visible money actions are open hides the visible money actions without changing anything.
 - Clicking `Add`, `Subtract`, or `Modify` starts the selected money amount input flow instead of hiding the visible money actions as an outside click.
 - When the selected money amount input flow starts, the visible main money action buttons are hidden and the open input flow does not show a visible `Add`, `Subtract`, or `Modify` reminder.
-- Money amount change history appears directly under the main money amount.
+- `Balance Changes` is available from the dashboard and keeps every current entry reachable.
+- The `Savings` action remains reachable whether `Balance Changes` is empty or contains entries.
 - There is no separate `View history` action for money amount change history.
 - The interface does not use misleading bank wording.
 
@@ -261,28 +274,30 @@ Tasks:
 - Build subtract money flow.
 - Build silent modify/correct money amount flow.
 - Validate amount inputs.
-- Render `Add`, `Subtract`, and `Modify` money amount inputs as a horizontal square in the middle of the screen.
-- Keep the main money amount circle visible only as a dimmed, inactive background element while the horizontal input square is open.
-- Treat the input flow as the active part of the screen. Clicking or tapping the visible main money amount circle behind the input flow should act like `Cancel`: close the input flow, return to the dashboard money amount view, change nothing, save nothing, create no `Balance Changes` entry, and show no message. It should not reopen the main money action buttons.
-- Start the horizontal input square at `0.00`.
-- Focus the horizontal input square immediately when it opens so the user can start typing without another tap or click, and request the mobile keyboard immediately on supported mobile devices.
+- Use the shared money amount entry flow for `Add`, `Subtract`, and `Modify` without requiring a particular shape, position, size, or visual arrangement.
+- Keep other dashboard controls inactive while a main money amount input flow is open.
+- Treat the input flow as the active interaction context. Clicking or tapping outside it should act like `Cancel`: close the flow, return to the dashboard money amount view, change nothing, save nothing, create no `Balance Changes` entry, and show no message. That interaction should not reopen the main money action buttons.
+- Start the money amount input at `0.00`.
+- Focus the money amount input immediately when it opens so the user can start typing without another tap or click, and request the mobile keyboard immediately on supported mobile devices.
 - Request a mobile keyboard suitable for digit entry for main money action inputs on supported devices.
-- Show a rectangular `Cent` button for all users while a main money action input is open. The `Cent` button should be part of the main money amount input controls and should appear directly under the horizontal input square on mobile and desktop. On mobile, when the browser and keyboard allow it, this placement should also keep the `Cent` button directly above the mobile keyboard.
-- Let the user type numbers from `0` through `9` and the `Space` key into main money action inputs, without typing the `$` sign. Let all users choose the `Cent` button for cents. Block typed decimal points and manually typed comma separators with no message. Add the decimal point and comma separators automatically in the displayed input.
-- Use `Space` and `Cent` as non-visible separators between digit groups. Accept separator input only after at least one digit and only when the previous accepted input is a digit. Block starting separators and consecutive separators with no message.
-- Automatically format typed main money action input values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. Without separator input, typed digits are whole money amount digits: typing `5` shows `5.00`, `58` shows `58.00`, `589` shows `589.00`, `5895` shows `5,895.00`, `58955` shows `58,955.00`, and `589550` shows `589,550.00`.
-- For accepted input with separator input from `Space` or `Cent`, split the accepted input into digit groups at accepted separators. If the input ends with a separator, treat all completed groups as the whole money amount and show cents as `00`. If the final group after a separator has one or two digits, treat that final group as cents and left-pad one cents digit with `0`; join all earlier groups as the whole money amount. If there is only one accepted separator and the final group grows to three or more digits, treat that final group as another whole money amount group and show cents as `00`. Once the input has two accepted separators, the final group is the cents group and should accept at most two digits. Block additional separator input after two accepted separators with no message.
+- Provide an action with the exact visible name `Cent` for all users while a main money action input is open. Choosing it keeps the input active, and the mobile digit-entry keyboard remains available when the browser permits it.
+- Let the user type numbers from `0` through `9` into main money action inputs without typing the `$` sign. Let `Cent`, with `Space` as its keyboard alternative, start cents entry. Block typed decimal points and manually typed comma separators with no message. Add the decimal point and comma separators automatically in the displayed input.
+- Accept `Cent` or `Space` only after at least one entered digit and only once per input. The initial `0.00` does not count as an entered digit. Ignore `Cent` or `Space` before a digit or after cents entry has already started, with no message. Visibly indicate when cents entry is active without requiring a particular visual treatment.
+- Automatically format typed main money action input values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. Before cents entry starts, typed digits are whole money amount digits: typing `5` shows `5.00`, `58` shows `58.00`, `589` shows `589.00`, `5895` shows `5,895.00`, `58955` shows `58,955.00`, and `589550` shows `589,550.00`.
+- After `Cent` or `Space` starts cents entry, treat the next one or two digits as cents, left-pad one cents digit with `0`, and block a third cents digit with no message. Keep all earlier digits as the whole money amount and add comma separators to that whole money amount automatically.
 - Treat `0` as a normal digit, not a starting zero-position skip. Normalize away unneeded leading zeros in the whole money amount, so typing `0005` shows `5.00`.
 - Reformat main money action inputs after deletion with two digits after the decimal point and no `$` sign while the input is still open.
 - Return main money action inputs to `0.00` when all typed numbers are deleted, without letting the input become empty.
-- Make main money action inputs append-only: focus can open the input, but cursor movement inside the formatted money amount, partial selection, selection replacement, and direct editing of generated comma separators or the generated decimal point are not supported. Accepted typing adds to the end, and delete removes only the last accepted digit or accepted separator.
-- Block letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting separators, consecutive separators, additional separator input after two accepted separators, a third cents digit after the cents group is fixed by two accepted separators, and paste in main money action inputs with no message.
+- Make main money action inputs append-only: focus can open the input, but cursor movement inside the formatted money amount, partial selection, selection replacement, and direct editing of generated comma separators or the generated decimal point are not supported. Accepted typing adds to the end, and delete removes only the last accepted digit or the action that started cents entry.
+- Block letters, minus signs, decimal points, `$` signs, manually typed comma separators, `Cent` or `Space` before any entered digit, another `Cent` or `Space` after cents entry starts, a third cents digit, and paste in main money action inputs with no message.
 - Block typed characters that would make a main money action input greater than `999,999.99`, with no message and no field change.
-- Keep money amounts up to `999,999.99$` contained in the horizontal input square, dashboard, `Balance Changes`, and `Savings` displays without horizontal page overflow, text overlap, hidden actions, rejected valid values, or missing required comma separators while typing or in visible saved/rendered values.
-- Show the rectangular `Cent` button under the horizontal input square, `Save Changes` under `Cent`, and buttons exactly named `Yes` and `Cancel` under `Save Changes`.
+- Keep money amounts up to `999,999.99$` and every required control readable and usable in the input flow, dashboard, `Balance Changes`, and `Savings` without rejecting valid values or omitting required comma separators.
+- Show the exact text `Save Changes` and provide actions exactly named `Cent`, `Yes`, and `Cancel` without requiring a particular visual arrangement.
 - Make `Yes` apply the selected `Add`, `Subtract`, or `Modify` action.
-- After a successful `Add`, `Subtract`, or `Modify` that changes the money amount, close the horizontal input square, reset the temporary typed input so the next main money amount input starts at `0.00`, return to the dashboard money amount view, hide the main money action buttons, show the updated money amount, save only the data required by that action, and show no message.
-- Make `Cancel` and outside click or tap close the main money amount input flow, return to the dashboard money amount view, and change nothing. The dimmed, inactive main money amount circle behind the input flow counts as outside the input flow.
+- After a successful `Add`, `Subtract`, or `Modify` that changes the money amount, close the input flow, reset the temporary typed input so the next main money amount input starts at `0.00`, return to the dashboard money amount view, hide the main money action buttons, show the updated money amount, save only the data required by that action, and show no message.
+- After a failed save, keep the input flow and entered amount, and show `Changes could not be saved.` while the failed flow remains unchanged.
+- Remove the previous save-failure message when the user changes the amount, chooses `Yes` to retry, or closes the flow. Show it again if the retry also fails, and do not carry it into a later new flow.
+- Make `Cancel` and a click or tap outside the active entry flow close the main money amount input flow, return to the dashboard money amount view, and change nothing.
 - Make the browser Back button, mobile browser back gesture, and system Back action act like `Cancel` while an `Add`, `Subtract`, or `Modify` money amount input flow is open, without changing anything, saving anything, creating a `Balance Changes` entry, or showing a message.
 - Discard unsaved typed input from an open `Add`, `Subtract`, or `Modify` money amount input flow after page refresh, browser tab or window close, or later website reopen. Restore only the last successfully saved data, without saving the unsaved typed value, creating a `Balance Changes` entry, or showing a message or browser leave warning.
 - Save each `Add` and `Subtract` action to `Balance Changes` as its own separate entry.
@@ -303,34 +318,34 @@ Acceptance criteria:
 - Modifying the money amount replaces the current money amount without creating history or notification entries only when the entered money amount is different from the money amount already shown.
 - Separate `Add` and `Subtract` actions stay separate in history.
 - Money changes are still visible after page refresh.
-- `Add`, `Subtract`, and `Modify` money amount input flows show a horizontal input square in the middle of the screen while the main money amount circle stays visible only as a dimmed, inactive background element.
-- Clicking or tapping the dimmed, inactive main money amount circle behind the input flow acts like `Cancel`, changes nothing, saves nothing, creates no `Balance Changes` entry, shows no message, and does not reopen the main money action buttons.
-- The horizontal input square starts at `0.00`.
-- The horizontal input square is focused and ready for typing immediately when it opens.
-- `Add`, `Subtract`, and `Modify` money amount input flows show a rectangular `Cent` button for all users directly under the horizontal input square.
-- On mobile, when the browser and keyboard allow it, the `Cent` button appears directly above the mobile keyboard.
+- `Add`, `Subtract`, and `Modify` use the same money amount entry flow without requiring a particular shape, position, size, or visual arrangement.
+- While the flow is open, it is the active interaction context and other dashboard controls are inactive.
+- The money amount input starts at `0.00`.
+- The money amount input is focused and ready for typing immediately when it opens.
+- `Add`, `Subtract`, and `Modify` money amount input flows provide an action with the exact visible name `Cent` on mobile and desktop.
+- Choosing `Cent` keeps the input active, and the mobile digit-entry keyboard remains available when the browser permits it.
 - Typing `5` in a main money action input shows `5.00`, typing `58` shows `58.00`, typing `589` shows `589.00`, typing `5895` shows `5,895.00`, typing `58955` shows `58,955.00`, and typing raw digits `589550` shows `589,550.00`.
-- Typing `5`, then `Space`, keeps the display at `5.00`; typing `5`, then `Space`, then `5` shows `5.05`; typing `5`, then `Space`, then `50` shows `5.50`; typing `58`, then `Space`, then `430` shows `58,430.00`; typing `58`, then `Space`, then `430`, then `Space`, then `88` shows `58,430.88`; and typing `999999`, then `Space`, then `99` shows `999,999.99`.
-- Typing `5`, choosing `Cent`, then typing `5` shows `5.05`; typing `5`, choosing `Cent`, then typing `50` shows `5.50`; and typing `58`, choosing `Cent`, typing `430`, choosing `Cent`, then typing `88` shows `58,430.88`.
+- Typing `5`, then `Space`, then `5` shows `5.05`; typing `5`, then `Space`, then `50` shows `5.50`; typing `58430`, then `Space`, then `88` shows `58,430.88`; and typing `999999`, then `Space`, then `99` shows `999,999.99`.
+- Typing `5`, choosing `Cent`, then typing `5` shows `5.05`; typing `5`, choosing `Cent`, then typing `50` shows `5.50`; and typing `58430`, choosing `Cent`, then typing `88` shows `58,430.88`.
 - Typing `0005` in a main money action input shows `5.00`.
 - Typing `Space`, `Space`, `Space`, then `5` in a main money action input blocks the three `Space` key presses and then shows `5.00` after the `5` is typed.
 - Saving a main money action input stores the money amount as a normalized plain decimal string without the `$` sign or comma separators, such as `5.00`, `5.05`, `5895.50`, or `999999.99`, and shows the money amount with the `$` sign at the end and required comma separators for thousands and larger values, such as `5.00$`, `5.05$`, `5,895.50$`, or `999,999.99$`.
 - Deleting one typed character from a main money action input reformats the remaining typed value as a money amount.
-- Deleting all typed numbers in a main money action input returns the horizontal input square to `0.00` instead of making it empty.
+- Deleting all typed numbers in a main money action input returns the input to `0.00` instead of making it empty.
 - Clicking or tapping inside a main money action input does not move the cursor into the middle of the formatted money amount.
 - Selecting part of a main money action input and typing does not replace the selected text; accepted typing is added to the end.
-- Backspace or Delete in a main money action input removes only the last accepted digit or accepted separator, not generated comma separators or the generated decimal point.
-- Main money action inputs keep their previous value when the user types letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting separators, consecutive separators, additional separator input after two accepted separators, a third cents digit after the cents group is fixed by two accepted separators, or other blocked characters.
-- Tapping `Cent` when a separator would be blocked keeps the previous input value and shows no message.
+- Backspace or Delete in a main money action input removes only the last accepted digit or the action that started cents entry, not generated comma separators or the generated decimal point.
+- Main money action inputs keep their previous value when the user types letters, minus signs, decimal points, `$` signs, manually typed comma separators, chooses `Cent` or presses `Space` before entering a digit, chooses `Cent` or presses `Space` again after cents entry starts, enters a third cents digit, or enters another blocked character.
+- Choosing `Cent` when cents entry cannot start keeps the previous input value and shows no message.
 - Main money action inputs accept valid money amounts up to `999,999.99` and block typed characters that would make the value greater than `999,999.99`.
-- Money amounts up to `999,999.99$` remain visible or editable without horizontal page overflow, overlapping content, hidden controls, or missing required comma separators while typing or in saved/rendered visible values.
+- Money amounts up to `999,999.99$` and all required controls remain readable and usable with required comma separators while typing or in saved/rendered visible values.
 - If the user tries to paste letters, numbers, symbols, or any other content into a main money action input, the pasted content does not appear, the input keeps its previous value, and no message is shown.
-- `Add`, `Subtract`, and `Modify` money amount input flows show the order: horizontal input square, `Cent`, `Save Changes`, then `Yes` and `Cancel`.
+- `Add`, `Subtract`, and `Modify` money amount input flows show the exact text `Save Changes` and provide actions exactly named `Cent`, `Yes`, and `Cancel` without requiring a particular visual arrangement.
 - `Cancel` in `Add`, `Subtract`, or `Modify` closes the money amount input flow, returns to the dashboard money amount view, changes nothing, saves nothing, creates no `Balance Changes` entry, and shows no message.
-- Clicking or tapping outside the horizontal input square, `Save Changes`, `Yes`, `Cancel`, and the `Cent` button acts like `Cancel`. This includes clicking or tapping the dimmed, inactive main money amount circle behind the input flow.
+- Clicking or tapping outside the active money amount entry flow acts like `Cancel` and does not reopen the main money actions.
 - Using browser Back while an `Add`, `Subtract`, or `Modify` money amount input flow is open acts like `Cancel`, changes nothing, saves nothing, creates no `Balance Changes` entry, and shows no message.
 - Refreshing, closing, or reopening the website while an `Add`, `Subtract`, or `Modify` money amount input flow has unsaved typed input discards the open input flow and typed value, restores only the last successfully saved data, creates no `Balance Changes` entry, and shows no message or browser leave warning.
-- Tapping or clicking the `Cent` button behaves like pressing `Space` and does not cancel or close the main money amount input flow.
+- Choosing `Cent` after at least one entered digit starts cents entry, behaves like pressing `Space`, keeps the input active, visibly indicates that cents entry is active, and does not cancel or close the flow.
 - `Add`, `Subtract`, and `Modify` do not save invalid money amounts. Negative money amounts and above-limit money amounts are blocked, `Add` and `Subtract` require more than `0.00$` and not greater than `999,999.99$`, and `Modify` allows `0.00$` through `999,999.99$`.
 - Clicking `Yes` while the input is `0.00` in `Add` or `Subtract` does nothing: no message, no money amount change, no saved data change, no `Balance Changes` entry, and the same money amount input step stays open.
 - Clicking `Yes` in `Modify` with the same money amount that is already shown does nothing: no message, no money amount change, no saved data change, no browser storage creation or update, no `Balance Changes` entry, no `Balance Changes` cleanup, and the same money amount input step stays open until the user enters a different valid money amount or cancels.
@@ -341,35 +356,34 @@ Acceptance criteria:
 ### Milestone 4: Balance Changes
 
 Tasks:
-- Build the `Balance Changes` list as a large square directly under the main money amount.
-- Make the large `Balance Changes` square use most of the dashboard page space under the main money amount.
-- Make `Balance Changes` entries scroll inside the large square when there are too many entries to fit.
-- Let the dashboard page scroll past the bottom of the large `Balance Changes` square to reach `Savings`.
-- Keep scroll gestures that start inside the large `Balance Changes` square locked to that square. If the internal entry list is already at the top or bottom, continued scrolling inside the square should not move the dashboard page.
-- Place `Savings` below the large `Balance Changes` square in the dashboard page flow.
+- Build the `Balance Changes` section on the dashboard.
+- Keep every current `Balance Changes` entry reachable when the history is long.
+- Keep the `Savings` action reachable whether `Balance Changes` is empty or contains entries.
+- Leave the section's shape, size, position, and scrolling implementation as design decisions that work on mobile and desktop.
 - Do not set a smaller maximum visible-entry limit for valid 30-day `Balance Changes` entries.
 - When no `Balance Changes` entries exist, show no history rows and no empty-state sentence, placeholder, icon, or other empty-state content.
-- Show each visible `Balance Changes` row with the signed money amount, action text, and both the created date and created time: `+{money amount} added` or `-{money amount} subtracted`, plus the visible created date and created time. A date-only display is not enough. The visible date and time format should be like `July 21, 2026 at 3:45 PM`.
+- Show each visible `Balance Changes` row with the signed money amount, action text, and both the created date and created time: `+{money amount} added` or `-{money amount} subtracted`. Use the fixed English date-and-time format shown by `September 18, 2026 at 2:30 PM`; a date-only display is not enough.
 - Render each visible `Balance Changes` entry as a compact entry box, not a large panel.
 - Place the signed money amount and action text in the top-left corner of each visible `Balance Changes` entry.
 - Place the visible created date and created time in the bottom-right corner of the same entry, below the money change text and not too far from it.
 - Keep the same `Balance Changes` entry layout on mobile. Text may wrap only as needed to stay readable, but the money change text should remain in the top-left area and the visible date and time should remain in the bottom-right area.
-- Use the user's browser/device local date and time for visible `Balance Changes` created dates and times.
+- Record the user's local date and time when the action succeeds, then always show it with the fixed English format.
 - Save an internal exact created date and time with seconds and milliseconds for each `Balance Changes` entry, but do not show seconds or milliseconds to the user.
 - Do not show the previous money amount, new money amount, internal exact created date and time, or internal visible until date and time in visible `Balance Changes` rows.
 - Keep each add and subtract action as its own visible entry.
 - Show newest `Balance Changes` entries first by internal exact created date and time, with older changes lower in the list.
 - If two `Balance Changes` entries have the exact same internal exact created date and time, use saved list order as the tie-breaker, with entries earlier in the saved list appearing first.
-- Automatically scroll the `Balance Changes` square to the top after a successful `Add` or `Subtract` creates a new `Balance Changes` entry, even if the user had previously scrolled lower in the history list.
+- Move the `Balance Changes` scroll position to the top after a successful `Add` or `Subtract` creates a new `Balance Changes` entry, even if the user had previously scrolled lower in the history list.
+- Also move a receiving tab or window's `Balance Changes` scroll position to the top when a new saved `Add` or `Subtract` entry arrives from another open copy.
 - Do not ask the user to choose a date for `Add` or `Subtract`.
 - Do not replace separate entries with only a combined net result.
-- Calculate each `Balance Changes` internal visible until date and time as the internal exact created date and time plus 30 days using the user's browser/device local date and time.
+- Calculate each `Balance Changes` internal visible-until timestamp as its exact created timestamp plus `2_592_000_000` milliseconds, which is exactly 720 hours.
 - Run `Balance Changes` cleanup when the website opens and loads saved data.
 - Run `Balance Changes` cleanup after every successful saved user action.
 - During cleanup, delete visible history entries from browser storage at or after their visible until date.
-- Do not add a background timer for checking old `Balance Changes` entries while the website stays open with no user action.
+- While the website stays open, schedule a view check for the next expiration and recheck after the page becomes visible or its window gains focus.
 - Keep the current money amount unchanged when old history entries expire.
-- Let the user scroll inside the large `Balance Changes` square when the history list is longer than the square.
+- Keep every current entry reachable when the `Balance Changes` history is longer than the available view.
 - Add delete support for `Balance Changes` entries.
 - For touch users, open the delete action when the user presses and holds a `Balance Changes` entry for `600ms`.
 - For mouse users, open the delete action when the user clicks and holds a `Balance Changes` entry for `600ms`.
@@ -387,8 +401,7 @@ Tasks:
 
 Acceptance criteria:
 - The user can understand how their money amount changed over time.
-- `Balance Changes` appears as a large square directly under the main money amount.
-- The large `Balance Changes` square uses most of the dashboard page space under the main money amount.
+- `Balance Changes` is available on the dashboard without requiring a particular shape, size, position, or scrolling implementation.
 - When there are no `Balance Changes` entries, the history list is empty and shows no sentence, placeholder, icon, or other empty-state content.
 - The user sees separate entries such as `+56.00$ added` and `-34.00$ subtracted`.
 - Visible `Balance Changes` rows show both the created date and created time using the format `July 21, 2026 at 3:45 PM`.
@@ -398,18 +411,14 @@ Acceptance criteria:
 - Visible `Balance Changes` rows do not show previous money amount, new money amount, internal exact created date and time, seconds, milliseconds, or internal visible until date and time.
 - The newest `Balance Changes` entry appears first by internal exact created date and time, and older changes go lower.
 - If two `Balance Changes` entries have the exact same internal exact created date and time, saved list order decides which one appears first.
-- After a successful `Add` or `Subtract` creates a new `Balance Changes` entry, the `Balance Changes` square automatically scrolls to the top so the newest entry is visible.
+- After a successful `Add` or `Subtract` creates a new `Balance Changes` entry, the `Balance Changes` scroll position moves to the top so the newest entry is visible.
 - `Balance Changes` does not show only a combined result such as `+22.00$ net change`.
 - `Balance Changes` cleanup runs when the website opens and loads saved data.
 - `Balance Changes` cleanup runs after every successful saved user action.
 - During cleanup, entries at or after their visible until date are deleted from browser storage and no longer shown.
 - Removing old history entries does not change the current money amount.
-- The user can scroll inside the large `Balance Changes` square to see more history entries when needed.
-- The dashboard page can scroll past the large `Balance Changes` square to reach `Savings`.
-- Scrolling inside the large `Balance Changes` square does not move the dashboard page, even when the internal entry list is already at the top or bottom.
-- Scrolling outside the large `Balance Changes` square can move the dashboard page to reach `Savings`.
-- `Savings` appears below the large `Balance Changes` square.
-- All valid 30-day `Balance Changes` entries remain reachable inside the scrollable square, with no smaller maximum visible-entry limit.
+- Every valid 30-day `Balance Changes` entry remains reachable when the history is long, with no smaller maximum visible-entry limit.
+- The `Savings` action remains reachable whether `Balance Changes` is empty or contains entries.
 - Touch users can open a `Balance Changes` entry delete action by pressing and holding the entry for `600ms`.
 - Mouse users can open a `Balance Changes` entry delete action by clicking and holding the entry for `600ms`.
 - Releasing before `600ms`, moving the pointer or finger before `600ms`, or starting to scroll before `600ms` cancels the pending `Balance Changes` delete hold and does not open the little square.
@@ -498,6 +507,8 @@ Tasks:
 - Do not render `Saving` squares in multiple columns or a grid.
 - Calculate `Saving` square coverage from top to bottom using the main money amount.
 - Treat the visible order of normal `Saving` squares as the coverage order, skipping broken saved `Saving` squares.
+- Derive coverage, each needed amount, `Savings money amount`, and the overall amount needed with exact integer `bigint` cents in normal-square order without floating-point arithmetic or rounding.
+- Keep derived `bigint` coverage values only in memory and rebuild them from validated saved decimal strings whenever coverage is recalculated.
 - Add thin horizontal coverage bars at the very bottom of `Saving` squares in their default state.
 - Show full green bars for fully covered `Saving` squares, left-to-right partly green bars for partly covered squares, and grey bars for uncovered squares.
 - Show a `{money amount} needed` note at the top-left of the bottom coverage bar when a `Saving` square is not fully covered.
@@ -517,6 +528,8 @@ Tasks:
 - Do not show a `Cent` button in `Saving` square planned money amount inputs, do not apply the main money amount `Space` key cents behavior there, and block `Space` with no message.
 - Treat `Saving` square planned money amount input without a decimal point as a whole money amount, and input with one decimal point as cents after the decimal point.
 - After `Save`, normalize and render `Saving` square planned money amounts with two decimal digits, comma separators when needed, and the `$` sign.
+- After a successful creation, append the new `Saving` after every existing `Saving`, keep every existing relative position unchanged, and give the new `Saving` the last coverage priority until it is reordered.
+- Give the first saved `Saving` order `0`; otherwise, give a new `Saving` one more than the highest usable existing non-negative safe-integer order. If no next safe order is available, save nothing and handle the attempt as a save failure.
 - Require each `Saving` square name to be unique inside `Savings`.
 - Allow `Saving` square names with no maximum length, including one-letter names, number-only names, names with numbers before or after words, multiple words, full sentences, symbols, punctuation, emoji characters, and very long names.
 - Trim only the spaces at the beginning and end of `Saving` square names before saving, while preserving spaces inside the trimmed name.
@@ -530,6 +543,8 @@ Tasks:
 - Do not remember unsaved typed `Saving` input as a draft.
 - Discard the typed `Saving` name and planned money amount if the user refreshes the page, closes the browser tab or window, reopens the website later, cancels the input flow, closes the input flow with `<` or Back, or leaves `Savings` after the input flow has been closed before a successful `Save`.
 - Restore only the last successfully saved data after discarded unsaved `Saving` input, without saving a draft to browser storage, creating a `Balance Changes` entry, showing a browser leave warning, or showing a message.
+- After a failed `Saving` creation save, keep `Changes could not be saved.` visible while the flow is unchanged. Remove the previous message after an accepted name or planned-money edit, while retrying, or when the flow closes or is discarded; show it again if the retry also fails.
+- After a failed broken-square fix save, keep `Changes could not be saved.` visible while the flow is unchanged. Remove the previous message after an accepted name or planned-money edit, while retrying, or when the flow closes or is discarded; show it again if the retry also fails.
 - For new `Saving` square creation, validate in this order: planned money amount missing, `0.00$`, or greater than `999,999.99$`; missing `Saving` name; then duplicate `Saving` name.
 - Count normal `Saving` squares and visible broken saved `Saving` squares with readable non-empty saved names as reserved names during duplicate-name checks.
 - During a broken-square fix, do not count the broken `Saving` square being fixed as a duplicate against itself, but still count normal `Saving` squares and other broken `Saving` squares with the same trimmed name.
@@ -545,9 +560,14 @@ Tasks:
 - Exclude broken saved `Saving` squares from `Savings money amount`, top needed text, and coverage calculations until fixed.
 - Keep broken saved `Saving` squares locked during reorder until fixed or deleted, while still allowing normal default `Saving` squares to be reordered around those locked broken squares.
 - Make `Fix` replace the broken square with a temporary `Saving` input square in the same visible position.
+- Start a broken-square fix with no entered name text or planned-money digits, copy no input value from the broken record, and do not insert `0` or `0.00`.
 - Make the broken-square fix input square ask for a valid `Saving` name and planned money amount greater than `0.00$` and not greater than `999,999.99$`.
 - Do not render the broken-square fix input square as a modal, bottom sheet, or separate page.
+- Give each loaded broken record a unique in-memory symbol that is recreated on every complete load and is never written to browser storage.
+- If the selected broken record is no longer available, close and discard the fix flow without saving or showing a message, and keep the latest successfully saved information visible.
+- Before repairing, reserve every usable order number from remaining broken records and assign normal records increasing unused safe-integer orders in their visible order; fail without writing if no safe order remains.
 - Make a successful broken-square fix save browser storage, turn the broken square into a normal `Saving` square, keep it in the same visible position when possible, give it a valid unique ID and valid order if needed, recalculate the `Savings money amount`, top needed text, and coverage bars, create no `Balance Changes` entry, and show no message.
+- After a successful broken-square fix, revalidate the complete saved `Saving` list so any other unchanged record that is now valid becomes normal and every still-invalid record remains broken.
 - Make broken-square `Delete` use the same small centered `Saving` delete confirmation with `Delete this Saving?`, show `Cancel` and `Delete`, remove only that broken square after confirmation, save browser storage, create no `Balance Changes` entry, and offer no undo.
 - Save the final `Saving` square order to browser storage after the user finishes moving a square and lets go.
 - Recalculate the money amount shown inside `Savings`, top needed text, and coverage bars from the visible order of normal `Saving` squares after the final reorder, skipping broken saved `Saving` squares.
@@ -603,6 +623,7 @@ Acceptance criteria:
 - The temporary create input square appears centered when opened from the centered empty-state `+`, and appears at the top-left before existing squares when opened from the top-left `+`.
 - `Saving` square create does not open as a modal, bottom sheet, or separate page.
 - A new `Saving` square is created only after the user enters a valid name and a planned money amount greater than `0.00$` and not greater than `999,999.99$`.
+- A successfully created `Saving` square appears after all existing `Saving` squares and has the last coverage priority until the user reorders it.
 - `Saving` square planned money amount inputs show raw decimal number text while typing and do not add a `$` sign, comma separators, or automatic two-decimal formatting before `Save`.
 - `Saving` square planned money amount inputs do not show a `Cent` button, do not use the main money amount `Space` key cents behavior, and block `Space` with no message.
 - In `Saving` square planned money amount inputs, typing `14` saves and displays as `14.00$`, typing `14.5` saves and displays as `14.50$`, typing `5898` saves and displays as `5,898.00$`, and typing `589.80` saves and displays as `589.80$`.
@@ -698,12 +719,20 @@ Tasks:
 - Test unreadable or broken browser storage data.
 - Test mobile and desktop layouts.
 - Test invalid inputs.
-- Test long `Balance Changes` history with entries scrolling inside the large square, scroll gestures inside the square staying locked to that square at the top and bottom, dashboard page scrolling still working outside the square to reach `Savings`, and the square automatically scrolling to the top after a successful `Add` or `Subtract` creates a new entry.
+- Test long `Balance Changes` history by confirming that every current entry remains reachable, the `Savings` action remains reachable whether history is empty or long, and the `Balance Changes` scroll position moves to the top after a successful `Add` or `Subtract` creates a new entry on mobile and desktop.
 - Test `Saving` square planned money amount input display with raw decimal typing before `Save`, no `Cent` button, no main money amount `Space` key cents behavior, and formatted display only after `Save`.
+- Test exact Savings coverage with no `Saving` records, zero money, exact and excess money, the `100.00$` with `80.00$` and `50.00$` example, changed order, broken records, failed actions, and combined planned totals above JavaScript's safe-integer range.
+- Test that a new `Saving` is appended after all existing `Saving` squares, receives order `0` when it is first or one more than the highest usable order otherwise, and does not change existing order or coverage priority.
+- Test a failed `Saving` creation save and confirm its message clears after an accepted edit, retry, or closure, remains after rejected amount input, and appears again after another failed retry.
 - Test unsaved `Saving` input recovery by typing a `Saving` name and planned money amount, then canceling, using `<` or Back, leaving `Savings`, refreshing, and reopening later before `Save`; confirm only last successfully saved data returns, no draft is saved, no `Balance Changes` entry is created, no browser leave warning appears, and no message appears.
 - Test duplicate-name checks against broken `Saving` squares by loading a broken square with a readable non-empty saved name; confirm create, rename, and fixing another broken square with that same trimmed name return to the `Saving` squares view with no duplicate-name error, no saved data change, no `Balance Changes` entry, and the broken square still reserving the name until fixed or deleted.
 - Test fixing a broken `Saving` square using its own readable saved name when no other square uses that same trimmed name; confirm the square does not block itself and can be fixed if all other fix values are valid.
 - Test broken-square fix validation order by entering a duplicate name with a missing, `0.00$`, or above-limit planned money amount; confirm the planned-money-amount rule happens first, the same broken-square fix input step stays open, no message appears, no data saves, no square is fixed, and no `Balance Changes` entry is created.
+- Test that a new broken-square fix starts with empty raw name and planned-money values, `confirming` and failure visibility set to `false`, and no information copied from the broken record.
+- Test a failed broken-square fix and confirm its message clears after an accepted edit, retry, or closure, remains after rejected amount input, and appears again after another failed retry.
+- Test that an unavailable broken-square fix target closes the stale flow without calling the storage writer or showing a message and leaves the latest successfully saved information visible.
+- Test a repair with usable order numbers in remaining broken records; confirm those numbers are reserved, normal records receive increasing unused safe orders without changing their relative order, and no normal record becomes broken from a new duplicate order.
+- Test complete-list revalidation after a successful fix; confirm another unchanged record becomes normal only if it now passes every validation rule and otherwise remains broken.
 - Test touch scrolling over `Saving` squares by moving the finger more than `8px` before `600ms`; confirm the list scrolls, action state does not open, reorder does not start, no drag placeholder appears, nothing saves, no `Balance Changes` entry is created, and no message appears.
 - Test holding a normal default `Saving` square for `600ms` and releasing before moving at least `8px`; confirm no action state opens, no reorder starts, no drag placeholder appears, nothing saves, no `Balance Changes` entry is created, and no message appears.
 - Test `Saving` square reorder auto-scroll by dragging within `40px` of the top and bottom edges of the scrollable `Saving` squares area; confirm the area auto-scrolls at a fixed `8px` per animation frame, top and bottom use the same behavior, and speed does not change based on edge distance.
@@ -735,7 +764,7 @@ Acceptance criteria:
 13. Website updates the money amount.
 14. If the action is `Add` or `Subtract`, website saves it as its own history entry with the correct display type.
 15. If the action is `Modify` and the entered money amount is different from the money amount already shown, website updates the current money amount without saving history or showing a notification.
-16. Website shows money amount change history directly under the main money amount.
+16. Website shows money amount change history in `Balance Changes` on the dashboard.
 17. Website saves the updated data in browser storage.
 17. User reviews `Saving` squares.
 18. User can close the website and open it again later to see saved data when it is available.
@@ -747,25 +776,25 @@ Acceptance criteria:
 - Main money action inputs should start at `0.00`.
 - Main money action inputs should focus immediately when they open so the user can start typing without another tap or click.
 - Main money action inputs should request a mobile keyboard suitable for digit entry on supported devices.
-- Main money action inputs should show a rectangular `Cent` button for all users while a main money action input is open. The `Cent` button should appear directly under the horizontal input square on mobile and desktop. On mobile, when the browser and keyboard allow it, this placement should also keep the `Cent` button directly above the mobile keyboard.
-- Main money action inputs should accept only numbers from `0` through `9` and separator input from the `Space` key or `Cent` button, without letting the user type the `$` sign. Typed decimal points and manually typed comma separators should be blocked with no message. The input should add the decimal point and comma separators automatically while the user is typing.
-- Main money action inputs should accept separator input only after at least one digit and only when the previous accepted input is a digit. Starting separators and consecutive separators should be blocked with no message.
-- Main money action inputs should automatically format typed values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. Without separator input, typed digits are whole money amount digits: typing `5` should show `5.00`, `58` should show `58.00`, `589` should show `589.00`, `5895` should show `5,895.00`, `58955` should show `58,955.00`, and `589550` should show `589,550.00`.
-- Main money action inputs should use accepted separators from `Space` or `Cent` to split digit groups. If the input ends with a separator, all completed groups should be whole money amount digits and cents should show as `00`. If the final group after a separator has one or two digits, it should be cents and should be left-padded with `0` when it has one digit. Earlier groups should join into the whole money amount. If there is only one accepted separator and the final group grows to three or more digits, that final group should become another whole money amount group and cents should show as `00`. Once the input has two accepted separators, the final group is the cents group and should accept at most two digits.
+- Main money action inputs should provide an action with the exact visible name `Cent` on mobile and desktop without requiring a particular shape, position, size, or visual arrangement. Choosing `Cent` should keep the input active, and the mobile digit-entry keyboard should remain available when the browser permits it.
+- Main money action inputs should accept only numbers from `0` through `9`, with `Cent` or its keyboard alternative `Space` starting cents entry, without letting the user type the `$` sign. Typed decimal points and manually typed comma separators should be blocked with no message. The input should add the decimal point and comma separators automatically while the user is typing.
+- Main money action inputs should accept `Cent` or `Space` only after at least one entered digit and only once per input. The initial `0.00` should not count as an entered digit. `Cent` or `Space` before a digit or after cents entry has already started should be ignored without a message. The flow should visibly indicate when cents entry is active without requiring a particular visual treatment.
+- Main money action inputs should automatically format typed values with two digits after the decimal point, automatic comma separators for thousands and larger values, and no `$` sign while the user is typing. Before cents entry starts, typed digits are whole money amount digits: typing `5` should show `5.00`, `58` should show `58.00`, `589` should show `589.00`, `5895` should show `5,895.00`, `58955` should show `58,955.00`, and `589550` should show `589,550.00`.
+- After `Cent` or `Space` starts cents entry, the next one or two digits should be cents, with one digit left-padded by `0`. A third cents digit should be blocked without a message. All digits entered before cents entry should remain the whole money amount, with comma separators added automatically.
 - Main money action inputs should treat `0` as a normal digit, not a starting zero-position skip. Unneeded leading zeros in the whole money amount should be normalized away, so typing `0005` shows `5.00`.
 - Deleting one typed character from a main money action input should reformat the remaining typed value with two digits after the decimal point and no `$` sign while the input is still open.
 - Deleting all typed numbers from a main money action input should return it to `0.00` instead of making it empty.
 - Main money action inputs should be append-only: users should not move the cursor into the formatted value, select part of it, replace selected text, or directly edit generated comma separators or the generated decimal point.
-- Main money action input typing should add only to the end, and Backspace or Delete should remove only the last accepted digit or accepted separator.
-- Main money action inputs should block letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting separators, consecutive separators, additional separator input after two accepted separators, a third cents digit after the cents group is fixed by two accepted separators, and other invalid typed characters.
+- Main money action input typing should add only to the end, and Backspace or Delete should remove only the last accepted digit or the action that started cents entry.
+- Main money action inputs should block letters, minus signs, decimal points, `$` signs, manually typed comma separators, `Cent` or `Space` before any entered digit, another `Cent` or `Space` after cents entry starts, a third cents digit, and other invalid typed characters.
 - Main money action inputs should block typed characters that would make the input greater than `999,999.99`, with no message and no field change.
-- The dashboard, horizontal input square, `Balance Changes`, and `Savings` displays should contain money amounts up to `999,999.99$` without horizontal page overflow, overlapping content, hidden actions, rejected valid values, or missing required comma separators while typing or in visible saved/rendered values.
+- The money amount entry flow, dashboard, `Balance Changes`, and `Savings` displays should keep money amounts up to `999,999.99$` and required controls readable and usable without rejecting valid values or omitting required comma separators.
 - Main money action inputs should block paste. Pasted content should not appear, the input should keep its previous value, and no message should appear.
-- Main money action input flows should show the rectangular `Cent` button under the horizontal input square, `Save Changes` under `Cent`, and `Yes` and `Cancel` under `Save Changes`.
+- Main money action input flows should show the exact text `Save Changes` and provide actions exactly named `Cent`, `Yes`, and `Cancel` without requiring a particular visual arrangement.
 - In main money action input flows, `Yes` should try to save the entered value using the selected `Add`, `Subtract`, or `Modify` rule.
 - In main money action input flows, `Cancel` should close the input flow, return to the dashboard, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
-- In main money action input flows, clicking or tapping outside the horizontal input square, `Save Changes`, `Yes`, `Cancel`, and the `Cent` button should act like `Cancel`. This includes clicking or tapping the dimmed, inactive main money amount circle behind the input flow.
-- In main money action input flows, tapping or clicking the `Cent` button should behave like pressing `Space` and should not act like `Cancel`.
+- In main money action input flows, clicking or tapping outside the active entry flow should act like `Cancel` and should not reopen the main money actions.
+- In main money action input flows, choosing `Cent` should behave like pressing `Space`, start cents entry after at least one entered digit, keep the input active, and not act like `Cancel`.
 - `Saving` square planned money amount inputs may include cents, with up to two digits after the decimal point, and should not save values greater than `999,999.99$`.
 - `Saving` square planned money amount inputs should show the accepted typed value as raw decimal number text while typing, with no `$` sign, no comma separators, and no automatic two-decimal formatting before `Save`.
 - `Saving` square planned money amount inputs should accept digits from `0` through `9` and one decimal point, block letters, `$` signs, comma separators, a second decimal point, more than two digits after the decimal point, and `Space` with no message, should not show a `Cent` button, and should not use the main money amount `Space` key cents behavior.
@@ -811,18 +840,18 @@ Acceptance criteria:
 - `0.00$` should remove an existing `Saving` square instead of saving it with a `0.00$` planned money amount.
 - Changing a `Saving` square planned money amount should use a new total planned money amount, not an add or subtract amount.
 - Total planned money amount in valid `Saving` squares may be greater than the current money amount. The money amount shown inside `Savings` should stop at `0.00$`, coverage bars should show what is still needed for each square, and the fixed top `Savings` area should show the total difference as `{money amount} needed`.
-- `Balance Changes` created dates and created times are visible to the user in the format `July 21, 2026 at 3:45 PM` and use the user's browser/device local date and time. Each entry should also save an internal exact created date and time with seconds and milliseconds for ordering and clearing entries after 30 days, but should not show seconds or milliseconds to the user.
+- `Balance Changes` created dates and created times use the local date and time recorded when the action succeeds and the fixed English format shown by `September 18, 2026 at 2:30 PM`. Each entry also saves an exact created timestamp with milliseconds for ordering and expiration, but does not show seconds or milliseconds to the user.
 - The user should not choose dates for `Add` or `Subtract`.
 - `Add`, `Subtract`, and `Balance Changes` entries should not have notes.
 - Browser storage data should be checked before use so broken saved data does not crash the website.
 - Broken saved data should show `Saved data could not be loaded.` and a `Start again` action.
 - Saved browser data should load only when the data version value is exactly `1`.
 - Saved browser data with a missing, wrong, future, unreadable, or unrecognized data version, or a saved current money amount outside `0.00` through `999999.99` or not in normalized plain decimal format, should be treated as broken saved data.
-- Clicking `Start again` should delete the broken saved data and immediately create fresh browser storage data with the saved money amount set to `0.00`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`.
+- Clicking `Start again` should replace the broken saved data in one successful complete save with the saved money amount set to `0.00`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`, without deleting the storage key first.
 - If saved browser data can be read and has data version `1`, one broken saved `Saving` square should appear as a broken square in `Savings` instead of triggering the full saved-data error.
-- Visible history entries should be shown for 30 days.
-- For visible `Balance Changes` history, one month means 30 days, not a calendar month.
-- Each `Balance Changes` internal visible until date and time should be calculated from the internal exact created date and time plus 30 days using the user's browser/device local date and time.
+- Visible history entries should be shown for exactly 720 hours.
+- For visible `Balance Changes` history, 30 days means exactly 720 hours, not 30 calendar dates or one calendar month.
+- Each `Balance Changes` internal visible-until timestamp should equal its exact created timestamp plus `2_592_000_000` milliseconds.
 - Expiring old history entries should not change the current money amount.
 
 ## Browser Storage Rules
@@ -833,6 +862,7 @@ Acceptance criteria:
 - Save after every successful money amount change, `Saving` square change, or `Balance Changes` delete.
 - If the same website is open in multiple tabs or windows in the same browser, a successful saved change in one tab or window should automatically update the other open tabs or windows to the latest saved data.
 - Same-browser tab or window updates should refresh the visible money amount, `Balance Changes`, `Savings`, `Savings money amount`, top needed text, and coverage bars from the latest saved data.
+- When that update contains a new saved `Add` or `Subtract` entry, the receiving tab or window should move `Balance Changes` to the top so the newest entry is visible.
 - Same-browser tab or window updates should happen silently, create no `Balance Changes` entry, and should not write browser storage again only because another tab or window saved a change.
 - If a receiving tab or window has a temporary UI open when a same-browser storage update arrives, close that temporary UI like a cancel, discard unsaved typed input, save nothing from that tab or window, delete nothing from that tab or window, create no `Balance Changes` entry from that tab or window, and show the latest saved data.
 - Do not implement a normal user-controlled reset, clear-all-data, or start-fresh action for valid saved data in the first version.
@@ -854,11 +884,12 @@ Acceptance criteria:
 - Do not save browser storage for new `Saving` square attempts with a planned money amount of `0.00$` or greater than `999,999.99$` because nothing changed.
 - Save `Modify` changes only as an updated current money amount, not as a history entry.
 - Save `Balance Changes` deletes only as visible history removal, not as a money amount change.
-- Load saved browser data before showing the dashboard.
+- Keep a neutral loading state while checking saved browser data; show neither the dashboard nor recovery, and do not briefly show the default `0.00$` dashboard before the check finishes.
 - If saved browser data exists, restore the money amount, 30-day visible `Balance Changes` history, and `Saving` squares.
 - Restore saved browser data only when the data version value is exactly `1`.
 - Treat saved browser data with a missing, wrong, future, unreadable, or unrecognized data version, or a saved current money amount outside `0.00` through `999999.99` or not in normalized plain decimal format, as broken saved data.
-- When the user chooses `Start again` after broken saved data, immediately create fresh browser storage data with the saved money amount set to `0.00`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`.
+- When the user chooses `Start again` after broken saved data, replace it in one successful complete save with the saved money amount set to `0.00`, an empty `Balance Changes` list, no saved `Saving` squares, and data version `1`, without deleting the storage key first.
+- After a failed `Start again`, keep `Changes could not be saved.` visible while recovery is unchanged, remove it while retrying or when recovery closes, show it again after another failure, and do not restore it in a later new recovery state.
 - If saved browser data can be read and has data version `1`, do not show the full saved-data error only because one saved `Saving` square is broken.
 - A saved `Saving` square should be treated as broken when it has a missing ID, duplicate ID, missing name, empty trimmed name, duplicate trimmed name ignoring uppercase or lowercase differences, missing planned money amount, invalid planned money amount, planned money amount of `0.00$` or less, planned money amount greater than `999,999.99$`, missing order, invalid order, or duplicate order.
 - For duplicate saved IDs, duplicate saved names, or duplicate saved orders, keep the first matching saved `Saving` square in saved list order as normal if it is otherwise valid, and treat later matching saved `Saving` squares as broken.
@@ -921,53 +952,54 @@ Use:
 - Scrolling the dashboard page while the visible main money action buttons are open hides those buttons without changing anything.
 - Clicking `Add`, `Subtract`, or `Modify` starts the selected money amount input flow and does not count as an outside click.
 - Add money updates the money amount correctly.
-- `Add`, `Subtract`, and `Modify` money amount inputs open as a horizontal square in the middle of the screen.
-- The main money amount circle stays visible only as a dimmed, inactive background element while the horizontal input square is open.
-- The horizontal input square starts at `0.00`.
-- The horizontal input square is focused and ready for typing immediately when it opens, without requiring another tap or click.
+- `Add`, `Subtract`, and `Modify` use the same money amount entry flow without requiring a particular shape, position, size, or visual arrangement.
+- The money amount entry flow is the active interaction context while open, and other dashboard controls are inactive.
+- The money amount input starts at `0.00`.
+- The money amount input is focused and ready for typing immediately when it opens, without requiring another tap or click.
 - Main money action inputs request a mobile keyboard suitable for digit entry on supported devices.
-- Main money action inputs show a rectangular `Cent` button for all users directly under the horizontal input square while the input is open.
-- On mobile, when the browser and keyboard allow it, the `Cent` button appears directly above the mobile keyboard.
+- Main money action inputs provide an action with the exact visible name `Cent` on mobile and desktop.
+- Choosing `Cent` keeps the input active, and the mobile digit-entry keyboard remains available when the browser permits it.
 - Typing `5` in a main money action input shows `5.00`.
 - Typing `58` in a main money action input shows `58.00`.
 - Typing `589` in a main money action input shows `589.00`.
 - Typing `5895` in a main money action input shows `5,895.00`.
 - Typing `58955` in a main money action input shows `58,955.00`.
 - Typing raw digits `589550` in a main money action input shows `589,550.00`.
-- Typing `5`, then `Space`, in a main money action input keeps the display at `5.00`.
+- Typing `5`, then `Space`, in a main money action input keeps the display at `5.00` and visibly indicates that cents entry is active.
 - Typing `5`, then `Space`, then `5` in a main money action input shows `5.05` and saves and shows as `5.05$`.
 - Typing `5`, then `Space`, then `50` in a main money action input shows `5.50` and saves and shows as `5.50$`.
-- Typing `58`, then `Space`, then `430` in a main money action input shows `58,430.00` and saves and shows as `58,430.00$`.
-- Typing `58`, then `Space`, then `430`, then `Space`, then `88` in a main money action input shows `58,430.88` and saves and shows as `58,430.88$`.
+- Typing `58430`, then `Space`, then `88` in a main money action input shows `58,430.88` and saves and shows as `58,430.88$`.
+- Pressing another `Space` or choosing `Cent` after cents entry has started does not change the input and shows no message.
 - Typing `0`, then `Space`, then `5` in a main money action input shows `0.05` and saves and shows as `0.05$`.
 - Typing `999999`, then `Space`, then `99` in a main money action input shows `999,999.99` and saves and shows as `999,999.99$`.
 - Typing `5`, choosing `Cent`, then typing `5` in a main money action input shows `5.05` and saves and shows as `5.05$`.
 - Typing `5`, choosing `Cent`, then typing `50` in a main money action input shows `5.50` and saves and shows as `5.50$`.
-- Typing `58`, choosing `Cent`, typing `430`, choosing `Cent`, then typing `88` in a main money action input shows `58,430.88` and saves and shows as `58,430.88$`.
+- Typing `58430`, choosing `Cent`, then typing `88` in a main money action input shows `58,430.88` and saves and shows as `58,430.88$`.
 - Typing `0005` in a main money action input shows `5.00` and saves and shows as `5.00$`.
 - Typing `Space`, `Space`, `Space`, then `5` in a main money action input blocks the three `Space` key presses and then shows `5.00` after the `5` is typed.
 - Tapping `Cent`, `Cent`, `Cent`, then typing `5` in a main money action input blocks the three `Cent` taps and then shows `5.00` after the `5` is typed.
-- Trying to type another `Space` or tap `Cent` after `58`, `Space`, `430`, `Space`, `88` does not change the input and shows no message.
-- Trying to type a third cents digit after the cents group is fixed by two accepted separators does not change the input and shows no message.
+- Choosing `Cent` or pressing `Space` after cents entry has started does not change the input and shows no message.
+- Trying to type a third cents digit after two cents digits does not change the input and shows no message.
 - Saving raw digits `589550` in a main money action input stores `589550.00` and shows `589,550.00$`.
 - Saving a main money action input stores the money amount without the `$` sign or comma separators and shows the saved money amount with the `$` sign at the end.
-- Deleting one typed character from a main money action input reformats the remaining typed value as a money amount.
+- Deleting from `5.50` entered as `5`, `Cent`, `5`, `0` first shows `5.05`, then `5.00`, then removes the accepted `Cent` action and its visible cents-entry indication while leaving the display at `5.00`.
 - Deleting all typed numbers in a main money action input returns it to `0.00` instead of making it empty.
 - Clicking or tapping inside `58,430.88` keeps the main money action input append-only, so the next accepted typed character is handled at the end.
 - Selecting `430` in `58,430.88` and typing `9` does not replace `430`; accepted typing uses append-only behavior.
-- Backspace or Delete with the cursor or selection inside the formatted value removes only the last accepted digit or accepted separator.
-- Typing letters, minus signs, decimal points, `$` signs, manually typed comma separators, starting separators, consecutive separators, additional separator input after two accepted separators, a third cents digit after the cents group is fixed by two accepted separators, or other blocked characters into a main money action input does not change the field, and no message appears for that typed character.
-- Tapping `Cent` when separator input is blocked does not change the field, and no message appears.
-- Tapping `Cent` does not cancel or close the main money amount input flow.
+- Backspace or Delete with the cursor or selection inside the formatted value removes only the last accepted digit or the action that started cents entry.
+- Typing letters, minus signs, decimal points, `$` signs, manually typed comma separators, choosing `Cent` or pressing `Space` before any entered digit, choosing `Cent` or pressing `Space` again after cents entry starts, entering a third cents digit, or entering another blocked character does not change the field, and no message appears.
+- Choosing `Cent` when cents entry cannot start does not change the field, and no message appears.
+- Choosing `Cent` keeps the input active, visibly indicates that cents entry is active, and does not cancel or close the main money amount input flow.
 - Trying to type a main money action input value greater than `999,999.99` does not change the field and shows no message.
-- Money amounts up to `999,999.99$` stay contained in the horizontal input square, dashboard, `Balance Changes`, and `Savings` displays without horizontal page overflow, overlap, hidden actions, or missing required comma separators while typing or in visible saved/rendered values.
+- Money amounts up to `999,999.99$` and all required controls remain readable and usable in the entry flow, dashboard, `Balance Changes`, and `Savings`, with required comma separators while typing or in visible saved/rendered values.
 - Trying to paste letters, numbers, symbols, or any other content into a main money action input does not change the field and shows no message.
 - Trying to paste letters, numbers, symbols, or any other content into a `Saving` square planned money amount input does not change the field and shows no message.
-- `Add`, `Subtract`, and `Modify` money amount input flows show the order: horizontal input square, `Cent`, `Save Changes`, then `Yes` and `Cancel`.
+- `Add`, `Subtract`, and `Modify` money amount input flows show the exact text `Save Changes` and provide actions exactly named `Cent`, `Yes`, and `Cancel` without requiring a particular visual arrangement.
 - Clicking `Yes` applies the selected `Add`, `Subtract`, or `Modify` action when the typed amount is valid for that action and, for `Modify`, different from the money amount already shown.
-- After a successful `Add`, `Subtract`, or `Modify` that changes the money amount, the horizontal input square closes, the temporary typed input resets for the next input, the dashboard money amount view returns, the main money action buttons are hidden, the updated money amount is shown, and no message appears.
+- After a successful `Add`, `Subtract`, or `Modify` that changes the money amount, the input flow closes, the temporary typed input resets for the next input, the dashboard money amount view returns, the main money action buttons are hidden, the updated money amount is shown, and no message appears.
+- After a failed `Add`, `Subtract`, or `Modify` save, `Changes could not be saved.` remains while the flow is unchanged, disappears when the amount changes or the user retries or closes the flow, and appears again if the retry fails.
 - Clicking `Cancel` or clicking/tapping outside a main money amount input flow changes nothing, saves nothing, creates no `Balance Changes` entry, and shows no message.
-- Clicking or tapping the dimmed, inactive main money amount circle behind the input flow acts like outside-cancel and does not reopen the main money action buttons.
+- Clicking or tapping outside the active money amount entry flow acts like `Cancel` and does not reopen the main money action buttons.
 - `Saving` square create, `Saving` square rename, `Saving` square planned-money-amount change, and broken `Saving` square fix input flows show `Save` and `Cancel` text actions at the bottom.
 - `Saving` square create and broken `Saving` square fix input flows appear as temporary `Saving` input squares inside the `Saving` squares area.
 - Trying to confirm `0.00` in `Add` does not change the money amount, does not save data, does not create a `Balance Changes` entry, and keeps the same money amount input step open.
@@ -983,27 +1015,24 @@ Use:
 - Modify to `0.00$` from `0.00$` is a no-op and does not create browser storage.
 - Add and subtract entries stay separate in history.
 - Newest `Balance Changes` entries appear first.
-- After a successful `Add` or `Subtract` creates a new `Balance Changes` entry, the `Balance Changes` square automatically scrolls to the top so the newest entry is visible.
+- After a successful `Add` or `Subtract` creates a new `Balance Changes` entry, the `Balance Changes` scroll position moves to the top so the newest entry is visible.
+- A new saved `Add` or `Subtract` entry received from another open tab or window also moves the receiving `Balance Changes` view to the top.
 - Empty `Balance Changes` shows no rows, sentence, placeholder, icon, or other empty-state content.
 - History does not replace separate entries with only a net result.
-- Money amount change history appears as a large `Balance Changes` square directly under the main money amount.
+- Money amount change history is available in `Balance Changes` on the dashboard without requiring a particular shape, size, position, or scrolling implementation.
 - There is no separate `View history` action for money amount change history.
-- Long money amount change history can be reached by scrolling inside the large `Balance Changes` square.
-- The dashboard page can scroll past the large `Balance Changes` square to reach `Savings`.
-- Scrolling inside the large `Balance Changes` square does not move the dashboard page, even when the internal entry list is already at the top or bottom.
-- Scrolling outside the large `Balance Changes` square can move the dashboard page to reach `Savings`.
-- `Savings` appears below the large `Balance Changes` square.
-- All valid 30-day `Balance Changes` entries remain reachable inside the scrollable square, with no smaller maximum visible-entry limit.
+- All valid 30-day `Balance Changes` entries remain reachable when the history is long, with no smaller maximum visible-entry limit.
+- The `Savings` action remains reachable whether `Balance Changes` is empty or contains entries.
 - During cleanup, `Balance Changes` entries at or after their visible until date are deleted from browser storage.
 - `Balance Changes` cleanup runs when the website opens and loads saved data.
 - `Balance Changes` cleanup runs after every successful saved user action.
-- `Balance Changes` internal visible until dates are calculated from the internal exact created date and time plus 30 days using the user's browser/device local date and time.
+- `Balance Changes` internal visible-until timestamps equal their exact created timestamps plus `2_592_000_000` milliseconds, or exactly 720 hours.
 - Expiring old history entries does not change the current money amount.
 - `Balance Changes` shows correct differences.
 - Visible `Balance Changes` rows show the signed money amount, action text, and both the created date and created time, such as `+56.00$ added` or `-34.00$ subtracted` plus a visible date and time like `July 21, 2026 at 3:45 PM`.
 - Visible `Balance Changes` entries are compact, with the signed money amount and action text in the top-left corner and the visible date and time in the bottom-right corner.
 - Mobile keeps the same compact `Balance Changes` entry layout and allows wrapping only as needed to keep text readable.
-- Visible `Balance Changes` dates and times use the user's browser/device local date and time.
+- Visible `Balance Changes` dates and times use the local values recorded when each action succeeds and the fixed English format shown by `September 18, 2026 at 2:30 PM`.
 - Visible `Balance Changes` rows do not show previous money amount, new money amount, internal exact created date and time, seconds, milliseconds, or internal visible until date and time.
 - Deleting a `Balance Changes` entry removes only that visible history entry and does not change the current money amount.
 - Touch users open `Balance Changes` delete by pressing and holding the entry for `600ms`.
@@ -1020,6 +1049,7 @@ Use:
 - Browser storage saves the current money amount and history.
 - Browser storage restores the current money amount and history after refresh.
 - Browser storage restores data after closing and reopening the website in the same browser.
+- While browser storage is being checked after opening, neither the dashboard nor recovery is shown and the default `0.00$` dashboard does not briefly appear.
 - Browser storage changes saved from one open tab or window update other open tabs or windows in the same browser without creating extra history entries, extra saves, or user-facing messages.
 - `Start again` appears only when saved browser data is broken or unreadable, not when saved data is valid.
 - Open temporary UI is not restored after refresh, close, or later reopen; only latest successfully saved data is restored.
@@ -1030,8 +1060,9 @@ Use:
 - Saved browser storage data with a current money amount greater than `999999.99` shows the broken saved-data recovery message.
 - Saved browser storage data with a current money amount of `5000.00` loads and shows the money amount as `5,000.00$`.
 - Saved browser storage data with a current money amount of `5`, `5.0`, `005.00`, `5,000.00`, or `5.000` shows the broken saved-data recovery message.
-- Clicking `Start again` after broken browser storage data deletes the broken saved data and immediately creates fresh browser storage data with the saved money amount set to `0.00`, empty `Balance Changes`, no saved `Saving` squares, and data version `1`.
-- If saved browser data has one broken saved `Balance Changes` entry but the rest of the data can be read, the website loads the rest of the data, removes only that broken history entry, does not change the current money amount, and shows no error message.
+- Clicking `Start again` after broken browser storage data replaces it in one successful complete save with the saved money amount set to `0.00`, empty `Balance Changes`, no saved `Saving` squares, and data version `1`, without deleting the storage key first.
+- A failed `Start again` keeps `Changes could not be saved.` until retry or recovery closes, shows it again if retry fails, and does not restore it in a later new recovery state.
+- If saved browser data has one or more broken saved `Balance Changes` entries but the rest of the data can be read, the website removes every broken history entry independently, keeps every usable entry, does not change the current money amount, and shows no error message.
 - If saved browser data has one broken saved `Saving` square but the rest of the data can be read, the website loads the rest of the data and shows that square as `Saving could not be loaded.` with `Fix` and `Delete`.
 - A broken saved `Saving` square with missing name, duplicate name, invalid order, duplicate order, invalid planned money amount, planned money amount of `0.00$` or less, or planned money amount greater than `999,999.99$` does not affect `Savings money amount`, top needed text, or valid square coverage calculations.
 - A broken saved `Saving` square cannot be reordered, stays locked in its displayed position until fixed or deleted, and does not prevent normal default `Saving` squares from being reordered.
