@@ -23,17 +23,17 @@
 | 021 | FeatureSpec 011 | Deleting a `Saving` |
 | 022 | FeatureSpec 012 | Reordering `Saving` squares |
 
-Each one starts in `docs/specs/drafts/`, links to exactly one FeatureSpec, and remains a draft until you approve it.
+Each new TechnicalSpec starts in `docs/specs/drafts/`, links to exactly one FeatureSpec, and remains a draft until you approve it.
 
-TechnicalSpecs 001 through 020 are accepted. TechnicalSpecs 021 through 022 are in draft review.
+TechnicalSpecs 001 through 022 are accepted. There are no TechnicalSpecs in draft review.
 
-## What still needs clarification?
+## Implementation Verification Still Required
 
-A few user-visible details are not fully settled:
+The specifications are accepted. These implementation verification items remain before the website can be treated as complete.
 
-1. **Other save-failure message lifetimes**
+1. **Touch reorder browser verification**
 
-   The lifetime is settled for main money amount entry, `Saving` creation, broken-`Saving` fix, and `Start again` recovery flows. The remaining save-failure flows can be settled in their matching FeatureSpecs before their TechnicalSpecs are accepted.
+   Accepted TechnicalSpec 022 uses Touch Events with a non-passive active `touchmove` listener for touch, Pointer Events for mouse, native pre-hold scrolling, explicit successful touch reservation, and clean cancellation when prevention or retained gesture resources fail. Verify pre-hold scrolling, sub-threshold jitter followed by post-hold reorder, actual scroll after sub-threshold movement, every post-hold prevention check, stable event ownership, and visual-viewport interruption on real devices in current mobile Safari, Chrome for Android, and Firefox for Android before implementation is treated as complete.
 
 2. **Browser and accessibility support**
 
@@ -44,14 +44,10 @@ Shapes, colors, spacing, exact positions, responsive breakpoints, and component 
 
 ## From now until completion
 
-1. Review TechnicalSpec 021 with you.
-2. Accept TechnicalSpec 021 only after your approval.
-3. Repeat that process for TechnicalSpec 022.
-4. Update the active implementation plan using the accepted TechnicalSpecs.
-5. Decide the visible design while working on the dashboard and Savings technical work.
-6. Build the website code in `website/`.
-7. Test every feature against its FeatureSpec and TechnicalSpec.
-8. Check mobile, desktop, browser storage, multiple tabs, failures, and recovery.
-9. Complete the final review and move the active plan to done.
+1. Decide the visible design while working on the dashboard and Savings technical work.
+2. Build the website code in `website/`.
+3. Test every feature against its accepted FeatureSpec and TechnicalSpec.
+4. Check mobile, desktop, browser storage, multiple tabs, failures, and recovery.
+5. Complete the final review and move the active plan to done.
 
-The current draft-review work covers TechnicalSpecs 021 through 022.
+TechnicalSpec review is complete through TechnicalSpec 022.

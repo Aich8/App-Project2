@@ -83,8 +83,8 @@ Do not infer approval from silence, discussion, review feedback, or a request to
 - `accepted/FEATURE-SPEC-008-opening-saving-actions.md`: user-visible behavior and rules for opening and closing the available actions of one existing `Saving` square, including its one-step Back result.
 - `accepted/FEATURE-SPEC-009-renaming-a-saving.md`: user-visible behavior and rules for renaming one existing `Saving`, including starting input, pending-save interaction, failure-message lifetime, and complete-list rechecking.
 - `accepted/FEATURE-SPEC-010-changing-the-planned-money-amount-of-a-saving.md`: user-visible behavior and rules for changing one `Saving`'s planned money amount, including starting input, accepted decimal forms, pending-save interaction, failure-message lifetime, and complete-list checking after zero removal.
-- `accepted/FEATURE-SPEC-011-deleting-a-saving.md`: user-visible behavior and rules for deleting one existing `Saving`.
-- `accepted/FEATURE-SPEC-012-reordering-saving-squares.md`: user-visible behavior and rules for changing the order of existing `Saving` squares.
+- `accepted/FEATURE-SPEC-011-deleting-a-saving.md`: user-visible behavior and rules for deleting one existing `Saving`, including complete-list rechecking and save-failure message lifetime.
+- `accepted/FEATURE-SPEC-012-reordering-saving-squares.md`: user-visible behavior and rules for changing the order of existing `Saving` squares, including exact reorder thresholds, complete-list rechecking, and save-failure message lifetime.
 - `accepted/FEATURE-SPEC-013-viewing-savings-coverage.md`: user-visible behavior and rules for viewing how the main money amount covers `Saving` plans.
 - `accepted/FEATURE-SPEC-014-recovering-unreadable-saved-data.md`: user-visible behavior and rules for whole-data recovery, `Start again` failure-message timing, and silently removing every broken `Balance Changes` entry when everything else remains usable.
 - `accepted/FEATURE-SPEC-015-fixing-a-saving-that-could-not-be-loaded.md`: user-visible behavior and rules for fixing one saved `Saving` that cannot be loaded normally, including empty starting inputs, save-failure message lifetime, an unavailable target, and complete-list revalidation.
@@ -115,10 +115,9 @@ Do not infer approval from silence, discussion, review feedback, or a request to
 - `accepted/TECHNICAL-SPEC-018-opening-and-closing-saving-actions.md`: gesture-safe opening, coordinated continuation, one-step Back behavior, and closing of one normal `Saving` action state for `FEATURE-SPEC-008`.
 - `accepted/TECHNICAL-SPEC-019-renaming-a-saving.md`: temporary rename state, name validation, coherent save attempts, complete candidate creation, revalidation, and coordinated result handling for `FEATURE-SPEC-009`.
 - `accepted/TECHNICAL-SPEC-020-changing-a-saving-planned-money-amount.md`: temporary amount-change state, exact decimal parsing, coherent replacement or zero-removal candidates, complete-list revalidation, and coordinated save results for `FEATURE-SPEC-010`.
+- `accepted/TECHNICAL-SPEC-021-deleting-a-saving.md`: normal and broken target confirmation, atomic deletion, complete-list revalidation, failure-message lifetime, and coordinated result handling for `FEATURE-SPEC-011`.
+- `accepted/TECHNICAL-SPEC-022-reordering-saving-squares.md`: hybrid touch-and-mouse gesture recognition without a hold timer, stable fixed-overlay dragging, exact automatic-scrolling geometry, broken-slot-safe order allocation, complete-list revalidation, and coordinated save results for `FEATURE-SPEC-012`.
 
 ## Current Draft Specs
 
-- `drafts/FEATURE-SPEC-011-deleting-a-saving.md`: proposed revision clarifying complete-list rechecking after deletion and save-failure message lifetime.
-- `drafts/FEATURE-SPEC-012-reordering-saving-squares.md`: proposed revision clarifying exact reorder thresholds, complete-list rechecking, and save-failure message lifetime.
-- `drafts/TECHNICAL-SPEC-021-deleting-a-saving.md`: proposed normal and broken target confirmation, atomic deletion, and coordinated result handling for `FEATURE-SPEC-011`.
-- `drafts/TECHNICAL-SPEC-022-reordering-saving-squares.md`: proposed hold-and-move recognition, temporary ordering, automatic scrolling, broken-slot-safe order allocation, and coordinated save results for `FEATURE-SPEC-012`.
+There are no current draft specifications.

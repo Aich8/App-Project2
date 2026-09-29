@@ -36,8 +36,12 @@ Deleting a `Saving` does not change the main money amount.
 - Choosing `Delete` in the confirmation removes only the selected `Saving`.
 - The confirmation closes and returns to the `Savings` view.
 - The selected `Saving` name and planned money amount are removed.
-- Other `Saving` squares and their order remain unchanged.
-- The information shown inside `Savings` updates using the remaining `Saving` squares.
+- Deletion does not directly edit or reorder any remaining `Saving`.
+- The complete remaining `Saving` list is checked again after deletion.
+- An unchanged record that is now valid is shown as a normal `Saving`.
+- An unchanged record that is still invalid remains a broken `Saving`.
+- A record that becomes normal is shown according to its existing order.
+- The information shown inside `Savings` updates using the resulting normal `Saving` squares.
 - The main money amount remains unchanged.
 - No `Balance Changes` entry is created, and no success message is shown.
 - The deleted `Saving` cannot be restored with an undo action.
@@ -48,12 +52,20 @@ Deleting a `Saving` does not change the main money amount.
 - Other `Saving` squares and the main money amount remain unchanged.
 - The confirmation stays open, so the user can try `Delete` again or choose `Cancel`.
 - The exact message `Changes could not be saved.` is shown.
+- The message remains visible without a timer while the failed confirmation remains unchanged.
+- Choosing `Delete` to retry removes the old message while the retry is being attempted.
+- A failed retry shows the message again, and a successful retry closes the confirmation.
+- Choosing `Cancel`, clicking or tapping outside, or using either Back action removes the message by closing the confirmation.
+- Refreshing, closing, reopening, or receiving newer saved information from another open tab or window discards the confirmation and its message.
+- A later delete confirmation starts without the previous message.
 
 ## Acceptance Expectations
 
 - Choosing `Delete` for a `Saving` asks for confirmation before removing it.
 - Canceling, selecting outside, or using Back does not delete the `Saving`.
 - A successful deletion removes only the selected `Saving`.
+- The complete remaining `Saving` list is checked again, and each record is shown according to whether it is now normal or broken.
 - The remaining information inside `Savings` updates after deletion.
 - Deleting a `Saving` never changes the main money amount or creates a `Balance Changes` entry.
 - A failed deletion keeps the selected `Saving` and its confirmation available.
+- A save-failure message remains while its confirmation is unchanged, clears during retry or when the confirmation closes, and returns after another failed retry.

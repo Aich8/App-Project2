@@ -8,7 +8,7 @@ Implements: [`FEATURE-SPEC-011: Deleting A Saving`](FEATURE-SPEC-011-deleting-a-
 
 Covers: confirmation state, normal and broken target identity, complete deletion-candidate creation, and coordinated save results.
 
-Status: `Draft`
+Status: `Accepted`
 
 ## Purpose
 
@@ -103,10 +103,13 @@ Keep `Changes could not be saved.` visible without a timer while the failed conf
 Verify that:
 
 - normal IDs and broken runtime symbols each resolve only their exact current target;
+- deleting a normal target removes the one stored item belonging to its stable ID and no other item;
+- deleting a broken target removes the one stored item belonging to its current runtime symbol, preserves every other broken raw value by exact `Object.is` identity, and never serializes any runtime symbol;
 - a broken target opens only after every direct-start check and temporary Back-step operation succeeds;
 - a stale target closes without a write or message;
 - only a completed outside click or tap closes the confirmation, and the same interaction cannot start another action;
 - `Cancel`, outside interaction, and Back invalidate a pending request and close the confirmation without changing active information;
+- closing while a request is waiting aborts it before any writer call when possible, and a request invalidated after its synchronous writer turn cannot publish a late success, failure, or message into the closed flow;
 - every close clears handlers and handles the temporary Back step exactly once;
 - one attempt uses one coherent ready-state snapshot, its matching target and baseline, and one fresh request identity;
 - repeated `Delete` choices while pending create one request and at most one writer call;
@@ -115,10 +118,13 @@ Verify that:
 - candidate-construction failure registers no request, calls no writer, and follows the save-failure behavior;
 - encoder rejection calls no `setItem` and returns `save-failed`;
 - success builds and installs one complete ready state, rechecks every remaining `Saving`, recalculates `Savings`, closes the confirmation, and creates no message, history entry, scrolling request, or undo state;
+- deleting the earlier reserving record in a duplicate-ID, duplicate-name, or duplicate-order pair makes the later unchanged record normal only when complete revalidation finds that all of its fields are now valid;
+- deleting a record that does not resolve every invalid field leaves each still-invalid unchanged record broken after complete revalidation;
 - failure retains the target and confirmation and changes no active information;
+- one failed deletion, a retry, a second failure, and a successful retry respectively show, hide, show, and finally remove the failure message while retaining the same selected target until success;
 - retry clears the old failure message, another failure restores it, and every close removes it;
 - stale handlers and late results cannot affect a closed, replaced, or newer deletion flow;
-- deleting a broken target never serializes its runtime symbol; and
+- success and every non-navigation close leave the primary view inside `Savings`, while TechnicalSpec 017 removes or consumes the temporary Back step exactly once; and
 - a remaining record appears normally after success only when complete-list rechecking finds it valid.
 
 ## Boundaries
