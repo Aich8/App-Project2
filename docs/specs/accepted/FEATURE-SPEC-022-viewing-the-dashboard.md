@@ -38,7 +38,6 @@ The dashboard is for a manual cash tracker. It does not represent a real bank ac
 
 ## Main Money Amount
 
-- The main money amount is the most visually prominent information on the dashboard.
 - It is shown with the exact user-facing label `Current Balance`.
 - The main money amount is always shown with two digits after the decimal point and a `$` sign at the end.
 - Amounts of `1,000.00$` or more use comma separators every three digits before the decimal point.

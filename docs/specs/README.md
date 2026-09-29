@@ -77,12 +77,12 @@ Do not infer approval from silence, discussion, review feedback, or a request to
 - `accepted/FEATURE-SPEC-002-subtracting-money.md`: user-visible behavior and rules for manually subtracting money.
 - `accepted/FEATURE-SPEC-003-modifying-the-money-amount.md`: user-visible behavior and rules for silently correcting the complete money amount.
 - `accepted/FEATURE-SPEC-004-viewing-balance-changes.md`: user-visible behavior and rules for reviewing successful `Add` and `Subtract` actions, including exact entry text, fixed English date-and-time output, 720-hour visibility, and newest-entry scrolling.
-- `accepted/FEATURE-SPEC-005-deleting-a-balance-change.md`: user-visible behavior and rules for deleting one `Balance Changes` entry.
-- `accepted/FEATURE-SPEC-006-viewing-savings.md`: user-visible behavior and rules for opening, viewing, and leaving the `Savings` planning section.
+- `accepted/FEATURE-SPEC-005-deleting-a-balance-change.md`: user-visible behavior and rules for deleting one `Balance Changes` entry, including stale-confirmation closure and save-failure message lifetime.
+- `accepted/FEATURE-SPEC-006-viewing-savings.md`: user-visible behavior and rules for opening, viewing, updating, navigating back to, and leaving the `Savings` planning section.
 - `accepted/FEATURE-SPEC-007-creating-a-saving.md`: user-visible behavior and rules for creating one new `Saving` square, including planned-money typing, last-place insertion, and save-failure message lifetime.
-- `accepted/FEATURE-SPEC-008-opening-saving-actions.md`: user-visible behavior and rules for opening the available actions of one existing `Saving` square.
-- `accepted/FEATURE-SPEC-009-renaming-a-saving.md`: user-visible behavior and rules for renaming one existing `Saving`.
-- `accepted/FEATURE-SPEC-010-changing-the-planned-money-amount-of-a-saving.md`: user-visible behavior and rules for changing the planned money amount of one existing `Saving`.
+- `accepted/FEATURE-SPEC-008-opening-saving-actions.md`: user-visible behavior and rules for opening and closing the available actions of one existing `Saving` square, including its one-step Back result.
+- `accepted/FEATURE-SPEC-009-renaming-a-saving.md`: user-visible behavior and rules for renaming one existing `Saving`, including starting input, pending-save interaction, failure-message lifetime, and complete-list rechecking.
+- `accepted/FEATURE-SPEC-010-changing-the-planned-money-amount-of-a-saving.md`: user-visible behavior and rules for changing one `Saving`'s planned money amount, including starting input, accepted decimal forms, pending-save interaction, failure-message lifetime, and complete-list checking after zero removal.
 - `accepted/FEATURE-SPEC-011-deleting-a-saving.md`: user-visible behavior and rules for deleting one existing `Saving`.
 - `accepted/FEATURE-SPEC-012-reordering-saving-squares.md`: user-visible behavior and rules for changing the order of existing `Saving` squares.
 - `accepted/FEATURE-SPEC-013-viewing-savings-coverage.md`: user-visible behavior and rules for viewing how the main money amount covers `Saving` plans.
@@ -102,8 +102,23 @@ Do not infer approval from silence, discussion, review feedback, or a request to
 - `accepted/TECHNICAL-SPEC-005-detecting-and-repairing-a-broken-saving.md`: saved-record validation, broken-slot isolation, fix state and validation, safe order allocation, complete-list revalidation, and atomic replacement for `FEATURE-SPEC-015`.
 - `accepted/TECHNICAL-SPEC-006-safe-browser-storage-writes-and-rollback.md`: complete-candidate browser-storage writes, failure isolation, commit handling, and rollback by discarding an unsuccessful candidate for `FEATURE-SPEC-016`.
 - `accepted/TECHNICAL-SPEC-007-loading-validating-and-recovering-saved-data.md`: version-1 saved data, safe loading and validation, item recovery, silent cleanup, and `Start again` execution for `FEATURE-SPEC-014`.
+- `accepted/TECHNICAL-SPEC-008-temporary-action-lifetime-and-discard.md`: in-memory temporary-action boundaries, safe lifecycle discard, pending-request invalidation, and saved-view restoration for `FEATURE-SPEC-017`.
+- `accepted/TECHNICAL-SPEC-009-same-browser-save-coordination-and-updates.md`: exclusive save coordination, stale-write prevention, and received-update handling for `FEATURE-SPEC-018`.
+- `accepted/TECHNICAL-SPEC-010-one-open-action-coordination.md`: shared action gating, safe same-action transitions, stale-callback protection, and one-interaction protection for `FEATURE-SPEC-019`.
+- `accepted/TECHNICAL-SPEC-011-dashboard-loading-and-rendering.md`: neutral initial rendering, root-view selection, complete dashboard derivation, exact money formatting, and safe expiration re-rendering for `FEATURE-SPEC-022`.
+- `accepted/TECHNICAL-SPEC-012-opening-and-closing-main-money-actions.md`: current-value action availability, coordinated opening and continuation, and safe click, tap, keyboard, outside-interaction, and scroll closing for `FEATURE-SPEC-020`.
+- `accepted/TECHNICAL-SPEC-013-adding-money-safely.md`: exact Add validation and calculation, positive history-record creation, complete-candidate construction, and coordinated save-result handling for `FEATURE-SPEC-001`.
+- `accepted/TECHNICAL-SPEC-014-subtracting-money-safely.md`: exact Subtract validation, non-negative calculation, actual-removed history-record creation, complete-candidate construction, and coordinated save-result handling for `FEATURE-SPEC-002`.
+- `accepted/TECHNICAL-SPEC-015-modifying-the-money-amount.md`: exact full-amount replacement, complete candidate creation without a new history record, and coordinated save-result handling for `FEATURE-SPEC-003`.
+- `accepted/TECHNICAL-SPEC-016-deleting-a-balance-change.md`: hold recognition, coordinated deletion steps, atomic removal of one selected `Balance Changes` record, and safe failure handling for `FEATURE-SPEC-005`.
+- `accepted/TECHNICAL-SPEC-017-savings-view-and-browser-navigation.md`: safe `Savings` view derivation, primary-view navigation, temporary action Back steps, and same-document Back and Forward coordination for `FEATURE-SPEC-006`.
+- `accepted/TECHNICAL-SPEC-018-opening-and-closing-saving-actions.md`: gesture-safe opening, coordinated continuation, one-step Back behavior, and closing of one normal `Saving` action state for `FEATURE-SPEC-008`.
+- `accepted/TECHNICAL-SPEC-019-renaming-a-saving.md`: temporary rename state, name validation, coherent save attempts, complete candidate creation, revalidation, and coordinated result handling for `FEATURE-SPEC-009`.
+- `accepted/TECHNICAL-SPEC-020-changing-a-saving-planned-money-amount.md`: temporary amount-change state, exact decimal parsing, coherent replacement or zero-removal candidates, complete-list revalidation, and coordinated save results for `FEATURE-SPEC-010`.
 
 ## Current Draft Specs
 
-- `drafts/TECHNICAL-SPEC-008-temporary-action-lifetime-and-discard.md`: proposed in-memory boundary and lifecycle discard rules for unfinished actions under `FEATURE-SPEC-017`.
-- `drafts/TECHNICAL-SPEC-009-same-browser-save-coordination-and-updates.md`: proposed exclusive save coordination, stale-write prevention, and received-update handling for `FEATURE-SPEC-018`.
+- `drafts/FEATURE-SPEC-011-deleting-a-saving.md`: proposed revision clarifying complete-list rechecking after deletion and save-failure message lifetime.
+- `drafts/FEATURE-SPEC-012-reordering-saving-squares.md`: proposed revision clarifying exact reorder thresholds, complete-list rechecking, and save-failure message lifetime.
+- `drafts/TECHNICAL-SPEC-021-deleting-a-saving.md`: proposed normal and broken target confirmation, atomic deletion, and coordinated result handling for `FEATURE-SPEC-011`.
+- `drafts/TECHNICAL-SPEC-022-reordering-saving-squares.md`: proposed hold-and-move recognition, temporary ordering, automatic scrolling, broken-slot-safe order allocation, and coordinated save results for `FEATURE-SPEC-012`.

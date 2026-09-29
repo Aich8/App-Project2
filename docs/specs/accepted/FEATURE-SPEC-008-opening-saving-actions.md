@@ -37,6 +37,8 @@ Opening or closing these actions does not change the `Saving` or the main money 
 - Closing the actions shows no message.
 - Clicking or tapping a blank part of the selected `Saving` keeps its actions open.
 - Scrolling keeps the actions open.
+- When only a `Saving`'s actions are open, using the `Savings` Back action or browser/device Back closes those actions and returns to the dashboard in the same step.
+- That Back result changes no information, creates no `Balance Changes` entry, and shows no message.
 - Leaving `Savings` closes any open `Saving` actions.
 - Refreshing, closing, or reopening the website clears any open `Saving` actions.
 
@@ -58,5 +60,6 @@ Opening or closing these actions does not change the `Saving` or the main money 
 - The user can start renaming, changing the planned money amount, or deleting the selected `Saving`.
 - Clicking or tapping outside closes the actions without changing anything.
 - Scrolling and blank-space interaction do not close actions that are already open.
+- When only a `Saving`'s actions are open, the `Savings` Back action or browser/device Back closes them and returns to the dashboard in one step.
 - Selecting another `Saving` closes the current actions without opening new actions from the same selection.
 - Opening or closing `Saving` actions never changes the main money amount or creates a `Balance Changes` entry.

@@ -33,6 +33,19 @@ Source specs:
 - `docs/specs/accepted/TECHNICAL-SPEC-005-detecting-and-repairing-a-broken-saving.md`
 - `docs/specs/accepted/TECHNICAL-SPEC-006-safe-browser-storage-writes-and-rollback.md`
 - `docs/specs/accepted/TECHNICAL-SPEC-007-loading-validating-and-recovering-saved-data.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-008-temporary-action-lifetime-and-discard.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-009-same-browser-save-coordination-and-updates.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-010-one-open-action-coordination.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-011-dashboard-loading-and-rendering.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-012-opening-and-closing-main-money-actions.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-013-adding-money-safely.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-014-subtracting-money-safely.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-015-modifying-the-money-amount.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-016-deleting-a-balance-change.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-017-savings-view-and-browser-navigation.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-018-opening-and-closing-saving-actions.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-019-renaming-a-saving.md`
+- `docs/specs/accepted/TECHNICAL-SPEC-020-changing-a-saving-planned-money-amount.md`
 
 Other planned technical behavior is not a source of truth until it is covered by explicitly approved TechnicalSpecs.
 
@@ -72,10 +85,11 @@ Included in the first version:
 - Silent modify flow with corrected total amount.
 - 30-day visible money amount change history available in the dashboard's `Balance Changes` section, where each add and subtract action stays as its own entry, every current entry remains reachable, and the `Savings` action remains reachable whether history is empty or contains entries.
 - Newest `Balance Changes` entries shown first.
-- Full-screen `Savings` planning view with a money amount shown inside `Savings` using the label `Savings money amount`, a fixed top `Savings` area while `Saving` squares scroll, normal visual styling when `Savings money amount` is `0.00$`, small top `{money amount} needed` text when total planned money amount in valid `Saving` squares is greater than the main money amount, ordered user-named `Saving` squares in one vertical column on mobile and desktop, coverage bars, outside-click dismissal for `Saving` square action state, blank-area clicks inside an open action-state `Saving` square doing nothing, touch scrolling over `Saving` squares canceling tap and reorder when the finger moves more than `8px` before the `600ms` hold completes, `Saving` square holds for `600ms` without at least `8px` of movement doing nothing, fixed `Saving` reorder auto-scroll within `40px` of the top or bottom edge at `8px` per animation frame, interrupted `Saving` reorder drags canceling back to the original position, duplicate-name checks that include visible broken saved `Saving` squares with readable non-empty saved names, broken-square fix validation order matching new `Saving` square creation, a centered circle `+` empty state only when no normal or broken saved `Saving` squares are visible, a top-left circle `+` action when normal or broken saved `Saving` squares are visible, temporary `Saving` input squares for create, rename, planned-money-amount change, and broken-square fix, raw decimal typing for planned money amount inputs before `Save`, discarded unsaved `Saving` input drafts unless `Save` succeeds, locked broken saved `Saving` squares that cannot be reordered until fixed or deleted, saved-data-only `Savings money amount`, top needed text, and coverage updates while `Saving` input flows are open, a top-left `<` back action, and browser Back behavior that closes an open `Saving` input flow or delete confirmation first before closing full-screen `Savings`.
+- Full-screen `Savings` planning view with a money amount shown inside `Savings` using the label `Savings money amount`, a fixed top `Savings` area while `Saving` squares scroll, normal visual styling when `Savings money amount` is `0.00$`, small top `{money amount} needed` text when total planned money amount in valid `Saving` squares is greater than the main money amount, ordered user-named `Saving` squares in one vertical column on mobile and desktop, coverage bars, outside-click dismissal for `Saving` square action state, one-step Back behavior that closes an open basic `Saving` action state and returns to the dashboard, blank-area clicks inside an open action-state `Saving` square doing nothing, touch scrolling over `Saving` squares canceling tap and reorder when the finger moves more than `8px` before the `600ms` hold completes, `Saving` square holds for `600ms` without at least `8px` of movement doing nothing, fixed `Saving` reorder auto-scroll within `40px` of the top or bottom edge at `8px` per animation frame, interrupted `Saving` reorder drags canceling back to the original position, duplicate-name checks that include visible broken saved `Saving` squares with readable non-empty saved names, broken-square fix validation order matching new `Saving` square creation, a centered circle `+` empty state only when no normal or broken saved `Saving` squares are visible, a top-left circle `+` action when normal or broken saved `Saving` squares are visible, temporary `Saving` input squares for create, rename, planned-money-amount change, and broken-square fix, raw decimal typing for planned money amount inputs before `Save`, discarded unsaved `Saving` input drafts unless `Save` succeeds, locked broken saved `Saving` squares that cannot be reordered until fixed or deleted, saved-data-only `Savings money amount`, top needed text, and coverage updates while `Saving` input flows are open, a top-left `<` back action, and browser Back behavior that closes an open `Saving` input flow or delete confirmation first before closing full-screen `Savings`.
 - `Balance Changes` history for added money and subtracted money, with newest-entry auto-scroll to the top after a successful `Add` or `Subtract`.
 - Saved `Balance Changes` entry validation that removes only broken saved history entries while keeping the rest of the saved data.
 - Delete support for `Balance Changes` entries that opens from `600ms` press-and-hold or click-and-hold, cancels the pending hold on early release, pointer or finger movement, or scrolling before `600ms`, shows one little `Delete` and `Cancel` square in the middle of the screen after a completed hold, closes that little square on `Cancel`, outside click, or browser Back without changing anything, keeps it open during pointer or finger movement and scrolling, asks for confirmation with `Delete this Balance Change?` after `Delete` is chosen, shows `Cancel` and `Delete` in the confirmation, closes the confirmation on `Cancel`, outside click, or browser Back without changing anything, removes only the visible history entry after the confirmation `Delete` is clicked, and does not offer undo.
+- A failed `Balance Changes` deletion keeps its confirmation and message available without a timer until the user retries or closes it; an expired selected entry or newer information from another tab or window closes and discards the stale confirmation and message.
 - Responsive layout for mobile and desktop.
 - Clear trust wording that this is a manual cash tracking tool, not a real bank, using the exact website name and short trust label `Manual Cash Tracker`.
 - Browser storage save failure handling that blocks the valid action, keeps the last successfully saved visible state, shows `Changes could not be saved.`, and leaves retryable inputs or confirmations open.
@@ -127,7 +141,7 @@ Primary areas:
 
 Dashboard content:
 - Exact website name and short trust label `Manual Cash Tracker`.
-- Visually prominent main money amount with the user-facing label `Current Balance`; selecting it reveals only the actions available for its current value.
+- Main money amount with the user-facing label `Current Balance`; selecting it reveals only the actions available for its current value.
 - A `Balance Changes` section that keeps every current entry reachable.
 - The exact action `Savings`, which remains reachable whether `Balance Changes` is empty or contains entries.
 - Component shapes, positions, sizes, and scrolling implementation remain design decisions.
@@ -248,7 +262,7 @@ Tasks:
 - Keep `Balance Changes` empty with no empty-state content when no history entries exist, and use a centered circle `+` as the empty state when no `Saving` squares exist.
 
 Acceptance criteria:
-- The main money amount is the most visible item on the first screen.
+- The complete main money amount remains readable without horizontal overflow or overlapping required actions.
 - Clicking the main money amount at `0.00$` reveals `Add` and `Modify`, but not `Subtract`.
 - Clicking the main money amount above `0.00$` and below `999,999.99$` reveals `Add`, `Subtract`, and `Modify`.
 - Clicking the main money amount at exactly `999,999.99$` reveals `Subtract` and `Modify`, but not `Add`.
@@ -398,6 +412,11 @@ Tasks:
 - Make clicking `Cancel` or clicking/tapping outside the `Delete this Balance Change?` confirmation close the confirmation, keep the `Balance Changes` entry visible, change nothing, save nothing, and show no message.
 - Make browser Back, mobile browser back gesture, or system Back close the `Delete this Balance Change?` confirmation while keeping the user on the dashboard, keeping the `Balance Changes` entry visible, changing nothing, saving nothing, deleting nothing, creating no `Balance Changes` entry, and showing no message.
 - Make clicking `Delete` in the `Delete this Balance Change?` confirmation remove only the visible history entry, not change the current money amount, and not offer undo.
+- If the selected entry expires and is no longer visible before confirmation or retry, close the stale confirmation without saving, deleting anything else, or showing a message.
+- After a failed deletion, keep `Changes could not be saved.` visible without a timer while the confirmation remains unchanged.
+- When the user retries, remove the old failure message while the retry is pending. Show it again after another failure, or close the confirmation after success.
+- Choosing `Cancel`, clicking or tapping outside, or using Browser Back closes the confirmation and removes its failure message.
+- Refreshing, closing, reopening, or receiving newer information from another tab or window discards the confirmation and its failure message. A later new confirmation starts without the old message.
 
 Acceptance criteria:
 - The user can understand how their money amount changed over time.
@@ -433,6 +452,8 @@ Acceptance criteria:
 - Clicking `Cancel` or clicking/tapping outside the `Delete this Balance Change?` confirmation closes the confirmation, keeps the `Balance Changes` entry visible, changes nothing, saves nothing, and shows no message.
 - Browser Back while the `Delete this Balance Change?` confirmation is open closes that confirmation, keeps the user on the dashboard, keeps the `Balance Changes` entry visible, changes nothing, saves nothing, deletes nothing, creates no `Balance Changes` entry, and shows no message.
 - Clicking `Delete` in the `Delete this Balance Change?` confirmation removes only the visible history entry, does not change the current money amount, and does not offer undo.
+- A failed deletion's message remains while its confirmation is unchanged, clears during retry or when the confirmation closes, and returns after another failed retry.
+- Confirming or retrying after the selected entry has expired closes the stale confirmation without saving or showing a message.
 - Saved `Balance Changes` entries cannot be edited.
 - Recent money amount change history is visible from the dashboard without a separate `View history` action.
 
@@ -451,6 +472,10 @@ Tasks:
 - Make clicking `<` or using browser Back, mobile browser back gesture, or system Back close an open `Saving` square create, rename, planned-money-amount change, or broken-square fix input flow first, act like `Cancel`, keep the user inside `Savings`, discard unsaved typed input, restore the `+`, normal square, or broken square that the input replaced, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
 - Make clicking `<` or using browser Back, mobile browser back gesture, or system Back close an open `Saving` square delete confirmation first, keep the user inside `Savings`, delete nothing, change nothing, save nothing, create no `Balance Changes` entry, and show no message.
 - After the open `Saving` square input flow or delete confirmation is closed, make the next `<` click or Back action close full-screen `Savings` when no other `Saving` square input flow or delete confirmation is open.
+- When newer usable information arrives from another tab or window while `Savings` is open, close any unfinished action first, keep `Savings` open, and show the complete newer information.
+- When newer information requires saved-data recovery while `Savings` is open, replace `Savings` with recovery and show the dashboard after recovery closes.
+- Let Browser Forward return to `Savings` only from that current document's `Savings` step while usable information is ready, using the latest successfully kept information and never restoring an unfinished action.
+- After refresh, close, or later reopen, do not let an older `Savings` or unfinished-action browser step reopen `Savings`.
 - In the default `Saving` square state, show the `Saving` square name in the top-left corner, the planned money amount on the right side of the same top row, and the thin coverage bar at the bottom.
 - Make clicking a `Saving` square change that same square into its action state.
 - In the `Saving` square action state, keep the `Saving` name at the top left and planned money amount on the right side of the same top row, show `Delete` at the bottom center, and hide the thin coverage bar.
@@ -474,7 +499,7 @@ Tasks:
 - Let a touch release before `600ms` with movement of `8px` or less count as a tap that opens the action state.
 - If the user clicks another normal default `Saving` square while one square is in action state, close the old action state and do not open the clicked square in its own action state from that same click.
 - Keep an open `Saving` square action state open during scrolling by itself.
-- Clear any open `Saving` square action state when the user clicks the small `<` sign to return to the dashboard.
+- When only a `Saving` square action state is open, make the `Savings` Back action or browser/device Back close it and return to the dashboard in the same step, without changing information, creating a `Balance Changes` entry, or showing a message.
 - Let touch users reorder by holding a normal default `Saving` square for `600ms`, then moving the whole square.
 - Let mouse users reorder by clicking and holding a normal default `Saving` square for `600ms`, then dragging the whole square.
 - Keep broken saved `Saving` squares locked in their current displayed positions until fixed or deleted.
@@ -535,8 +560,13 @@ Tasks:
 - Trim only the spaces at the beginning and end of `Saving` square names before saving, while preserving spaces inside the trimmed name.
 - Make long `Saving` square names wrap or stay contained so they do not create horizontal page overflow, overlap square content, or break the square layout.
 - Build create, rename, delete, and reorder square actions.
+- Start rename with the selected `Saving`'s current saved name. Keep rename open during outside interaction and scrolling, and block unrelated actions while it is open.
+- While one rename save is running, accept no name edit or repeated `Save`; keep `Cancel` and Back available to cancel a still-waiting attempt.
+- Start planned-money-amount change with the selected `Saving`'s current normalized amount as raw decimal text without commas or a `$` sign. Keep the flow open during outside interaction and scrolling, and block unrelated actions while it is open.
+- While one planned-money-amount change save is running, accept no amount edit or repeated `Save`; keep `Cancel` and Back available to cancel a still-waiting attempt.
 - Keep create or rename open with no message and no saved data changes when the user tries to save a missing `Saving` name.
 - Keep create or planned-money-amount change open with no message and no saved data changes when the user tries to save a missing planned money amount.
+- In planned-money-amount change, treat `5`, `5.`, `5.0`, and `5.00` as `5.00$`, `.50` as `0.50$`, and `005.00` as `5.00$`; treat a lone decimal point as invalid and keep the flow open without a message.
 - Keep the `Saving` square create input step open with no message and no saved data changes when the user tries to save a new `Saving` square with a planned money amount of `0.00$` or greater than `999,999.99$`.
 - Add bottom text actions `Save` and `Cancel` to `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows.
 - Make `Cancel` close the `Saving` square input flow, return to the `Saving` squares view, and change nothing.
@@ -544,6 +574,8 @@ Tasks:
 - Discard the typed `Saving` name and planned money amount if the user refreshes the page, closes the browser tab or window, reopens the website later, cancels the input flow, closes the input flow with `<` or Back, or leaves `Savings` after the input flow has been closed before a successful `Save`.
 - Restore only the last successfully saved data after discarded unsaved `Saving` input, without saving a draft to browser storage, creating a `Balance Changes` entry, showing a browser leave warning, or showing a message.
 - After a failed `Saving` creation save, keep `Changes could not be saved.` visible while the flow is unchanged. Remove the previous message after an accepted name or planned-money edit, while retrying, or when the flow closes or is discarded; show it again if the retry also fails.
+- After a failed rename save, keep `Changes could not be saved.` visible while the entered name remains unchanged. Remove it after a name edit, during retry, or when the flow closes or is discarded; show it again if the retry also fails.
+- After a failed planned-money-amount change save, keep `Changes could not be saved.` visible while the entered amount remains unchanged. Remove it after an accepted amount edit, during retry, or when the flow closes or is discarded; rejected input leaves it visible, and another failed retry shows it again.
 - After a failed broken-square fix save, keep `Changes could not be saved.` visible while the flow is unchanged. Remove the previous message after an accepted name or planned-money edit, while retrying, or when the flow closes or is discarded; show it again if the retry also fails.
 - For new `Saving` square creation, validate in this order: planned money amount missing, `0.00$`, or greater than `999,999.99$`; missing `Saving` name; then duplicate `Saving` name.
 - Count normal `Saving` squares and visible broken saved `Saving` squares with readable non-empty saved names as reserved names during duplicate-name checks.
@@ -554,6 +586,7 @@ Tasks:
 - Make delete ask for confirmation in a small centered confirmation square with `Delete this Saving?`, show `Cancel` and `Delete`, remove only the selected `Saving` square and its saved details after confirmation, and not offer undo.
 - Build planned-money-amount editing flows that replace the old planned money amount with a new total planned money amount.
 - Remove a `Saving` square if its planned money amount becomes `0.00$`.
+- After a successful zero removal, validate the complete remaining saved `Saving` list again, show another unchanged record normally only when every field is now valid, and recalculate `Savings` from the resulting valid list.
 - Save `Saving` square changes to browser storage.
 - Render a broken saved `Saving` square as an error square with exact text `Saving could not be loaded.` and actions `Fix` and `Delete`.
 - Keep valid saved data loaded when only one saved `Saving` square is broken.
@@ -568,6 +601,7 @@ Tasks:
 - Before repairing, reserve every usable order number from remaining broken records and assign normal records increasing unused safe-integer orders in their visible order; fail without writing if no safe order remains.
 - Make a successful broken-square fix save browser storage, turn the broken square into a normal `Saving` square, keep it in the same visible position when possible, give it a valid unique ID and valid order if needed, recalculate the `Savings money amount`, top needed text, and coverage bars, create no `Balance Changes` entry, and show no message.
 - After a successful broken-square fix, revalidate the complete saved `Saving` list so any other unchanged record that is now valid becomes normal and every still-invalid record remains broken.
+- After a successful rename, revalidate the complete saved `Saving` list so another record made valid by the changed name appears normally, then recalculate `Savings` when needed.
 - Make broken-square `Delete` use the same small centered `Saving` delete confirmation with `Delete this Saving?`, show `Cancel` and `Delete`, remove only that broken square after confirmation, save browser storage, create no `Balance Changes` entry, and offer no undo.
 - Save the final `Saving` square order to browser storage after the user finishes moving a square and lets go.
 - Recalculate the money amount shown inside `Savings`, top needed text, and coverage bars from the visible order of normal `Saving` squares after the final reorder, skipping broken saved `Saving` squares.
@@ -599,6 +633,8 @@ Acceptance criteria:
 - The `Saving` square action state shows the name at the top left, the planned money amount on the right side of the top row, and `Delete` at the bottom center.
 - The `Saving` square action state hides the thin coverage bar.
 - Clicking a `Saving` square name in the action state opens rename.
+- Rename starts with the selected `Saving`'s current saved name; outside interaction and scrolling keep it open.
+- A rename save in progress accepts no name edit or repeated `Save`, while `Cancel` and Back remain available.
 - Clicking a `Saving` square planned money amount in the action state opens planned-money-amount change.
 - Clicking `Delete` in the action state starts delete confirmation.
 - `Saving` square delete confirmation appears as a small confirmation square in the middle of the screen.
@@ -611,7 +647,7 @@ Acceptance criteria:
 - Clicking or tapping a blank part inside the open action-state square does nothing and keeps that square in action state.
 - Clicking another normal default `Saving` square while one square is in action state closes the old action state and does not open the clicked square from that same click.
 - Scrolling by itself does not close an open `Saving` square action state.
-- Clicking `<` while a `Saving` square is in action state returns to the dashboard and clears the open action state.
+- When only a `Saving` square action state is open, the `Savings` Back action or browser/device Back closes it and returns to the dashboard in one step without changing information, creating a `Balance Changes` entry, or showing a message.
 - Rename, planned-money-amount change, and delete do not open from a separate action menu or larger action square.
 - The user can add a `Saving` square with a circle `+` action.
 - When no visible `Saving` squares exist, the circle `+` action appears in the middle of the `Saving` squares area.
@@ -635,6 +671,7 @@ Acceptance criteria:
 - `Cancel` in `Saving` square create, rename, planned-money-amount change, or broken-square fix closes the input flow, returns to the `Saving` squares view, changes nothing, saves nothing, creates no `Balance Changes` entry, and shows no message.
 - If the user enters a duplicate name while creating a `Saving` square, the website returns to the `Saving` squares view, shows no duplicate-name error message, creates no new `Saving` square, and keeps saved data unchanged.
 - If the user enters a duplicate name while renaming a `Saving` square, the website returns to the `Saving` squares view, shows no duplicate-name error message, keeps the old name, and keeps saved data unchanged.
+- A successful rename rechecks the complete saved `Saving` list, shows another record that has become fully valid, and recalculates `Savings` when needed without changing the main money amount or creating a `Balance Changes` entry.
 - If the user enters a duplicate name while fixing a broken `Saving` square, the website returns to the `Saving` squares view, shows no duplicate-name error message, keeps the broken square broken, and keeps saved data unchanged.
 - Duplicate `Saving` square name checks use trimmed names and ignore uppercase or lowercase differences.
 - Duplicate `Saving` square name checks count visible broken saved `Saving` squares with readable non-empty saved names as reserved names until those broken squares are fixed or deleted.
@@ -726,6 +763,8 @@ Tasks:
 - Test a failed `Saving` creation save and confirm its message clears after an accepted edit, retry, or closure, remains after rejected amount input, and appears again after another failed retry.
 - Test unsaved `Saving` input recovery by typing a `Saving` name and planned money amount, then canceling, using `<` or Back, leaving `Savings`, refreshing, and reopening later before `Save`; confirm only last successfully saved data returns, no draft is saved, no `Balance Changes` entry is created, no browser leave warning appears, and no message appears.
 - Test duplicate-name checks against broken `Saving` squares by loading a broken square with a readable non-empty saved name; confirm create, rename, and fixing another broken square with that same trimmed name return to the `Saving` squares view with no duplicate-name error, no saved data change, no `Balance Changes` entry, and the broken square still reserving the name until fixed or deleted.
+- Test rename starting input, outside interaction, scrolling, pending-save controls, failure-message lifetime, stale results, and complete-list revalidation after the selected name changes.
+- Test planned-money-amount change starting input, equivalent decimal forms, lone-decimal rejection, outside interaction, scrolling, pending-save controls, coherent save attempts, failure-message lifetime, stale results, and complete-list revalidation after zero removal.
 - Test fixing a broken `Saving` square using its own readable saved name when no other square uses that same trimmed name; confirm the square does not block itself and can be fixed if all other fix values are valid.
 - Test broken-square fix validation order by entering a duplicate name with a missing, `0.00$`, or above-limit planned money amount; confirm the planned-money-amount rule happens first, the same broken-square fix input step stays open, no message appears, no data saves, no square is fixed, and no `Balance Changes` entry is created.
 - Test that a new broken-square fix starts with empty raw name and planned-money values, `confirming` and failure visibility set to `false`, and no information copied from the broken record.
@@ -802,6 +841,8 @@ Acceptance criteria:
 - `Saving` square planned money amount inputs should enforce the `999,999.99$` maximum and should not save values above that limit.
 - `Saving` square planned money amount inputs should not require users to type comma separators; saved planned money amounts should use normalized plain decimal strings without the `$` sign or comma separators, such as `5895.50`, while rendered planned money amounts of `1,000.00$` or more should show required comma separators, such as `5,895.50$`.
 - `Saving` square planned money amount inputs should block paste. Pasted content should not appear, the input should keep its previous value, and no message should appear.
+- A planned-money-amount change should start with the selected `Saving`'s normalized saved amount, accept `5`, `5.`, `5.0`, and `5.00` as `5.00$`, accept `.50` as `0.50$`, normalize `005.00` to `5.00$`, and reject a lone decimal point without showing a message.
+- Outside interaction and scrolling should keep planned-money-amount change open. While its save is pending, amount edits and repeated `Save` choices should do nothing, while `Cancel` and Back remain available.
 - `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows should show bottom text actions `Save` and `Cancel`.
 - `Saving` square create and broken-square fix input flows should use temporary `Saving` input squares inside the `Saving` squares area, not modals, bottom sheets, or separate pages.
 - The create input square should replace the clicked circle `+` while open.
@@ -876,7 +917,10 @@ Acceptance criteria:
 - On browser storage save failure, do not create, update, delete, or reorder saved data, do not create a `Balance Changes` entry, and do not run `Balance Changes` cleanup as a successful saved user action.
 - Keep main money amount input flows open with the same typed value after a browser storage save failure.
 - Keep `Saving` square create, rename, planned-money-amount change, and broken-square fix input flows open with the same typed values after a browser storage save failure.
+- Keep a failed planned-money-amount change message while the entered amount remains unchanged; clear it after an accepted edit, retry, or closure, preserve it after rejected input, and show it again after another failed retry.
 - Keep `Saving` square delete and `Balance Changes` delete confirmations open with the selected item still visible after a browser storage save failure.
+- Keep a failed `Balance Changes` deletion message visible without a timer while its confirmation is unchanged, clear it while retrying or when the confirmation closes, and show it again after another failed retry.
+- Discard a `Balance Changes` deletion confirmation and its message after refresh, close, reopen, newer information from another tab or window, or expiration of its selected entry.
 - Return a failed `Saving` square reorder to the last successfully saved order after a browser storage save failure.
 - Do not save browser storage for `Add`, `Subtract`, or `Modify` attempts with an empty or above-limit money amount because nothing changed.
 - Do not save browser storage for `Add` or `Subtract` attempts with `0.00$` because nothing changed.
@@ -1045,6 +1089,8 @@ Use:
 - Pointer or finger movement does not close the little square after it is open.
 - Scrolling does not close the little square after it is open.
 - Deleting a `Balance Changes` entry asks for confirmation after `Delete` is clicked with `Delete this Balance Change?`, closes the little square, shows `Cancel` and `Delete`, closes the little square or confirmation on browser Back without deleting the entry, closes the confirmation on `Cancel` or outside click without deleting the entry, and does not offer undo.
+- A failed `Balance Changes` deletion keeps `Changes could not be saved.` visible without a timer while the confirmation remains unchanged, clears it during retry or when the confirmation closes, and shows it again after another failed retry.
+- If the selected `Balance Changes` entry expires before confirmation or retry, the stale confirmation closes without saving, deleting anything else, or showing a message.
 - Saved `Balance Changes` entries cannot be edited.
 - Browser storage saves the current money amount and history.
 - Browser storage restores the current money amount and history after refresh.
@@ -1071,7 +1117,9 @@ Use:
 - The website works whether the user updates money rarely or many times in one day.
 - `Saving` squares can be created, renamed, updated, and deleted.
 - `Saving` square rename starts by opening the square's action state and clicking the `Saving` name in the square.
+- `Saving` square rename starts with the current saved name, remains open during outside interaction and scrolling, and blocks name edits or repeated `Save` while one save attempt runs.
 - `Saving` square planned-money-amount change starts by opening the square's action state and clicking the planned money amount in the square.
+- `Saving` square planned-money-amount change starts with the current normalized amount as raw decimal text, remains open during outside interaction and scrolling, and blocks amount edits or repeated `Save` while one save attempt runs.
 - `Saving` square rename replaces that same square with a temporary `Saving` input square in the same visible position.
 - `Saving` square planned-money-amount change replaces that same square with a temporary `Saving` input square in the same visible position.
 - `Saving` square delete starts by opening the square's action state and clicking `Delete` at the bottom center of the square.
@@ -1086,7 +1134,11 @@ Use:
 - A very long `Saving` square name stays contained in the square layout without horizontal page overflow or overlapping other square content.
 - Trying to save a new `Saving` square without a planned money amount does nothing, keeps the create flow open, and does not change saved data.
 - Trying to rename a `Saving` square with an empty name does nothing, keeps the rename flow open, and does not change saved data.
+- A failed rename keeps its entered name and message until the name changes, a retry starts, or the flow closes; another failed retry shows the message again.
+- A successful rename rechecks every saved `Saving`, shows any other record that has become fully valid, and recalculates `Savings` when needed.
 - Trying to change a `Saving` square planned money amount with an empty planned money amount does nothing, keeps the change flow open, and does not change saved data.
+- Planned-money-amount change accepts equivalent decimal forms and unneeded leading zeros, while a decimal point without a digit is invalid and changes nothing.
+- A failed planned-money-amount change keeps its entered amount and message until an accepted amount edit, retry, or closure; rejected input keeps the message, and another failed retry shows it again.
 - `Saving` square planned money amount inputs show raw decimal number text while typing, do not show a `Cent` button, block `Space` with no message, and format with two decimal digits, comma separators when needed, and the `$` sign only after `Save`.
 - Creating, renaming, or fixing a `Saving` square with a duplicate name returns to the `Saving` squares view with no duplicate-name error message and no saved data changes.
 - Visible broken saved `Saving` squares with readable non-empty saved names reserve those names until fixed or deleted, while a broken square being fixed does not block itself.
@@ -1102,7 +1154,7 @@ Use:
 - Touch scrolling over a `Saving` square by moving the finger more than `8px` before `600ms` does not open action state or start reorder.
 - Clicking another normal default `Saving` square while one `Saving` square is already in action state closes the old action state and does not open the clicked square from that same click.
 - Scrolling does not close the open `Saving` square action state.
-- Clicking `<` clears the open `Saving` square action state while returning to the dashboard.
+- When only a `Saving` square action state is open, clicking `<` or using browser/device Back closes it and returns to the dashboard in one step without changing information or showing a message.
 - Touch users can reorder `Saving` squares by holding a normal default square for `600ms`, then moving the whole square after at least `8px` of finger movement.
 - Mouse users can reorder `Saving` squares by clicking and holding a normal default square for `600ms`, then dragging the whole square after at least `8px` of pointer movement.
 - Holding a normal default `Saving` square for `600ms` and releasing before moving at least `8px` does nothing.
@@ -1126,6 +1178,7 @@ Use:
 - Changing `Rent` from `40.00$` to `10.00$` makes `Rent` show `10.00$`, not `30.00$`.
 - Changing `Rent` from `40.00$` to `0.00$` removes `Rent` from `Savings`.
 - Changing a `Saving` square planned money amount to `0.00$` removes that square from browser storage.
+- After that zero removal succeeds, every remaining saved `Saving` is checked again; another record appears normally only when it is now fully valid, and `Savings` is recalculated from the complete valid list.
 - Changing a `Saving` square planned money amount does not create a `Balance Changes` entry.
 - Deleting `Rent` removes only `Rent` and its saved details, does not change the main money amount, and leaves the other `Saving` squares unchanged.
 - Deleting a `Saving` square asks for confirmation first in a small centered confirmation square with `Delete this Saving?`, shows `Cancel` and `Delete`, closes on `Cancel` or outside click with no saved data changes, and does not offer undo.

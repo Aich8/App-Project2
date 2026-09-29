@@ -16,7 +16,7 @@
 | 014 | FeatureSpec 002 | Subtracting money safely |
 | 015 | FeatureSpec 003 | Modifying the money amount |
 | 016 | FeatureSpec 005 | Deleting a `Balance Changes` entry |
-| 017 | FeatureSpec 006 | Opening, showing, and leaving `Savings` |
+| 017 | FeatureSpec 006 | `Savings` view and browser navigation |
 | 018 | FeatureSpec 008 | Opening and closing `Saving` actions |
 | 019 | FeatureSpec 009 | Renaming a `Saving` |
 | 020 | FeatureSpec 010 | Changing a `Saving` planned money amount |
@@ -25,7 +25,7 @@
 
 Each one starts in `docs/specs/drafts/`, links to exactly one FeatureSpec, and remains a draft until you approve it.
 
-TechnicalSpecs 001 through 007 are accepted. TechnicalSpecs 008 and 009 are in draft review.
+TechnicalSpecs 001 through 020 are accepted. TechnicalSpecs 021 through 022 are in draft review.
 
 ## What still needs clarification?
 
@@ -44,16 +44,14 @@ Shapes, colors, spacing, exact positions, responsive breakpoints, and component 
 
 ## From now until completion
 
-1. Review TechnicalSpec 008 with you.
-2. Accept TechnicalSpec 008 only after your approval.
-3. Review TechnicalSpec 009 with you.
-4. Accept TechnicalSpec 009 only after your approval.
-5. Repeat that process through TechnicalSpec 022.
-6. Update the active implementation plan using the accepted TechnicalSpecs.
-7. Decide the visible design while working on the dashboard and Savings technical work.
-8. Build the website code in `website/`.
-9. Test every feature against its FeatureSpec and TechnicalSpec.
-10. Check mobile, desktop, browser storage, multiple tabs, failures, and recovery.
-11. Complete the final review and move the active plan to done.
+1. Review TechnicalSpec 021 with you.
+2. Accept TechnicalSpec 021 only after your approval.
+3. Repeat that process for TechnicalSpec 022.
+4. Update the active implementation plan using the accepted TechnicalSpecs.
+5. Decide the visible design while working on the dashboard and Savings technical work.
+6. Build the website code in `website/`.
+7. Test every feature against its FeatureSpec and TechnicalSpec.
+8. Check mobile, desktop, browser storage, multiple tabs, failures, and recovery.
+9. Complete the final review and move the active plan to done.
 
-The immediate next piece of work is reviewing **TechnicalSpec 008: Temporary Action Lifetime And Discard**.
+The current draft-review work covers TechnicalSpecs 021 through 022.

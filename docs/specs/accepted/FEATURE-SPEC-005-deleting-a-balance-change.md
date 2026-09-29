@@ -45,6 +45,7 @@ Deleting an entry changes only `Balance Changes`. It does not change the main mo
 - Choosing `Cancel` closes the confirmation without deleting the entry.
 - Clicking or tapping outside closes the confirmation without deleting the entry.
 - Browser Back closes the confirmation without leaving the dashboard or deleting the entry.
+- If the selected entry reaches its normal expiration and is no longer visible before the user confirms or retries, the stale confirmation closes without saving, deleting anything else, or showing a message.
 
 ## Successful Deletion
 
@@ -60,6 +61,11 @@ Deleting an entry changes only `Balance Changes`. It does not change the main mo
 - Other entries and the main money amount remain unchanged.
 - The confirmation remains open so the user can retry or cancel.
 - The exact message `Changes could not be saved.` is shown.
+- The message remains visible without a timer while the failed confirmation remains unchanged.
+- Choosing `Delete` to retry removes the old message while the retry is being attempted.
+- A failed retry shows the message again, and a successful retry closes the confirmation.
+- Choosing `Cancel`, clicking or tapping outside, or using Browser Back removes the message by closing the confirmation.
+- Refreshing, closing, reopening, or receiving newer information from another tab or window discards the confirmation and its message. A later new confirmation starts without the old message.
 
 ## Acceptance Expectations
 
@@ -69,3 +75,5 @@ Deleting an entry changes only `Balance Changes`. It does not change the main mo
 - The user must confirm before an entry is deleted.
 - A successful deletion removes only the selected entry and does not change the main money amount.
 - A failed deletion leaves the selected entry and the main money amount unchanged.
+- A save-failure message remains while its confirmation is unchanged, clears during retry or when the confirmation closes, and returns after another failed retry.
+- Confirming or retrying after the selected entry has expired closes the stale confirmation without saving or showing a message.
