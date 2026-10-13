@@ -96,7 +96,8 @@ Do not recreate the old folders `WebSite Project/`, `BUSINESS-Specs.md/`, root `
 
 ## Product Rules
 
-- Do not use real banking language like deposit, withdrawal, bank transfer, real account number, or card-related money wording.
+- Do not use real banking language like deposit, withdrawal, bank transfer, real account number, or card-related money wording, except for the exact main money action button label `Withdraw` described below.
+- `Withdraw` is allowed only as the exact visible button label for the main money Subtract action. Continue to use subtract and `subtracted` for the feature concept, internal names, saved data, `Balance Changes` wording, planning, explanations, and code comments unless specifically referring to that button.
 - Use `money amount` in specs, planning, explanations, and code comments when explaining the tracked value.
 - Use `Current Balance` only as the exact user-facing website label for the money amount.
 - Do not use `Current Balance` as the general name of the value outside website text.

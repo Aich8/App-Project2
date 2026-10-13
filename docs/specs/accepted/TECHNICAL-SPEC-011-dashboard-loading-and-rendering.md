@@ -42,7 +42,6 @@ type DashboardBalanceChangeRow = {
 };
 
 type DashboardViewModel = {
-  identityText: "Manual Cash Tracker";
   mainMoneyLabel: "Current Balance";
   mainMoneyAmountText: string;
   balanceChangesLabel: "Balance Changes";
@@ -74,7 +73,6 @@ Only a validated ready state reaches this formatter. Invalid or unreadable store
 
 Render the dashboard from one `DashboardViewModel`:
 
-- show `Manual Cash Tracker` as the website identity;
 - associate `Current Balance` with the complete formatted main money amount;
 - show the `Balance Changes` section and render every row supplied by the view model;
 - render no empty-state content when `balanceChangeRows` is empty; and

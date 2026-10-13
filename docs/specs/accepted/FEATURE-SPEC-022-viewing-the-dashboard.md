@@ -27,9 +27,8 @@ The dashboard is for a manual cash tracker. It does not represent a real bank ac
 - The dashboard opens with no unfinished action restored and with the main money actions closed.
 - When saved information cannot be loaded as a usable whole, the recovery state from `FEATURE-SPEC-014: Recovering Unreadable Saved Data` appears instead of the normal dashboard.
 
-## Website Identity And Trust
+## Dashboard Trust
 
-- The dashboard shows the exact website name and short trust label `Manual Cash Tracker`.
 - The dashboard presents the website as a tool for manually tracking cash, not as a real bank or financial account.
 - It does not suggest that the website holds or moves real money.
 - It does not ask the user for personal information, an account, an email address, or a login.
@@ -84,7 +83,7 @@ The dashboard is for a manual cash tracker. It does not represent a real bank ac
 ## Acceptance Expectations
 
 - While the website is checking browser storage after opening, it shows neither the normal dashboard nor the saved-data recovery state and does not briefly show the default `0.00$` dashboard.
-- Opening the website normally shows a clear dashboard with `Manual Cash Tracker` and the main money amount labeled `Current Balance`.
+- Opening the website normally shows a clear dashboard with the main money amount labeled `Current Balance`.
 - With no saved information, the dashboard shows `0.00$` without creating saved information or history.
 - With usable saved information, the dashboard shows the latest successfully kept main money amount.
 - The main money amount uses two decimal digits, required comma separators, and a trailing `$` sign and remains fully readable through `999,999.99$`.

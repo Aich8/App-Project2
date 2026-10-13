@@ -4,7 +4,7 @@ Spec ID: `FEATURE-SPEC-021`
 
 Spec type: `FeatureSpec`
 
-Covers: the shared user-visible controls and interaction rules for entering a money amount in the `Add`, `Subtract`, and `Modify` flows.
+Covers: the shared user-visible controls and interaction rules for entering a money amount after choosing `Add`, `Withdraw`, or `Modify`.
 
 Status: `Accepted`
 
@@ -16,9 +16,9 @@ This feature controls how the amount is entered and how the entry flow is left. 
 
 ## Starting The Entry Flow
 
-- Choosing `Add`, `Subtract`, or `Modify` from the main money actions starts the matching money amount entry flow.
+- Choosing `Add`, `Withdraw`, or `Modify` from the main money actions starts the matching money amount entry flow.
 - The open main money actions close when the entry flow starts.
-- The selected action is not repeated as a visible `Add`, `Subtract`, or `Modify` reminder inside the entry flow.
+- The selected action is not repeated as a visible `Add`, `Withdraw`, or `Modify` reminder inside the entry flow.
 - The entry flow is temporary and does not change any information until a valid action is confirmed and successfully kept.
 
 ## Entry Flow Behavior
@@ -95,7 +95,7 @@ This feature controls how the amount is entered and how the entry flow is left. 
 
 - Choosing `Yes` attempts the selected action with the entered amount.
 - `Add` applies the rules in `FEATURE-SPEC-001: Adding Money`.
-- `Subtract` applies the rules in `FEATURE-SPEC-002: Subtracting Money`.
+- `Withdraw` starts the Subtract behavior defined by `FEATURE-SPEC-002: Subtracting Money`.
 - `Modify` applies the rules in `FEATURE-SPEC-003: Modifying The Money Amount`.
 - A successful action that changes the main money amount closes the entry flow, returns to the dashboard, shows the updated money amount, and resets the next money amount entry flow to `0.00`.
 - A no-action or invalid confirmation follows the selected action's accepted rules and keeps the flow open when those rules require it.
@@ -121,7 +121,7 @@ This feature controls how the amount is entered and how the entry flow is left. 
 
 ## Boundaries
 
-- This spec does not decide when `Add`, `Subtract`, or `Modify` is available or how the main money actions open.
+- This spec does not decide when `Add`, `Withdraw`, or `Modify` is available or how the main money actions open.
 - It does not redefine how any selected action changes the main money amount or `Balance Changes`.
 - It does not define storage, data structures, parsing algorithms, source files, or framework choices.
 - It does not require a particular shape, position, size, color, typography, or visual arrangement for the input, main money amount, or actions.
@@ -129,7 +129,7 @@ This feature controls how the amount is entered and how the entry flow is left. 
 
 ## Acceptance Expectations
 
-- `Add`, `Subtract`, and `Modify` use the same amount entry controls and typing rules.
+- `Add`, `Withdraw`, and `Modify` use the same amount entry controls and typing rules.
 - Every new entry flow starts focused at `0.00` without a `$` sign.
 - `Cent` starts cents entry, and `Space` provides the same keyboard behavior.
 - The next one or two digits become cents, while comma separators remain automatic.

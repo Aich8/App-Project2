@@ -74,7 +74,7 @@ Do not infer approval from silence, discussion, review feedback, or a request to
 
 - `accepted/GLOBAL-SPEC-002-manual-cash-tracker.md`: project purpose, audience, main directions, and global boundaries.
 - `accepted/FEATURE-SPEC-001-adding-money.md`: user-visible behavior and rules for manually adding money.
-- `accepted/FEATURE-SPEC-002-subtracting-money.md`: user-visible behavior and rules for manually subtracting money.
+- `accepted/FEATURE-SPEC-002-subtracting-money.md`: user-visible behavior and rules for manually subtracting money through the visible `Withdraw` button while keeping `subtracted` history wording.
 - `accepted/FEATURE-SPEC-003-modifying-the-money-amount.md`: user-visible behavior and rules for silently correcting the complete money amount.
 - `accepted/FEATURE-SPEC-004-viewing-balance-changes.md`: user-visible behavior and rules for reviewing successful `Add` and `Subtract` actions, including exact entry text, fixed English date-and-time output, 720-hour visibility, and newest-entry scrolling.
 - `accepted/FEATURE-SPEC-005-deleting-a-balance-change.md`: user-visible behavior and rules for deleting one `Balance Changes` entry, including stale-confirmation closure and save-failure message lifetime.
@@ -92,8 +92,8 @@ Do not infer approval from silence, discussion, review feedback, or a request to
 - `accepted/FEATURE-SPEC-017-discarding-unfinished-actions-after-refresh-or-reopen.md`: shared user-visible behavior for unfinished actions after refresh, close, or later reopen.
 - `accepted/FEATURE-SPEC-018-updating-other-open-tabs-and-windows.md`: user-visible behavior for automatically updating other open copies of the website in the same browser.
 - `accepted/FEATURE-SPEC-019-keeping-one-action-open-at-a-time.md`: shared user-visible behavior for allowing only one unfinished action to be open at a time.
-- `accepted/FEATURE-SPEC-020-opening-main-money-actions.md`: user-visible behavior for opening, choosing, and closing the actions available for the main money amount.
-- `accepted/FEATURE-SPEC-021-entering-main-money-amounts.md`: shared user-visible controls and interaction rules for entering a money amount in the `Add`, `Subtract`, and `Modify` flows.
+- `accepted/FEATURE-SPEC-020-opening-main-money-actions.md`: user-visible behavior for opening, choosing, and closing the visible `Add`, `Withdraw`, and `Modify` actions available for the main money amount.
+- `accepted/FEATURE-SPEC-021-entering-main-money-amounts.md`: shared user-visible controls and interaction rules for entering a money amount after choosing `Add`, `Withdraw`, or `Modify`.
 - `accepted/FEATURE-SPEC-022-viewing-the-dashboard.md`: user-visible behavior for initial loading and the normal dashboard, including the main money amount, recent money changes, and access to `Savings`.
 - `accepted/TECHNICAL-SPEC-001-main-money-amount-entry-state.md`: internal representation, formatting, state transitions, and browser input handling for `FEATURE-SPEC-021`.
 - `accepted/TECHNICAL-SPEC-002-balance-changes-records-and-retention.md`: stored records, exact output formatting, ordering, 720-hour retention, expiration checks, and newest-entry scrolling for `FEATURE-SPEC-004`.
@@ -106,7 +106,7 @@ Do not infer approval from silence, discussion, review feedback, or a request to
 - `accepted/TECHNICAL-SPEC-009-same-browser-save-coordination-and-updates.md`: exclusive save coordination, stale-write prevention, and received-update handling for `FEATURE-SPEC-018`.
 - `accepted/TECHNICAL-SPEC-010-one-open-action-coordination.md`: shared action gating, safe same-action transitions, stale-callback protection, and one-interaction protection for `FEATURE-SPEC-019`.
 - `accepted/TECHNICAL-SPEC-011-dashboard-loading-and-rendering.md`: neutral initial rendering, root-view selection, complete dashboard derivation, exact money formatting, and safe expiration re-rendering for `FEATURE-SPEC-022`.
-- `accepted/TECHNICAL-SPEC-012-opening-and-closing-main-money-actions.md`: current-value action availability, coordinated opening and continuation, and safe click, tap, keyboard, outside-interaction, and scroll closing for `FEATURE-SPEC-020`.
+- `accepted/TECHNICAL-SPEC-012-opening-and-closing-main-money-actions.md`: current-value action availability, mapping the internal `subtract` action to the visible `Withdraw` button, coordinated opening and continuation, and safe click, tap, keyboard, outside-interaction, and scroll closing for `FEATURE-SPEC-020`.
 - `accepted/TECHNICAL-SPEC-013-adding-money-safely.md`: exact Add validation and calculation, positive history-record creation, complete-candidate construction, and coordinated save-result handling for `FEATURE-SPEC-001`.
 - `accepted/TECHNICAL-SPEC-014-subtracting-money-safely.md`: exact Subtract validation, non-negative calculation, actual-removed history-record creation, complete-candidate construction, and coordinated save-result handling for `FEATURE-SPEC-002`.
 - `accepted/TECHNICAL-SPEC-015-modifying-the-money-amount.md`: exact full-amount replacement, complete candidate creation without a new history record, and coordinated save-result handling for `FEATURE-SPEC-003`.

@@ -49,6 +49,14 @@ Source specs:
 - `docs/specs/accepted/TECHNICAL-SPEC-021-deleting-a-saving.md`
 - `docs/specs/accepted/TECHNICAL-SPEC-022-reordering-saving-squares.md`
 
+Supporting visual design plans:
+- `docs/plans/active/visual-design/01-main-money-amount.md`: main money amount; in progress, with the basic main-area layout complete.
+- `docs/plans/active/visual-design/02-balance-changes.md`: `Balance Changes`; complete.
+- `docs/plans/active/visual-design/03-savings.md`: `Savings`; not described yet.
+- `docs/plans/active/visual-design/04-saving-squares.md`: `Saving` squares; not described yet.
+
+These four files collect the user's visual descriptions one part at a time. The complete website visual direction is not final until the user explicitly approves all four parts. These visual plans do not override accepted specifications or define new product behavior.
+
 Other planned technical behavior is not a source of truth until it is covered by explicitly approved TechnicalSpecs.
 
 ## Goal
@@ -58,9 +66,9 @@ Build the first usable version of the Cash Money Organizer website: a browser-ba
 The MVP should help a user:
 - See their money amount with the user-facing label `Current Balance`.
 - Start with the money amount shown as `0.00$` when no saved data exists.
-- Click the main money amount at `0.00$` to show `Add` and `Modify`, but not `Subtract`.
-- Add money manually while the money amount is less than `999,999.99$`, use `Subtract` after the money amount is greater than `0.00$`, and see all three actions when the money amount is greater than `0.00$` and less than `999,999.99$`.
-- Use `Subtract` and `Modify`, without `Add`, when the money amount is exactly `999,999.99$`.
+- Click the main money amount at `0.00$` to show `Add` and `Modify`, but not `Withdraw`.
+- Add money manually while the money amount is less than `999,999.99$`, use `Withdraw` to subtract money after the money amount is greater than `0.00$`, and see all three actions when the money amount is greater than `0.00$` and less than `999,999.99$`.
+- Use `Withdraw` and `Modify`, without `Add`, when the money amount is exactly `999,999.99$`.
 - Correct mistakes with `Modify` at any valid money amount from `0.00$` through `999,999.99$`.
 - Review 30-day visible money amount change history from the dashboard.
 - Keep saved money data after closing and reopening the website when saved data is available.
@@ -76,7 +84,7 @@ Included in the first version:
 - Default `0.00$` money amount when no saved data exists.
 - Visible money amounts use two digits after the decimal point, such as `0.00$`, `5.00$`, and `14.50$`, and use comma separators every three digits before the decimal point for values of `1,000.00$` or more, such as `5,895.50$` and `999,999.99$`.
 - Money amount values can include cents, but the maximum allowed money amount is `999,999.99$`. The main money amount and each `Saving` square planned money amount should never be saved above `999,999.99$`.
-- Clickable main money amount that shows `Add` and `Modify` as horizontal buttons at `0.00$`, shows `Add`, `Subtract`, and `Modify` as horizontal buttons when the money amount is greater than `0.00$` and less than `999,999.99$`, and shows `Subtract` and `Modify` without `Add` when the money amount is exactly `999,999.99$`.
+- Clickable main money amount that shows `Add` and `Modify` as horizontal buttons at `0.00$`, shows `Add`, `Withdraw`, and `Modify` as horizontal buttons when the money amount is greater than `0.00$` and less than `999,999.99$`, and shows `Withdraw` and `Modify` without `Add` when the money amount is exactly `999,999.99$`.
 - Browser storage for saved money amount, 30-day visible `Balance Changes` history, and `Saving` squares.
 - Same-browser multiple tab or window updates, where a successful saved change in one tab or window automatically updates other open tabs or windows to the latest saved data.
 - No normal user-controlled reset, clear-all-data, or start-fresh action in the first version; `Start again` appears only for broken or unreadable saved data.
@@ -93,7 +101,7 @@ Included in the first version:
 - Delete support for `Balance Changes` entries that opens from `600ms` press-and-hold or click-and-hold, cancels the pending hold on early release, pointer or finger movement, or scrolling before `600ms`, shows one little `Delete` and `Cancel` square in the middle of the screen after a completed hold, closes that little square on `Cancel`, outside click, or browser Back without changing anything, keeps it open during pointer or finger movement and scrolling, asks for confirmation with `Delete this Balance Change?` after `Delete` is chosen, shows `Cancel` and `Delete` in the confirmation, closes the confirmation on `Cancel`, outside click, or browser Back without changing anything, removes only the visible history entry after the confirmation `Delete` is clicked, and does not offer undo.
 - A failed `Balance Changes` deletion keeps its confirmation and message available without a timer until the user retries or closes it; an expired selected entry or newer information from another tab or window closes and discards the stale confirmation and message.
 - Responsive layout for mobile and desktop.
-- Clear trust wording that this is a manual cash tracking tool, not a real bank, using the exact website name and short trust label `Manual Cash Tracker`.
+- Clear wording that this is a manual cash tracking tool, not a real bank.
 - Browser storage save failure handling that blocks the valid action, keeps the last successfully saved visible state, shows `Changes could not be saved.`, and leaves retryable inputs or confirmations open.
 - Global open temporary UI priority that allows only one temporary UI at a time and prevents one click, tap, or hold from opening a second temporary UI while another one is open.
 
@@ -118,7 +126,7 @@ Out of scope for the first version:
 - The money amount should always be easy to find and understand.
 - Manual money changes should feel quick, low-friction, and safe.
 - The interface can look bank-like, but the wording must not imply real banking.
-- The website should use plain language: "Current Balance", "Add money", "Subtract money", "Modify amount", and "Saved cash".
+- The website should use plain language: "Current Balance", "Add money", "Subtract money", "Modify amount", and "Saved cash". The exact visible main money action button is `Withdraw`; it starts the normal Subtract behavior and does not describe a bank action.
 - Use `Current Balance` as the user-facing label for the main money amount.
 - Use `Savings money amount` as the user-facing label for the money amount shown at the top of `Savings`.
 - Use `money amount` in specs and implementation planning when explaining what the value means.
@@ -142,7 +150,6 @@ Primary areas:
 - Savings
 
 Dashboard content:
-- Exact website name and short trust label `Manual Cash Tracker`.
 - Main money amount with the user-facing label `Current Balance`; selecting it reveals only the actions available for its current value.
 - A `Balance Changes` section that keeps every current entry reachable.
 - The exact action `Savings`, which remains reachable whether `Balance Changes` is empty or contains entries.
@@ -246,18 +253,18 @@ Tasks:
 - Build the dashboard screen.
 - Display the main money amount prominently with the label `Current Balance`.
 - Make the main money amount clickable.
-- Show `Add` and `Modify`, but not `Subtract`, when the user clicks the main money amount at `0.00$`.
-- Show `Add`, `Subtract`, and `Modify` when the user clicks the main money amount above `0.00$` and below `999,999.99$`.
-- Show `Subtract` and `Modify`, but not `Add`, when the user clicks the main money amount at exactly `999,999.99$`.
+- Show `Add` and `Modify`, but not `Withdraw`, when the user clicks the main money amount at `0.00$`.
+- Show `Add`, `Withdraw`, and `Modify` when the user clicks the main money amount above `0.00$` and below `999,999.99$`.
+- Show `Withdraw` and `Modify`, but not `Add`, when the user clicks the main money amount at exactly `999,999.99$`.
 - Render visible main money actions as buttons lined together horizontally near the main money amount.
 - Order the two visible main money action buttons at `0.00$` from left to right as `Add`, then `Modify`.
-- Order the three visible main money action buttons from left to right as `Add`, `Subtract`, and `Modify`.
-- Order the two visible main money action buttons at `999,999.99$` from left to right as `Subtract`, then `Modify`.
+- Order the three visible main money action buttons from left to right as `Add`, `Withdraw`, and `Modify`.
+- Order the two visible main money action buttons at `999,999.99$` from left to right as `Withdraw`, then `Modify`.
 - Hide the main money action buttons when the user clicks or taps the main money amount again, without changing anything, saving anything, creating a `Balance Changes` entry, or showing a message.
 - Hide the main money action buttons when the user clicks or taps outside the main money amount and outside the visible action buttons, without changing anything, saving anything, creating a `Balance Changes` entry, or showing a message.
 - Hide the main money action buttons when the user scrolls the dashboard page, without changing anything, saving anything, creating a `Balance Changes` entry, or showing a message.
-- Start the selected money amount input flow when the user clicks `Add`, `Subtract`, or `Modify`; these action-button clicks should not be treated as outside clicks.
-- Hide the visible main money action buttons when the selected money amount input flow starts, remember the selected action internally only, and do not show a visible `Add`, `Subtract`, or `Modify` reminder inside the open input flow.
+- Start the selected money amount input flow when the user clicks `Add`, `Withdraw`, or `Modify`; these action-button clicks should not be treated as outside clicks.
+- Hide the visible main money action buttons when the selected money amount input flow starts, remember the selected action internally only, and do not show a visible `Add`, `Withdraw`, or `Modify` reminder inside the open input flow.
 - Include a `Balance Changes` section on the dashboard and keep every current entry reachable.
 - Keep the exact `Savings` action reachable whether `Balance Changes` is empty or contains entries.
 - Add clear manual-tracker wording.
@@ -265,18 +272,18 @@ Tasks:
 
 Acceptance criteria:
 - The complete main money amount remains readable without horizontal overflow or overlapping required actions.
-- Clicking the main money amount at `0.00$` reveals `Add` and `Modify`, but not `Subtract`.
-- Clicking the main money amount above `0.00$` and below `999,999.99$` reveals `Add`, `Subtract`, and `Modify`.
-- Clicking the main money amount at exactly `999,999.99$` reveals `Subtract` and `Modify`, but not `Add`.
+- Clicking the main money amount at `0.00$` reveals `Add` and `Modify`, but not `Withdraw`.
+- Clicking the main money amount above `0.00$` and below `999,999.99$` reveals `Add`, `Withdraw`, and `Modify`.
+- Clicking the main money amount at exactly `999,999.99$` reveals `Withdraw` and `Modify`, but not `Add`.
 - The visible money actions are visually connected to the main money amount.
 - At `0.00$`, the visible money actions are horizontal buttons, with the two-button order `Add`, then `Modify`.
-- The visible money actions are horizontal buttons, with the three-button order `Add`, `Subtract`, and `Modify`.
-- At `999,999.99$`, the visible money actions are horizontal buttons, with the two-button order `Subtract`, then `Modify`.
+- The visible money actions are horizontal buttons, with the three-button order `Add`, `Withdraw`, and `Modify`.
+- At `999,999.99$`, the visible money actions are horizontal buttons, with the two-button order `Withdraw`, then `Modify`.
 - Clicking or tapping the main money amount again while the visible money actions are open hides the visible money actions without changing anything.
 - Clicking or tapping outside the main money amount and outside the visible action buttons hides the visible money actions without changing anything.
 - Scrolling the dashboard page while the visible money actions are open hides the visible money actions without changing anything.
-- Clicking `Add`, `Subtract`, or `Modify` starts the selected money amount input flow instead of hiding the visible money actions as an outside click.
-- When the selected money amount input flow starts, the visible main money action buttons are hidden and the open input flow does not show a visible `Add`, `Subtract`, or `Modify` reminder.
+- Clicking `Add`, `Withdraw`, or `Modify` starts the selected money amount input flow instead of hiding the visible money actions as an outside click.
+- When the selected money amount input flow starts, the visible main money action buttons are hidden and the open input flow does not show a visible `Add`, `Withdraw`, or `Modify` reminder.
 - `Balance Changes` is available from the dashboard and keeps every current entry reachable.
 - The `Savings` action remains reachable whether `Balance Changes` is empty or contains entries.
 - There is no separate `View history` action for money amount change history.
@@ -290,7 +297,7 @@ Tasks:
 - Build subtract money flow.
 - Build silent modify/correct money amount flow.
 - Validate amount inputs.
-- Use the shared money amount entry flow for `Add`, `Subtract`, and `Modify` without requiring a particular shape, position, size, or visual arrangement.
+- Use the shared money amount entry flow after the user chooses `Add`, `Withdraw`, or `Modify`, without requiring a particular shape, position, size, or visual arrangement. `Withdraw` starts the Subtract behavior.
 - Keep other dashboard controls inactive while a main money amount input flow is open.
 - Treat the input flow as the active interaction context. Clicking or tapping outside it should act like `Cancel`: close the flow, return to the dashboard money amount view, change nothing, save nothing, create no `Balance Changes` entry, and show no message. That interaction should not reopen the main money action buttons.
 - Start the money amount input at `0.00`.
@@ -309,7 +316,7 @@ Tasks:
 - Block typed characters that would make a main money action input greater than `999,999.99`, with no message and no field change.
 - Keep money amounts up to `999,999.99$` and every required control readable and usable in the input flow, dashboard, `Balance Changes`, and `Savings` without rejecting valid values or omitting required comma separators.
 - Show the exact text `Save Changes` and provide actions exactly named `Cent`, `Yes`, and `Cancel` without requiring a particular visual arrangement.
-- Make `Yes` apply the selected `Add`, `Subtract`, or `Modify` action.
+- Make `Yes` apply the selected behavior: Add after `Add`, Subtract after `Withdraw`, or Modify after `Modify`.
 - After a successful `Add`, `Subtract`, or `Modify` that changes the money amount, close the input flow, reset the temporary typed input so the next main money amount input starts at `0.00`, return to the dashboard money amount view, hide the main money action buttons, show the updated money amount, save only the data required by that action, and show no message.
 - After a failed save, keep the input flow and entered amount, and show `Changes could not be saved.` while the failed flow remains unchanged.
 - Remove the previous save-failure message when the user changes the amount, chooses `Yes` to retry, or closes the flow. Show it again if the retry also fails, and do not carry it into a later new flow.
@@ -324,10 +331,10 @@ Tasks:
 
 Acceptance criteria:
 - The default `0.00$` starting state does not create a `Balance Changes` entry.
-- At `0.00$`, the main money amount shows `Add` and `Modify`, but not `Subtract`, when clicked.
+- At `0.00$`, the main money amount shows `Add` and `Modify`, but not `Withdraw`, when clicked.
 - Adding money increases the money amount and creates a positive `Balance Changes` entry.
-- After adding money above `0.00$` and below `999,999.99$`, the main money amount shows `Add`, `Subtract`, and `Modify` when clicked.
-- If a successful `Add` makes the money amount exactly `999,999.99$`, the main money amount shows `Subtract` and `Modify`, but not `Add`, when clicked.
+- After adding money above `0.00$` and below `999,999.99$`, the main money amount shows `Add`, `Withdraw`, and `Modify` when clicked.
+- If a successful `Add` makes the money amount exactly `999,999.99$`, the main money amount shows `Withdraw` and `Modify`, but not `Add`, when clicked.
 - Subtracting money decreases the money amount and creates a negative `Balance Changes` entry.
 - Subtracting more than the current money amount sets the money amount to `0.00$` instead of creating a negative money amount.
 - Subtracting when the current money amount is `0.00$` keeps the money amount at `0.00$` and does not create a history entry.
@@ -366,8 +373,8 @@ Acceptance criteria:
 - Clicking `Yes` while the input is `0.00` in `Add` or `Subtract` does nothing: no message, no money amount change, no saved data change, no `Balance Changes` entry, and the same money amount input step stays open.
 - Clicking `Yes` in `Modify` with the same money amount that is already shown does nothing: no message, no money amount change, no saved data change, no browser storage creation or update, no `Balance Changes` entry, no `Balance Changes` cleanup, and the same money amount input step stays open until the user enters a different valid money amount or cancels.
 - Clicking `Yes` while the input is `0.00` in `Modify` replaces the main money amount with `0.00$` only when the current money amount is greater than `0.00$`.
-- Modifying the money amount to `0.00$` makes the next main money amount click show `Add` and `Modify`, but not `Subtract`.
-- Modifying the money amount to `999,999.99$` makes the next main money amount click show `Subtract` and `Modify`, but not `Add`.
+- Modifying the money amount to `0.00$` makes the next main money amount click show `Add` and `Modify`, but not `Withdraw`.
+- Modifying the money amount to `999,999.99$` makes the next main money amount click show `Withdraw` and `Modify`, but not `Add`.
 
 ### Milestone 4: Balance Changes
 
@@ -821,17 +828,17 @@ Acceptance criteria:
 1. User opens the website.
 2. If no saved money amount exists yet, website shows `0.00$` labeled as `Current Balance`.
 3. User clicks the main money amount.
-4. Website shows `Add` and `Modify`, but not `Subtract`.
+4. Website shows `Add` and `Modify`, but not `Withdraw`.
 5. User chooses `Add`.
 6. User enters an amount greater than `0.00$`.
 7. Website updates the money amount and saves the add action as `+{money amount} added`.
 8. After the money amount is greater than `0.00$`, user clicks the main money amount.
-9. If the money amount is greater than `0.00$` and less than `999,999.99$`, website shows `Add`, `Subtract`, and `Modify`.
-10. If the money amount is exactly `999,999.99$`, website shows `Subtract` and `Modify`, but not `Add`.
+9. If the money amount is greater than `0.00$` and less than `999,999.99$`, website shows `Add`, `Withdraw`, and `Modify`.
+10. If the money amount is exactly `999,999.99$`, website shows `Withdraw` and `Modify`, but not `Add`.
 11. User chooses one visible action.
 12. User enters an amount.
 13. Website updates the money amount.
-14. If the action is `Add` or `Subtract`, website saves it as its own history entry with the correct display type.
+14. If the action is `Add` or `Withdraw`, website saves the resulting Add or Subtract change as its own history entry with the correct display type.
 15. If the action is `Modify` and the entered money amount is different from the money amount already shown, website updates the current money amount without saving history or showing a notification.
 16. Website shows money amount change history in `Balance Changes` on the dashboard.
 17. Website saves the updated data in browser storage.
@@ -883,8 +890,8 @@ Acceptance criteria:
 - Discarded unsaved `Saving` input should not save browser storage, create a `Balance Changes` entry, show a browser leave warning, or show a message.
 - `Add` should be available only when the money amount is less than `999,999.99$`, including when the money amount is `0.00$`.
 - `Modify` should be available when the money amount is from `0.00$` through `999,999.99$`.
-- `Subtract` should be available only when the money amount is greater than `0.00$`.
-- At exactly `999,999.99$`, the visible main money actions should be `Subtract` and `Modify`, with no `Add`.
+- The visible `Withdraw` button should be available only when the money amount is greater than `0.00$`.
+- At exactly `999,999.99$`, the visible main money actions should be `Withdraw` and `Modify`, with no `Add`.
 - Add and subtract amounts must be greater than `0.00$` and not greater than `999,999.99$`.
 - Clicking `Yes` while the input is `0.00` in `Add` or `Subtract` should do nothing: no message, no money amount change, no saved data change, no `Balance Changes` entry, and the same money amount input step stays open.
 - Modify amounts must be from `0.00$` through `999,999.99$`.
@@ -989,7 +996,7 @@ Acceptance criteria:
 
 Avoid:
 - Deposit to bank.
-- Withdraw from bank.
+- Wording that says or suggests `Withdraw from bank`; the standalone `Withdraw` main money button is the only approved exception.
 - Real account number.
 - Card-related money wording.
 - Bank transfer.
@@ -998,11 +1005,11 @@ Avoid:
 Use:
 - Add money.
 - Subtract money.
+- `Withdraw` only as the exact visible main money button label.
 - Modify amount.
 - Current Balance.
 - Savings money amount.
 - Saved cash.
-- Manual Cash Tracker.
 
 ## Testing Checklist
 
@@ -1016,20 +1023,20 @@ Use:
 - Refreshing, closing, or reopening while temporary UI is open does not save unsaved typed input, confirm a pending delete, save a pending reorder, create a `Balance Changes` entry, show a message, or show a browser leave warning.
 - Showing the default `0.00$` money amount does not create saved browser data by itself.
 - The default `0.00$` starting state does not create a `Balance Changes` entry.
-- Clicking the main money amount at `0.00$` shows `Add` and `Modify`, but not `Subtract`.
-- After a successful add above `0.00$` and below `999,999.99$`, clicking the main money amount shows `Add`, `Subtract`, and `Modify`.
-- After a successful `Add` makes the money amount exactly `999,999.99$`, clicking the main money amount shows `Subtract` and `Modify`, but not `Add`.
-- After `Modify` sets the money amount to `0.00$`, clicking the main money amount shows `Add` and `Modify`, but not `Subtract`.
-- After `Modify` sets the money amount to `999,999.99$`, clicking the main money amount shows `Subtract` and `Modify`, but not `Add`.
+- Clicking the main money amount at `0.00$` shows `Add` and `Modify`, but not `Withdraw`.
+- After a successful add above `0.00$` and below `999,999.99$`, clicking the main money amount shows `Add`, `Withdraw`, and `Modify`.
+- After a successful `Add` makes the money amount exactly `999,999.99$`, clicking the main money amount shows `Withdraw` and `Modify`, but not `Add`.
+- After `Modify` sets the money amount to `0.00$`, clicking the main money amount shows `Add` and `Modify`, but not `Withdraw`.
+- After `Modify` sets the money amount to `999,999.99$`, clicking the main money amount shows `Withdraw` and `Modify`, but not `Add`.
 - At `0.00$`, main money actions appear as horizontal buttons ordered `Add`, then `Modify`.
-- Main money actions appear as horizontal buttons near the main money amount, ordered `Add`, `Subtract`, and `Modify` when all three are visible.
-- At `999,999.99$`, main money actions appear as horizontal buttons ordered `Subtract`, then `Modify`.
+- Main money actions appear as horizontal buttons near the main money amount, ordered `Add`, `Withdraw`, and `Modify` when all three are visible.
+- At `999,999.99$`, main money actions appear as horizontal buttons ordered `Withdraw`, then `Modify`.
 - Clicking or tapping the main money amount again while the visible main money action buttons are open hides those buttons without changing anything.
 - Clicking or tapping outside the main money amount and outside the visible action buttons hides the visible main money action buttons without changing anything.
 - Scrolling the dashboard page while the visible main money action buttons are open hides those buttons without changing anything.
-- Clicking `Add`, `Subtract`, or `Modify` starts the selected money amount input flow and does not count as an outside click.
+- Clicking `Add`, `Withdraw`, or `Modify` starts the selected money amount input flow and does not count as an outside click.
 - Add money updates the money amount correctly.
-- `Add`, `Subtract`, and `Modify` use the same money amount entry flow without requiring a particular shape, position, size, or visual arrangement.
+- `Add`, `Withdraw`, and `Modify` use the same money amount entry flow without requiring a particular shape, position, size, or visual arrangement; `Withdraw` uses the Subtract behavior.
 - The money amount entry flow is the active interaction context while open, and other dashboard controls are inactive.
 - The money amount input starts at `0.00`.
 - The money amount input is focused and ready for typing immediately when it opens, without requiring another tap or click.

@@ -6,7 +6,7 @@ Spec type: `TechnicalSpec`
 
 Implements: [`FEATURE-SPEC-020: Opening Main Money Actions`](FEATURE-SPEC-020-opening-main-money-actions.md)
 
-Covers: deriving the available main money actions and opening, choosing, or closing them from the dashboard.
+Covers: deriving the available main money actions, mapping the internal Subtract action to the visible `Withdraw` button label, and opening, choosing, or closing the actions from the dashboard.
 
 Status: `Accepted`
 
@@ -42,7 +42,9 @@ function selectMainMoneyActions(
 }
 ```
 
-The selector accepts only an integer from `0` through `99_999_999`. A `true` value means that action is available. Map the internal actions to the exact visible texts `Add`, `Subtract`, and `Modify`.
+The selector accepts only an integer from `0` through `99_999_999`. A `true` value means that action is available. Map the internal actions to the exact visible texts `Add`, `Withdraw`, and `Modify`: internal `add` maps to `Add`, internal `subtract` maps to `Withdraw`, and internal `modify` maps to `Modify`.
+
+Keep `"subtract"` as the internal action value and in the entry descriptor. Do not introduce `"withdraw"` into internal action state, saved data, executor names, or `Balance Changes` records. The visible `Withdraw` label does not change the required `subtracted` history text.
 
 The availability object is used only to decide which actions are available.
 
@@ -117,8 +119,8 @@ Refresh, close, back-forward-cache restoration, and a newer cross-tab state disc
 Verify that:
 
 - `0.00$` produces only `Add` and `Modify`;
-- an amount between the limits produces `Add`, `Subtract`, and `Modify`;
-- `999,999.99$` produces only `Subtract` and `Modify`;
+- an amount between the limits produces `Add`, `Withdraw`, and `Modify`;
+- `999,999.99$` produces only `Withdraw` and `Modify`;
 - availability always comes from the latest ready-state integer cents and is used only to decide which actions are available;
 - a ready dashboard begins with the actions closed;
 - the interaction context begins with the initial pointer, touch, or keyboard activation and is reused through any resulting click;

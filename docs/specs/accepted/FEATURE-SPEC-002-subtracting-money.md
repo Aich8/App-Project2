@@ -12,17 +12,19 @@ Status: `Accepted`
 
 The user can record a decrease in their real cash by subtracting a money amount from the amount already tracked by the website.
 
-`Subtract` represents a normal cash change. It does not replace or silently correct the full money amount.
+The exact visible button label that starts this feature is `Withdraw`. It represents the same normal cash subtraction and does not mean the website holds or moves money. It does not replace or silently correct the full money amount.
+
+`Balance Changes` continues to describe a successful result as `-{money amount actually removed} subtracted`.
 
 ## Availability
 
-- `Subtract` is available only when the main money amount is greater than `0.00$`.
-- `Subtract` is unavailable when the main money amount is `0.00$`.
+- `Withdraw` is available only when the main money amount is greater than `0.00$`.
+- `Withdraw` is unavailable when the main money amount is `0.00$`.
 - The user may subtract money rarely or many times in one day. The feature has no usage schedule or frequency limit.
 
 ## Action Rules
 
-- The user chooses `Subtract`, enters the money amount to subtract, and confirms the action.
+- The user chooses `Withdraw`, enters the money amount to subtract, and confirms the action.
 - The entered money amount must be greater than `0.00$` and no greater than `999,999.99$`.
 - A valid confirmed amount lowers the existing main money amount; it does not replace that amount.
 - The main money amount must never become negative.
@@ -41,7 +43,7 @@ The user can record a decrease in their real cash by subtracting a money amount 
 - Confirming `0.00$` creates no `Balance Changes` entry and shows no message.
 - After confirming `0.00$`, the Subtract flow remains open so the user can enter a valid amount or cancel.
 - A negative amount or an entered amount above `999,999.99$` is not applied.
-- Because `Subtract` is unavailable at `0.00$`, no subtraction or `Balance Changes` entry can be created from that state.
+- Because `Withdraw` is unavailable at `0.00$`, no subtraction or `Balance Changes` entry can be created from that state.
 
 ## Successful Result
 
@@ -50,7 +52,7 @@ The user can record a decrease in their real cash by subtracting a money amount 
 - The updated main money amount is shown to the user.
 - One separate negative `Balance Changes` entry is created as `-{money amount actually removed} subtracted`.
 - The completed Subtract flow closes, and no success message appears.
-- If the result is `0.00$`, `Subtract` is no longer available.
+- If the result is `0.00$`, `Withdraw` is no longer available.
 
 ## Failure Result
 
@@ -67,6 +69,6 @@ The user can record a decrease in their real cash by subtracting a money amount 
 
 ## Acceptance Expectations
 
-- A valid Subtract decreases the main money amount without allowing a negative result.
-- Every successful Subtract creates exactly one matching negative `Balance Changes` entry for the amount actually removed.
-- Invalid, canceled, or failed Subtract attempts do not change the main money amount or create history.
+- Choosing `Withdraw` and confirming a valid amount decreases the main money amount without allowing a negative result.
+- Every successful action started through `Withdraw` creates exactly one matching negative `Balance Changes` entry for the amount actually removed.
+- Invalid, canceled, or failed attempts started through `Withdraw` do not change the main money amount or create history.

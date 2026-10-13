@@ -16,21 +16,22 @@ The user can see which actions are currently available for the main money amount
 
 - The main money actions are closed when the dashboard first opens.
 - Selecting the main money amount opens its available actions.
-- The actions use the exact names `Add`, `Subtract`, and `Modify`.
+- The actions use the exact names `Add`, `Withdraw`, and `Modify`.
+- `Withdraw` is the visible button label for the Subtract action. It does not change the `subtracted` wording used in `Balance Changes`.
 - Opening the actions does not change or save any information.
 - Opening the actions creates no `Balance Changes` entry and shows no message.
 
 ## Available Actions
 
-- When the main money amount is `0.00$`, `Add` and `Modify` are available. `Subtract` is not available.
-- When the main money amount is greater than `0.00$` and less than `999,999.99$`, `Add`, `Subtract`, and `Modify` are available.
-- When the main money amount is `999,999.99$`, `Subtract` and `Modify` are available. `Add` is not available.
+- When the main money amount is `0.00$`, `Add` and `Modify` are available. `Withdraw` is not available.
+- When the main money amount is greater than `0.00$` and less than `999,999.99$`, `Add`, `Withdraw`, and `Modify` are available.
+- When the main money amount is `999,999.99$`, `Withdraw` and `Modify` are available. `Add` is not available.
 - Only the actions available for the current main money amount are shown.
 
 ## Choosing An Action
 
 - Choosing `Add` starts the Add flow defined by `FEATURE-SPEC-001: Adding Money`.
-- Choosing `Subtract` starts the Subtract flow defined by `FEATURE-SPEC-002: Subtracting Money`.
+- Choosing `Withdraw` starts the Subtract flow defined by `FEATURE-SPEC-002: Subtracting Money`.
 - Choosing `Modify` starts the Modify flow defined by `FEATURE-SPEC-003: Modifying The Money Amount`.
 - The open main money actions close when the selected flow starts.
 
